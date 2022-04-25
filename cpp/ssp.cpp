@@ -14,12 +14,9 @@ Columbia Optimizer Framework
 
 /*  ssp.cpp -   search space implementation */
 
-#include "stdafx.h"
-#include "tasks.h"
+#include "../header/stdafx.h"
+#include "../header/tasks.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 #define SHRINK_INERVAL  10000
 #define MAX_AVAIL_MEM	40000000	// available memory bound to 50M
@@ -48,7 +45,7 @@ void SSP::Init()
 	if(COVETrace)	//End Initializing Search Space
 	{
 		CString os = "EndInit\r\n";
-		OutputCOVE.Write(os, os.GetLength());
+		OutputCOVE << (os) << endl;
 	}
 }
 
@@ -56,11 +53,11 @@ void SSP::Init()
 //##ModelId=3B0C0865005E
 SSP::~SSP()
 {
-	for(int i=0; i< Groups.GetSize();i++)
+	for(int i=0; i< Groups.size();i++)
 		delete Groups[i] ;
-	for (int j=0; j< M_WINNER::mc.GetSize(); j++)
+	for (int j=0; j< M_WINNER::mc.size(); j++)
 		delete M_WINNER::mc[j];
-	M_WINNER::mc.RemoveAll();
+	M_WINNER::mc.clear();
 	delete [] HashTbl;
 }
 
@@ -90,7 +87,7 @@ CString SSP::DumpChanged()
     CString os;
     GROUP* Group;
     
-	for(int i=0; i< Groups.GetSize();i++)
+	for(int i=0; i< Groups.size();i++)
 		if(Groups[i]->is_changed()) 
 		{
 			Group = Groups[i];
@@ -105,7 +102,7 @@ CString SSP::DumpChanged()
 //##ModelId=3B0C086500C3
 void SSP::Shrink()
 {
-	for(int i=InitGroupNum; i<Groups.GetSize();i++)	ShrinkGroup(i) ;
+	for(int i=InitGroupNum; i<Groups.size();i++)	ShrinkGroup(i) ;
 }
 
 //##ModelId=3B0C086500B9
@@ -193,7 +190,7 @@ CString SSP::Dump()
     
 	os.Format("%s%d%s","RootGID:" , RootGID , "\r\n");
     
-	for(int i=0; i< Groups.GetSize();i++)
+	for(int i=0; i< Groups.size();i++)
 	{
 		Group = Groups[i];
 		os += Group->Dump();
@@ -208,7 +205,7 @@ void SSP::FastDump()
 {
 	TRACE_FILE("SSP Content: RootGID: %d\r\n" , RootGID);
     
-	for(int i=0; i< Groups.GetSize();i++)
+	for(int i=0; i< Groups.size();i++)
 	{
 		Groups[i]->FastDump() ;
 		Groups[i]->set_changed(false);
@@ -373,7 +370,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 		// insert the new group into ssp
 		GrpID = Group->GetGroupID();
 		
-		if(GrpID >= Groups.GetSize() )	Groups.SetSize( GrpID + 1 );
+		if(GrpID >= Groups.size() )	Groups.resize( GrpID + 1 );
 		Groups[GrpID] = Group;
 		
 		
@@ -393,7 +390,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 			
 			// get the relevant attributes from the schema for this group
 			tmpKeySet = (((LOG_COLL_PROP *)(Group->get_log_prop()))->Schema)->AttrStore();
-			int ksize = tmpKeySet->GetSize();
+			int ksize = tmpKeySet->size();
 			
 			M_WINNER *MWin = new M_WINNER(ksize+1);	
 			for (int i=1; i<ksize+1; i++)
@@ -726,7 +723,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 //##ModelId=3B0C086700A7
     WINNER * GROUP::GetWinner(PHYS_PROP * PhysProp)
     {
-		int Size = Winners.GetSize();
+		int Size = Winners.size();
         for(int i = 0; i<Size; i++)
 		{
 			PHYS_PROP * WinPhysProp = Winners[i] -> GetPhysProp();
@@ -746,19 +743,19 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 		if(COVETrace && MExpr)	//New Winner
 		{
 			CString os;
-			os.Format("NewWin %d \"%s\"%s  { %d %d \"%s\" %s }\r\n",
+			os.Format("NewWin %d \"%s\"%s  { %d %p \"%s\" %s }\r\n",
 				MExpr -> GetGrpID(), ReqdProp -> Dump(), TotalCost -> Dump(),
-				MExpr -> GetGrpID(),int(MExpr), 
+				MExpr -> GetGrpID(),(MExpr), 
 				MExpr -> Dump(), done?"Done":"Not Done");
 			
-			OutputCOVE.Write(os, os.GetLength());
+			OutputCOVE << (os) << endl;
 			
 		}
 		
 		this -> set_changed(true);
 		
 		//Seek winner with property ReqdProp in the winner's circle
-        for(int i = Winners.GetSize(); --i>=0;)
+        for(int i = Winners.size(); --i>=0;)
 		{
 			if( *(Winners[i] -> GetPhysProp()) == *ReqdProp) 
 			{
@@ -770,7 +767,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 		}
 		
 		//No matching winner for this property
-		Winners . Add(new WINNER(MExpr, ReqdProp, TotalCost, done));
+		Winners . push_back(new WINNER(MExpr, ReqdProp, TotalCost, done));
 		
 		return;
     }
@@ -780,7 +777,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
     {
 		//Search Winner's circle.  If there is a winner done, return true
 		
-		int Size = Winners.GetSize();
+		int Size = Winners.size();
 		
 		for(int i = 0; i<Size; i++)
 		{
@@ -823,7 +820,7 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
     };
     
 //##ModelId=3B0C08680192
-    CArray< M_WINNER * , M_WINNER* > M_WINNER::mc;
+    vector<  M_WINNER* > M_WINNER::mc;
 //##ModelId=3B0C086801A4
 	COST M_WINNER::InfCost(-1);
 	
@@ -841,13 +838,13 @@ M_EXPR*	SSP::CopyIn(EXPR * Expr, GRP_ID& GrpID)
 		
 		//Create initial context, with no requested properties, infinite upper bound,
 		// zero lower bound, not yet done.  Later this may be specified by user.
-		if (CONT::vc.GetSize() == 0)
+		if (CONT::vc.size() == 0)
 		{
 			CONT * InitCont = new CONT( new PHYS_PROP(any), new COST(-1), false);
 			//Make this the first context
-			CONT::vc.Add (InitCont);
+			CONT::vc.push_back (InitCont);
 		}
-		//assert(CONT::vc.GetSize() == 1);
+		//assert(CONT::vc.size() == 1);
 		
 		// start optimization with root group, 0th context, parent task of zero.  
 		if (GlobepsPruning)

@@ -13,15 +13,12 @@ as defined in physop.h
 	
 */
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
-#include "physop.h"
-#include "cat.h"
-#include "cm.h"
+#include "../header/physop.h"
+#include "../header/cat.h"
+#include "../header/cm.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 /* need for group pruning, calculate the TouchCopy cost of the expr
 TouchCopyCost = 
@@ -110,8 +107,8 @@ PHYS_PROP * FILE_SCAN::FindPhysProp(PHYS_PROP ** input_phys_props)
 	else
 	{	PHYS_PROP * phys_prop = new PHYS_PROP(new KEYS_SET(*(CollProp->Keys)), CollProp->Order); 
 	if (CollProp->Order == sorted)
-		for (int i=0; i<CollProp->KeyOrder.GetSize(); i++)
-			phys_prop->KeyOrder.Add(CollProp->KeyOrder[i]);
+		for (int i=0; i<CollProp->KeyOrder.size(); i++)
+			phys_prop->KeyOrder.push_back(CollProp->KeyOrder[i]);
 		return phys_prop;
 	}
 	
@@ -550,7 +547,7 @@ PHYS_PROP * MERGE_JOIN::InputReqdProp(PHYS_PROP * PhysProp, LOG_PROP * InputLogP
 	
 	PHYS_PROP * result = new PHYS_PROP(Keys, sorted );	// require sort on input
 	//the KeyOrder is ascending for all keys
-	for (int i=0; i<size; i++) result->KeyOrder.Add(ascending);
+	for (int i=0; i<size; i++) result->KeyOrder.push_back(ascending);
 	
 	return result;
 	
@@ -568,7 +565,7 @@ PHYS_PROP * MERGE_JOIN::FindPhysProp(PHYS_PROP ** input_phys_props)
 	
 	PHYS_PROP * result = new PHYS_PROP( Keys, sorted );	//sorted on lattrs, and rattrs
 	//the KeyOrder is ascending for all keys
-	for (int i=0; i<size+size; i++) result->KeyOrder.Add(ascending);
+	for (int i=0; i<size+size; i++) result->KeyOrder.push_back(ascending);
 	
 	return result;
 }//MERGE_JOIN::FindPhysProp
@@ -956,7 +953,7 @@ COST * HGROUP_LIST::FindLocalCost (
     // Need to have a cost for 0 tuples case	+ 1 ?? 
     COST * result = new COST (
 		InputCard *( Cm->hash_cost()	//cost of hashing
-					   +Cm->cpu_apply()*(AggOps->GetSize()))//apply the aggregate operation
+					   +Cm->cpu_apply()*(AggOps->size()))//apply the aggregate operation
 					   + OutputCard * (Cm->touch_copy())  //copy out the result
 					   );
 	
@@ -982,7 +979,7 @@ PHYS_PROP * HGROUP_LIST::FindPhysProp(PHYS_PROP ** input_phys_props)
 	Keys = new KEYS_SET(GbyAtts, GbySize);
 	
 	PHYS_PROP * result = new PHYS_PROP( Keys, sorted );	//sorted on group_by attributes
-	for (int i=0; i<GbySize; i++) result->KeyOrder.Add(ascending);
+	for (int i=0; i<GbySize; i++) result->KeyOrder.push_back(ascending);
 	
 	return result;
 }//HGROUP_LIST::FindPhysProp
@@ -1009,7 +1006,7 @@ CString HGROUP_LIST::Dump()
 	//dump AggOps
 	temp.Format("%s", "( Aggregating: ");
 	os += temp;
-	int NumOps = AggOps->GetSize();
+	int NumOps = AggOps->size();
 	for (i=0; i< NumOps-1; i++)
 	{
 		temp = (* AggOps)[i]->Dump();
@@ -1243,9 +1240,9 @@ COST * INDEXED_FILTER::FindLocalCost (
 	//for model D, redicate must be on a single attribute to use this physical operator. 
 	assert(FreeVar.GetSize() == 1);
 	
-	for (int i=0; i<Indices->GetSize(); i++)
+	for (int i=0; i<Indices->size(); i++)
 	{
-		int IndexId = Indices->GetAt(i);
+		int IndexId = Indices->at(i);
 		if (IndexId == FreeVar[0] //FreeVar is contained in index list
 			&& Cat->GetIndProp(IndexId)->IndType == btree // index type is btree
 			&& Cat->GetIndProp(IndexId)->Clustered == true //index is clustered

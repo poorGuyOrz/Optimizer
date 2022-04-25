@@ -11,12 +11,9 @@ Supported by NSF Grants IRI-9610013 and IRI-9619977
 
   
 */
-#include "stdafx.h"
-#include "query.h"
+#include "../header/stdafx.h"
+#include "../header/query.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 //##ModelId=3B0C086E007F
 EXPR::EXPR(OP * LogOp, EXPR * First, EXPR * Second, 

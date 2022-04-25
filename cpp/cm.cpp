@@ -10,8 +10,8 @@ Columbia Optimizer Framework
   Supported by NSF Grants IRI-9610013 and IRI-9619977
   
 */
-#include "stdafx.h"
-#include "cm.h"
+#include "../header/stdafx.h"
+#include "../header/cm.h"
 
 #define LINEWIDTH 256		// buffer length of one text line
 
@@ -33,26 +33,31 @@ Columbia Optimizer Framework
 #define KEYWORD_IO				"IO:"
 #define KEYWORD_BIT_BF			"BIT_BF:"
 
-#define READ_IN(KEYWORD,Value)	if( p == strstr(p , KEYWORD) ) { \
-									p += strlen(KEYWORD);		 \
-									p = SkipSpace(p);			 \
-									parseString(p);				 \
-									Value = atof(p);			 \
-									continue;	}
-		
-#define ValueToString(KEYWORD,Value)   temp.Format("%s %f\r\n", KEYWORD,Value); \
-										os += temp;
+#define READ_IN(KEYWORD, Value)  \
+  if (p == strstr(p, KEYWORD)) { \
+    p += strlen(KEYWORD);        \
+    p = SkipSpace(p);            \
+    parseString(p);              \
+    Value = atof(p);             \
+    continue;                    \
+  }
+
+#define ValueToString(KEYWORD, Value)       \
+  temp.Format("%s %f\r\n", KEYWORD, Value); \
+  os += temp;
 
 // read catalog text file and store the information into CAT 
 //##ModelId=3B0C0877015F
-CM::CM(CString filename)
+CM::CM(string filename)
 {
 	FILE *fp;		// file handle
 	char TextLine[LINEWIDTH]; // text line buffer
 	char *p;
 	
-	if((fp = fopen(filename,"r"))==NULL) 
-		OUTPUT_ERROR("can not open CM file");
+	if((fp = fopen(filename.c_str(),"r"))==NULL) 
+		// OUTPUT_ERROR("can not open CM file");
+    cout << "can not open CM file" << endl;
+
 	
 	for(;;)
 	{

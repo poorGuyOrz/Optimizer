@@ -11,17 +11,14 @@
 	
 */
 
-#include "stdafx.h"
-#include "tasks.h"
-#include "physop.h"
-#include "cat.h"
+#include "../header/stdafx.h"
+#include "../header/tasks.h"
+#include "../header/physop.h"
+#include "../header/cat.h"
 
 #define NUMOFRULES 20		// Number of elements in the enum RULELABELS in rules.h
 #define LINEWIDTH 256		// buffer length of one text line
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 // use to turn some rules on/off in the optimizer
 
@@ -36,7 +33,7 @@ RULE_SET::RULE_SET(CString filename) : RuleCount(NUMOFRULES)
 	char *p;
 	int rule_count=0;
 	
-	if((fp = fopen(filename,"r"))==NULL) 
+	if((fp = fopen(filename.str_.c_str(),"r"))==NULL) 
 		OUTPUT_ERROR("can not open file 'ruleset'");
 	
 	for(;;)
@@ -186,9 +183,9 @@ CString RULE_SET::DumpStats()
 BINDERY::BINDERY (GRP_ID group_no, EXPR * original)
 :state(start), group_no(group_no), cur_expr(NULL),
 original(original), input(NULL), 
-one_expr(FALSE)               // try all expressions within this group
+one_expr(false)               // try all expressions within this group
 {
-    ASSERT (original);
+    assert (original);
 	
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 } // BINDERY::BINDERY
@@ -196,10 +193,10 @@ one_expr(FALSE)               // try all expressions within this group
 //##ModelId=3B0EA6DA0262
 BINDERY::BINDERY (M_EXPR * expr,  EXPR *  original)
 :state(start), cur_expr(expr), original(original), input(NULL), 
-one_expr(TRUE)	// restricted to this log expr            
+one_expr(true)	// restricted to this log expr            
 {
     group_no = expr -> GetGrpID();
-    ASSERT (original);
+    assert (original);
 	
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 	
@@ -279,7 +276,7 @@ EXPR * BINDERY::extract_expr ()
     State start:
 	If the original pattern is a leaf, we are done.  
 		State = finished
-		Return TRUE
+		Return true
 	Skip over non-logical, non-matching expressions.  
 		State = finished
 		break
@@ -287,7 +284,7 @@ EXPR * BINDERY::extract_expr ()
 	   try to create a binding for each input.
 	If successful
 		State = valid_binding
-		Return TRUE
+		Return true
 	else
 		delete input binderys
 		State = finished
@@ -298,7 +295,7 @@ EXPR * BINDERY::extract_expr ()
 	Increment input bindings in right-to-left order.
 	If we found a next binding, 
 		State = valid_binding
-		return TRUE
+		return true
 	else
 		delete input binderys
 		state = finished
@@ -311,7 +308,7 @@ EXPR * BINDERY::extract_expr ()
 	   this is an expr bindery //we finished the first expression, so done
 	   OR
 	   there is no next expression
-		return FALSE
+		return false
 	else
 		state = start
 		break
@@ -587,7 +584,7 @@ bool BINDERY::advance ()
 						
 						if (! input[other_input_no]->advance() )
 							// Impossible since we found these bindings earlier
-							ASSERT(false) ; 
+							assert(false) ; 
 					}
 					
 					// return overall success
@@ -781,7 +778,7 @@ bool EQ_TO_LOOPS_INDEX::condition ( EXPR * before, M_EXPR *mexpr, int ContextID)
 	int size = ((EQJOIN *) before -> GetOp()) -> size ;
 	
     // Loop thru indices
-    for (int i=0; i < Indices->GetSize(); i++) 
+    for (int i=0; i < Indices->size(); i++) 
 		
 		if ( size == 1 && Cat->GetIndProp((*Indices)[i])->Keys->ContainKey(rattrs[0])) 
 			return ( true );
@@ -1920,8 +1917,8 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  
 	  int i;
 	  AGG_OP_ARRAY * agg_ops = new AGG_OP_ARRAY;
-	  agg_ops->SetSize(Op->AggOps->GetSize());
-	  for (i=0; i<Op->AggOps->GetSize(); i++)
+	  agg_ops->resize(Op->AggOps->size());
+	  for (i=0; i<Op->AggOps->size(); i++)
 	  {
 		  (*agg_ops)[i] = new AGG_OP( *(* Op->AggOps)[i]);
 	  }
@@ -2006,8 +2003,8 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  AGG_LIST * agg_op = (AGG_LIST *) before->GetOp();
 	  int * gby_atts = CopyArray(agg_op->GbyAtts, agg_op->GbySize);
 	  AGG_OP_ARRAY *	agg_ops = new AGG_OP_ARRAY;
-	  agg_ops->SetSize(agg_op->AggOps->GetSize());
-	  for (i=0; i<agg_op->AggOps->GetSize(); i++)
+	  agg_ops->resize(agg_op->AggOps->size());
+	  for (i=0; i<agg_op->AggOps->size(); i++)
 	  {
 		  (*agg_ops)[i] = new AGG_OP( *(*agg_op->AggOps)[i]);
 	  }
@@ -2210,7 +2207,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  if (size == 1 && l_cand_key && BitIndices)
 	  {
 		  // check all the BitIndex
-		  for (int CurrBitIndex =0; CurrBitIndex < BitIndices->GetSize(); CurrBitIndex++)
+		  for (int CurrBitIndex =0; CurrBitIndex < BitIndices->size(); CurrBitIndex++)
 		  {
 			  int index_attr = Cat->GetBitIndProp((*BitIndices)[CurrBitIndex])->IndexAttr;
 			  KEYS_SET *bit_attrs = Cat->GetBitIndProp((*BitIndices)[CurrBitIndex])->BitAttr;
@@ -2293,7 +2290,7 @@ EXPR * EQJOIN_LTOR::next_substitute (EXPR * before,PHYS_PROP * ReqdProp)
 	  
 	  if (Indices && FreeVar.GetSize() == 1)
 	  {
-		  for (int i=0; i<Indices->GetSize(); i++)
+		  for (int i=0; i<Indices->size(); i++)
 		  {
 			  if ((*Cat->GetIndProp((*Indices)[i])->Keys) == FreeVar) return (true);
 		  }

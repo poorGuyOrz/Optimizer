@@ -13,13 +13,9 @@ supp.cpp -  implementation of supplement classes
 	
 */
 
-#include "stdafx.h"
-#include "cat.h"
-#include "item.h"
-
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
+#include "../header/stdafx.h"
+#include "../header/cat.h"
+#include "../header/item.h"
 
 //*************  Hash Function ******************
 //needed for hashing, used for duplicate elimination.  See ../doc/dupelim
@@ -38,10 +34,10 @@ supp.cpp -  implementation of supplement classes
 }
 
 ub4 lookup2( 
-			register ub4  k,	    // the key to be hashed
-			register ub4  initval)  // the previous hash, or an arbitrary value
+			 ub4  k,	    // the key to be hashed
+			 ub4  initval)  // the previous hash, or an arbitrary value
 {
-	register ub4 a,b,c;
+	ub4 a,b,c;
 	
 	/* Set up the internal state */
 	a = b = 0x9e3779b9;  /* the golden ratio; an arbitrary value */
@@ -56,17 +52,17 @@ ub4 lookup2(
 }
 
 ub4 lookup2( 
-			register CString  k,	// the key to be hashed
-			register ub4  length,   // the length of the key
-			register ub4  initval)  // the previous hash, or an arbitrary value
+			 CString  k,	// the key to be hashed
+			 ub4  length,   // the length of the key
+			 ub4  initval)  // the previous hash, or an arbitrary value
 {
-	register ub4 a,b,c,len;
+	 ub4 a,b,c,len;
 	
 	/* Set up the internal state */
 	len = length;
 	a = b = 0x9e3779b9;  /* the golden ratio; an arbitrary value */
 	c = initval;         /* the previous hash value */
-	register i = 0;		// How many bytes of k have we processed so far?
+	int i = 0;		// How many bytes of k have we processed so far?
 	
 	/*---------------------------------------- handle most of the key */
 	while (len >= 12)
@@ -166,11 +162,11 @@ bool KEYS_SET::AddKey(CString CollName, CString KeyName)
 	int AttId = GetAttId(CollName, KeyName);
 	
 	// check duplicate element in vector
-	for(int i=0; i < KeyArray.GetSize(); i++)
+	for(int i=0; i < KeyArray.size(); i++)
 		if(AttId == KeyArray[i]) return false;
 		
 		// if unique
-		KeyArray.Add(AttId);
+		KeyArray.push_back(AttId);
 		
 		return true;
 }
@@ -180,11 +176,11 @@ bool KEYS_SET::AddKey(CString CollName, CString KeyName)
 bool KEYS_SET::AddKey(int AttId)
 {
 	// check duplicate element in vector
-	for(int i=0; i < KeyArray.GetSize(); i++)
+	for(int i=0; i < KeyArray.size(); i++)
 		if(AttId == KeyArray[i]) return false;
 		
 		// if unique
-		KeyArray.Add(AttId);
+		KeyArray.push_back(AttId);
 		
 		return true;
 }
@@ -193,7 +189,7 @@ bool KEYS_SET::AddKey(int AttId)
 bool KEYS_SET::ContainKey(int AttId)
 {
 	// check if the attid is in the vector
-	for(int i=0; i < KeyArray.GetSize(); i++)
+	for(int i=0; i < KeyArray.size(); i++)
 		if(AttId == KeyArray[i]) return true;
 		
 		return false;
@@ -225,7 +221,7 @@ int * KEYS_SET::CopyOutOne(int i)
 //##ModelId=3B0C085F03BD
 void KEYS_SET::update(CString NewName)
 {
-	int Size = KeyArray.GetSize();
+	int Size = KeyArray.size();
 	for(int i=0; i< Size; i++)
 		KeyArray[i] =  GetAttId ( NewName, TruncName(GetAttName(KeyArray[i])));
 }
@@ -257,7 +253,7 @@ int KEYS_SET::ChMaxCuCard()
 		cucard1 = GetAttrCuCard(i);
 		collid = GetCollId(KeyArray[win]);
 		cname2 = GetCollName(collid);
-		if (strcmp(cname1, cname2) == 0)
+		if ((cname1 ==  cname2))
 		{
 			cucard2 = GetAttrCuCard(win);
 			if (cucard1 >= cucard2)
@@ -327,10 +323,10 @@ COLL_PROP::COLL_PROP(COLL_PROP& other)				// copy constructor
 	Card = other.Card;
 	Keys = other.Keys;
 	CandidateKey = other.CandidateKey;
-	for (int i=0; i<other.FKeyArray.GetSize(); i++)
+	for (int i=0; i<other.FKeyArray.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*other.FKeyArray[i]);
-		FKeyArray.Add(fk);
+		FKeyArray.push_back(fk);
 	}
 	Order = other.Order;
 	UCard = other.UCard;
@@ -342,7 +338,7 @@ void COLL_PROP::update(CString NewName)
 {
 	Keys -> update(NewName);
 	CandidateKey -> update(NewName);
-	for (int i=0; i<FKeyArray.GetSize(); i++)
+	for (int i=0; i<FKeyArray.size(); i++)
 	{
 		FKeyArray[i]->update(NewName);
 	}
@@ -367,13 +363,13 @@ CString COLL_PROP::Dump()
 	temp.Format("%s%s%s", "  CandidateKey:" , (*CandidateKey).Dump(), "\r\n" );
 	os += temp;
 	
-	if (FKeyArray.GetSize()>0)
+	if (FKeyArray.size()>0)
 	{
 		temp.Format("%s", "  Foreign Keys:");
 		os += temp;
-		for(int i=0; i< FKeyArray.GetSize(); i++)
+		for(int i=0; i< FKeyArray.size(); i++)
 		{
-			if (i<FKeyArray.GetSize()-1)
+			if (i<FKeyArray.size()-1)
 				temp.Format("%s%s", (*FKeyArray[i]).Dump(), "\r" );
 			else temp.Format("%s%s", (*FKeyArray[i]).Dump(), "\r\n" );
 			os += temp;
@@ -481,7 +477,8 @@ bool    SCHEMA::AddAttr(int Index, ATTR *attr)
 //##ModelId=3B0C08620033
 bool SCHEMA::InSchema(int AttId)
 {
-	for(int i=0;i<Size; i++)
+  int i = 0;
+	for(i=0;i<Size; i++)
 		if( AttId==Attrs[i]->AttId )
 			break;
 		
@@ -532,7 +529,8 @@ SCHEMA * SCHEMA::projection( int * attrs, int size)
     //add attribute sets from left operand
     for (int i = 0;  i < size;  i++)
     {
-		for(int index=0; index < this->Size; index++)
+      int index = 0;
+		for(index=0; index < this->Size; index++)
 		{
 			if ( attrs[i] == this->Attrs[index]->AttId )  
 			{
@@ -686,13 +684,13 @@ CString LOG_COLL_PROP::Dump()
 		os += temp;
 	}
 	
-	if (FKeyList.GetSize()>0)
+	if (FKeyList.size()>0)
 	{
 		temp.Format("%s", "  Foreign Keys:");
 		os += temp;
-		for(int i=0; i< FKeyList.GetSize(); i++)
+		for(int i=0; i< FKeyList.size(); i++)
 		{
-			if (i<FKeyList.GetSize()-1)
+			if (i<FKeyList.size()-1)
 				temp.Format("%s%s", (*FKeyList[i]).Dump(), "\r" );
 			else temp.Format("%s%s", (*FKeyList[i]).Dump(), "\r\n" );
 			os += temp;
@@ -717,19 +715,20 @@ CString LOG_COLL_PROP::DumpCOVE()
 int GetCollId(int AttId)
 {
 	if(AttId == 0 ) return 0;
-	assert( AttId < AttCollTable.GetSize() ) ;
+	assert( AttId < AttCollTable.size() ) ;
 	return AttCollTable [AttId];
 }
 
 // Get the ids from names
 int GetCollId(CString CollName)
 {
-	int Size = CollTable.GetSize();
-	for(int i=0; i < Size; i++)
+	int Size = CollTable.size();
+  int i = 0;
+	for( i=0; i < Size; i++)
 		if( CollName == CollTable[i] ) break;
 		
 		if(i == Size) 
-			CollTable.Add(CollName);
+			CollTable.push_back(CollName);
 		
 		return i;	
 }
@@ -741,16 +740,17 @@ int GetAttId(CString CollName, CString AttName)
 {
 	
 	CString Name = CollName + "." + AttName; 
-	int Size = AttTable.GetSize();
-	for(int i=0; i < Size; i++)
+	int Size = AttTable.size();
+  int i = 0;
+	for( i=0; i < Size; i++)
 	{
 		if( Name == AttTable[i] ) break;
 	}
 	
 	if(i == Size) // the entry not exist, new it
 	{
-		AttTable.Add(Name);
-		AttCollTable.Add( GetCollId(CollName) ) ;
+		AttTable.push_back(Name);
+		AttCollTable.push_back( GetCollId(CollName) ) ;
 	}
 	
 	return i;	
@@ -761,15 +761,16 @@ int GetAttId(CString Name)
 	int pos = Name.Find('.');
 	assert(pos!= -1);
 	
-	int Size = AttTable.GetSize();
+	int Size = AttTable.size();
+  int i = 0;
 	for(int i=0; i < Size; i++)
 		if( Name == AttTable[i] ) break;
 		
 		if(i == Size) // the entry not exist, new it
 		{
-			AttTable.Add(Name);
+			AttTable.push_back(Name);
 			CString CollName = Name.Left(pos);
-			AttCollTable.Add( GetCollId(CollName) ) ;
+			AttCollTable.push_back( GetCollId(CollName) ) ;
 		}
 		
 		return i;	
@@ -779,12 +780,13 @@ int GetAttId(CString Name)
 int GetIndId(CString CollName, CString IndName)
 {
 	CString Name = CollName + "." + IndName; 
-	int Size = IndTable.GetSize();
+  int i = 0;
+	int Size = IndTable.size();
 	for(int i=0; i < Size; i++)
 		if( Name == IndTable[i] ) break;
 		
 		if(i == Size) // the entry not exist, new it
-			IndTable.Add(Name);
+			IndTable.push_back(Name);
 		
 		return i;	
 }
@@ -793,12 +795,13 @@ int GetIndId(CString CollName, CString IndName)
 int GetBitIndId(CString CollName, CString BitIndName)
 {
 	CString Name = CollName + "." + BitIndName; 
-	int Size = BitIndTable.GetSize();
+	int Size = BitIndTable.size();
+  int i = 0;
 	for(int i=0; i < Size; i++)
 		if( Name == BitIndTable[i] ) break;
 		
 		if(i == Size) // the entry not exist, new it
-			BitIndTable.Add(Name);
+			BitIndTable.push_back(Name);
 		
 		return i;	
 }
@@ -807,21 +810,21 @@ int GetBitIndId(CString CollName, CString BitIndName)
 CString GetCollName(int CollId)
 {
 	if( CollId == 0 ) return "";
-	assert( CollId < CollTable.GetSize() ) ;	
+	assert( CollId < CollTable.size() ) ;	
 	return CollTable [CollId];
 }
 
 CString GetAttName(int AttId)
 {
 	if(AttId == 0 ) return "";
-	assert( AttId < AttTable.GetSize() ) ;
+	assert( AttId < AttTable.size() ) ;
 	return AttTable [AttId];
 }
 
 //Transform A.B to B
 CString TruncName(CString AttName)
 {
-	char *p = strstr(AttName, ".");
+	const char *p = strstr(AttName.str_.c_str(), ".");
 	assert(p);  //Input was not of the form A.B
 	p++; //skip over .
 	return p;
@@ -830,14 +833,14 @@ CString TruncName(CString AttName)
 CString GetIndName(int IndId)
 {
 	if(IndId == 0 ) return "";
-	assert( IndId < IndTable.GetSize() ) ;
+	assert( IndId < IndTable.size() ) ;
 	return IndTable [IndId];
 }
 
 CString GetBitIndName(int BitIndId)
 {
 	if(BitIndId == 0 ) return "";
-	assert( BitIndId < BitIndTable.GetSize() ) ;
+	assert( BitIndId < BitIndTable.size() ) ;
 	return BitIndTable [BitIndId];
 }
 
@@ -891,7 +894,7 @@ CString	OrderToString(ORDER p)
 ORDER_INDEX atoIndexOrder(char *p)
 {
 	if(strcmp(p,"btree")==0) return btree;
-	if(strcmp(p,"hash")==0) return hash;
+	if(strcmp(p,"hash")==0) return ORDER_INDEX::hash;
 	OUTPUT_ERROR("Index order type");
 	return btree;
 }
@@ -899,7 +902,7 @@ ORDER_INDEX atoIndexOrder(char *p)
 CString IndexOrderToString(ORDER_INDEX p)
 {
 	if(p==btree) return "btree";
-	if(p==hash) return "hash";
+	if(p==ORDER_INDEX::hash) return "hash";
 	OUTPUT_ERROR("Index order type");
 	return "";
 }
@@ -959,9 +962,9 @@ Order(other.Order)
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New(); 
 	if (Order == sorted) 
 	{
-		assert(other.KeyOrder.GetSize()==other.Keys->GetSize());
-		for (int i=0; i<other.KeyOrder.GetSize(); i++)
-			this->KeyOrder.Add(other.KeyOrder[i]);
+		assert(other.KeyOrder.size()==other.Keys->GetSize());
+		for (int i=0; i<other.KeyOrder.size(); i++)
+			this->KeyOrder.push_back(other.KeyOrder[i]);
 	}
 }
 
@@ -973,8 +976,8 @@ void PHYS_PROP::Merge(PHYS_PROP& other)
 	Keys->Merge(*(other.Keys));
 	if (Order == sorted)
 	{
-		for (int i=0; i<other.KeyOrder.GetSize(); i++)
-			this->KeyOrder.Add(other.KeyOrder[i]);
+		for (int i=0; i<other.KeyOrder.size(); i++)
+			this->KeyOrder.push_back(other.KeyOrder[i]);
 	}
 }
 
@@ -993,10 +996,10 @@ bool PHYS_PROP::operator== (PHYS_PROP & other)
 	{
 		if (Order == sorted)
 		{
-			if (KeyOrder.GetSize() != other.KeyOrder.GetSize())
+			if (KeyOrder.size() != other.KeyOrder.size())
 				return false;
 			
-			for (int i=0; i<KeyOrder.GetSize(); i++)
+			for (int i=0; i<KeyOrder.size(); i++)
 				if (KeyOrder[i] != other.KeyOrder[i]) return false;
 		}
 		return true;
@@ -1024,7 +1027,7 @@ CString PHYS_PROP::Dump()
 		CString temp;
 		os += "  KeyOrder: (";
 		int i;
-		for (i=0; i<KeyOrder.GetSize()-1; i++)
+		for (i=0; i<KeyOrder.size()-1; i++)
 		{
 			temp.Format("%s, ", KeyOrder[i]==ascending? "ascending" : "descending");
 			os += temp;
@@ -1044,7 +1047,7 @@ void PHYS_PROP::bestKey()
 	//with maximum unique cardinality
 	int win = Keys->ChMaxCuCard();
     int Size = Keys->GetSize();
-    int SizeKeyOrder = KeyOrder.GetSize();
+    int SizeKeyOrder = KeyOrder.size();
 	
     //make sure that both the CArrays ,
     //Keys and KeyOrder are equal in size
@@ -1064,7 +1067,7 @@ void PHYS_PROP::bestKey()
     Keys->AddKey(KeyValue);
 	
     KeyOrder[0]=KeyOrder[win];
-    KeyOrder.SetSize(1);
+    KeyOrder.resize(1);
 	delete result;
 }
 
@@ -1081,7 +1084,7 @@ ReqdPhys(RP), UpperBd(U), Finished(false)
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONT].New(); };
 	
 //##ModelId=3B0C086402DF
-	CArray< CONT * , CONT* > CONT::vc;
+	vector<  CONT* > CONT::vc;
 	
 	//=============  COST Methods  ===================
 	
@@ -1139,10 +1142,11 @@ ReqdPhys(RP), UpperBd(U), Finished(false)
 	// get used physical memory
 	int GetUsedMemory()
 	{
-		MEMORYSTATUS ms;
-		ms.dwLength = sizeof(MEMORYSTATUS);
-		GlobalMemoryStatus(&ms);
+		// MEMORYSTATUS ms;
+		// ms.dwLength = sizeof(MEMORYSTATUS);
+		// GlobalMemoryStatus(&ms);
 		
-		return (ms.dwTotalVirtual - ms.dwAvailVirtual);
+		// return (ms.dwTotalVirtual - ms.dwAvailVirtual);
+    return 0;
 	}
 	

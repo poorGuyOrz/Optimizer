@@ -12,7 +12,7 @@ Columbia Optimizer Framework
 #ifndef SUPP_H
 #define SUPP_H
 
-#include "stdafx.h"	// general definitions
+#include "../header/stdafx.h"	// general definitions
 
 class SET_TRACE;	// set trace flag
 class OPT_STAT;		// opt statistics
@@ -136,7 +136,7 @@ class KEYS_SET
 private:
 	//A set of attribute names
 	//##ModelId=3B0C085F0359
-	CArray< int , int >  KeyArray;
+	vector<  int >  KeyArray;
 	
 public:
 	//##ModelId=3B0C085F036D
@@ -146,7 +146,7 @@ public:
 	KEYS_SET(int * array, int size)
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_KEYS_SET].New();
-		KeyArray.SetSize(size);
+		KeyArray.resize(size);
 		for(int i=0; i<size; i++) KeyArray[i] = array[i];
 	}
 	
@@ -154,13 +154,13 @@ public:
 	KEYS_SET(KEYS_SET& other)				// copy constructor
 	{
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_KEYS_SET].New();
-		KeyArray.Copy(other.KeyArray);	
+		KeyArray = (other.KeyArray);	
 	};
 	
 	//##ModelId=3B0C085F038B
 	KEYS_SET& operator= (KEYS_SET& other)	//  = operator
 	{ 
-		KeyArray.Copy(other.KeyArray);
+		KeyArray = (other.KeyArray);
 		return *this;
 	};    
 	
@@ -205,15 +205,15 @@ public:
 	
 	// return the number of the keys
 	//##ModelId=3B0C08600007
-	inline int GetSize()  { return KeyArray.GetSize(); }
+	inline int GetSize()  { return KeyArray.size(); }
 	
 	// decrements the size of key array
 	//##ModelId=3B0C08600011
-	inline void SetSize() { KeyArray.SetSize(GetSize()-1); }
+	inline void SetSize() { KeyArray.resize(GetSize()-1); }
 	
 	//sets the size of key array
 	//##ModelId=3B0C0860001B
-	inline void SetSize(int newsize) {KeyArray.SetSize(newsize);}
+	inline void SetSize(int newsize) {KeyArray.resize(newsize);}
 	
 	//##ModelId=3B0C08600025
 	bool operator== (KEYS_SET& other)	//  = operator
@@ -276,7 +276,7 @@ public:
 	//##ModelId=3B0C08600061
 	CString Dump();
 	//##ModelId=3B0C08600062
-	void reset() {KeyArray.SetSize(0);};
+	void reset() {KeyArray.resize(0);};
 	//KEYS_SET* best();
 };
 
@@ -341,18 +341,18 @@ public:
 	{ 
 		Keys = new KEYS_SET(*other.Keys);
 		CandidateKey = new KEYS_SET(*other.CandidateKey);
-		for (int i=0; i<other.FKeyArray.GetSize(); i++)
+		for (int i=0; i<other.FKeyArray.size(); i++)
 		{
 			FOREIGN_KEY * fk = new FOREIGN_KEY(*other.FKeyArray[i]);
-			FKeyArray.Add(fk);
+			FKeyArray.push_back(fk);
 		}
 		Card = other.Card;
 		UCard = other.UCard;
 		Width = other.Width;
 		Order = other.Order;
 		if (Order == sorted)
-			for (int i=0; i<other.KeyOrder.GetSize(); i++)
-				KeyOrder.Add(other.KeyOrder[i]);
+			for (int i=0; i<other.KeyOrder.size(); i++)
+				KeyOrder.push_back(other.KeyOrder[i]);
 			return *this;
 	};    
 	
@@ -371,7 +371,7 @@ public:
 	KEYS_SET	* CandidateKey;
 	
 	//##ModelId=3B0C0860024D
-	CArray <FOREIGN_KEY *, FOREIGN_KEY *> FKeyArray;
+	vector < FOREIGN_KEY *> FKeyArray;
 	
 	// initialize member with -1, i.e.,not known
 	//##ModelId=3B0C08600260
@@ -387,7 +387,7 @@ public:
 	{ 
 		delete Keys;
 		delete CandidateKey;
-		for (int i=0; i<FKeyArray.GetSize(); i++)
+		for (int i=0; i<FKeyArray.size(); i++)
 			delete FKeyArray[i];
 	};
 	
@@ -711,7 +711,7 @@ public:
 	KEYS_SET * CandidateKey; // candidate key
 	
 	//##ModelId=3B0C086202B4
-	CArray <FOREIGN_KEY *, FOREIGN_KEY *> FKeyList;
+	vector < FOREIGN_KEY *> FKeyList;
 	
 	//##ModelId=3B0C086202C7
 	LOG_COLL_PROP(float card, float ucard, SCHEMA * schema, KEYS_SET * cand_keys=NULL)
@@ -730,7 +730,7 @@ public:
 	~LOG_COLL_PROP() 
 	{ delete Schema;
 	delete CandidateKey;
-	for(int i=0;i<FKeyList.GetSize();i++)
+	for(int i=0;i<FKeyList.size();i++)
 		delete FKeyList[i];
 	if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_COLL_PROP].Delete();
 	};
@@ -802,7 +802,7 @@ public:
 	
 	// Temporary, till we use LOG_ITEM_PROPs in COVE
 	//##ModelId=3B0C08630070
-	CString LOG_ITEM_PROP::DumpCOVE()
+	CString DumpCOVE()
 	{
 		CString os = "Error";
 		//os.Format("%d %d %s%s%s \r\n",Card, UCard, "{", (*Schema).DumpCOVE(), "}");
@@ -1085,7 +1085,7 @@ public:
 	   //creates a context  adds an entry to this vector.  Finish is true 
 	   // means the task is done.
 	//##ModelId=3B0C086402DF
-	   static CArray< CONT * , CONT* > vc;
+	   static vector<  CONT* > vc;
 	   
    private:
 	   

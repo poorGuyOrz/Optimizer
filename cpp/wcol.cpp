@@ -1,7 +1,7 @@
 // wcol.cpp : Defines the class behaviors for the application.
 //	$Revision: 8 $
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

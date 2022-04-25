@@ -1,15 +1,15 @@
 //$Revision: 6 $
 //Implements classes in bm.h
 
-#include "stdafx.h"	// This must be before the #ifdef USE..., else the #ifdef will be ignored
+#include "../header/stdafx.h"	// This must be before the #ifdef USE..., else the #ifdef will be ignored
                     // since the precompiler will search for the PCH first.
 
 #ifdef USE_MEMORY_MANAGER
 
 
 //We will use memory management for classes in these files
-#include "tasks.h"
-#include "physop.h"
+#include "../header/tasks.h"
+#include "../header/physop.h"
 
 #ifdef _DEBUG
 	#define new DEBUG_NEW

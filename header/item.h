@@ -352,4 +352,4 @@ public :
 	
 }; // COMP_OP
 
-#endif	 ITEM_H
+#endif

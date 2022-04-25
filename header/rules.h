@@ -12,7 +12,7 @@ RULES.H - Base classes and actual rules
 #ifndef RULES_H
 #define RULES_H
 
-#include "ssp.h" 
+#include "../header/ssp.h" 
 
 class BINDERY;
 class RULE;

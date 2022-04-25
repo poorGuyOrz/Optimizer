@@ -11,8 +11,8 @@
   
 */
 
-#include "stdafx.h"
-#include "cat.h"
+#include "../header/stdafx.h"
+#include "../header/cat.h"
 
 #define LINEWIDTH 256		// buffer length of one text line
 
@@ -30,9 +30,6 @@
 #define KEYWORD_NUMOFFOREIGNKEY "NumofForeignKey:"
 #define KEYWORD_KEYORDER	"KeyOrder:"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 // read catalog text file and store the information into CAT 
 //##ModelId=3B0C08770371
@@ -54,18 +51,18 @@ CAT::CAT(CString filename)
 	CString BitIndexName;
 	
 	// initialize the global tables with trivial entries
-	CollTable.SetSize(0);
-	AttTable.SetSize(0);
-	AttCollTable.SetSize(0);
-	IndTable.SetSize(0);
-	BitIndTable.SetSize(0);
-	CollTable.Add("");		
-	AttTable.Add("");
-	AttCollTable.Add(0);
-	IndTable.Add("");
-	BitIndTable.Add("");	//632
+	CollTable.resize(0);
+	AttTable.resize(0);
+	AttCollTable.resize(0);
+	IndTable.resize(0);
+	BitIndTable.resize(0);
+	CollTable.push_back("");		
+	AttTable.push_back("");
+	AttCollTable.push_back(0);
+	IndTable.push_back("");
+	BitIndTable.push_back("");	//632
 	
-	if((fp = fopen(filename,"r"))==NULL) 
+	if((fp = fopen(filename.str_.c_str(),"r"))==NULL) 
 		OUTPUT_ERROR("can not open file 'catalog'");
 	
 	bool FirstTime = true;
@@ -100,7 +97,7 @@ CAT::CAT(CString filename)
 			CollName = p;
 			
 			//set the foreignkeystring size to 0
-			CollProp->ForeignKeyString.SetSize(0);
+			CollProp->ForeignKeyString.resize(0);
 			
 			FirstTime = false; // now had got a relname
 			
@@ -176,13 +173,13 @@ CAT::CAT(CString filename)
 				{
 					*p=0;			// get a str
 					str = SkipSpace(str);
-					CollProp->KeyOrder.Add(atoKeyOrder(str));    // add the order to KeyOrder
+					CollProp->KeyOrder.push_back(atoKeyOrder(str));    // add the order to KeyOrder
 					break;
 				}
 				if (*p==',')
 				{
 					*p=0;			// get a str
-					CollProp->KeyOrder.Add(atoKeyOrder(str));    // add the order to KeyOrder
+					CollProp->KeyOrder.push_back(atoKeyOrder(str));    // add the order to KeyOrder
 					*p=',';			// restore the char
 					p++; 		
 					continue;
@@ -302,7 +299,7 @@ CAT::CAT(CString filename)
 				//just store this string for now, the string 
 				//will be translated to foreignkeys at the end of CAT
 				//otherwise the attr referenced may not be in the catalog
-				CollProp->ForeignKeyString.Add(p);
+				CollProp->ForeignKeyString.push_back(p);
 				i++;
 			}
 			continue;
@@ -315,13 +312,13 @@ CAT::CAT(CString filename)
 	fclose(fp);
 	
 	//translate foreign key string to foreignkey
-	for(int CollId = 1; CollId < CollProps.GetSize(); CollId++)
+	for(int CollId = 1; CollId < CollProps.size(); CollId++)
 	{
 		CollName = CollTable[CollId];
 		CollProp = CollProps[CollId];
-		if (CollProp->ForeignKeyString.GetSize()>0)
+		if (CollProp->ForeignKeyString.size()>0)
 		{
-			for (int keyNum = 0; keyNum < CollProp->ForeignKeyString.GetSize(); keyNum++)
+			for (int keyNum = 0; keyNum < CollProp->ForeignKeyString.size(); keyNum++)
 			{
 				p = CollProp->ForeignKeyString[keyNum].GetBuffer
 					(CollProp->ForeignKeyString[keyNum].GetLength());
@@ -330,21 +327,21 @@ CAT::CAT(CString filename)
 				parseKeys(p,FKeys,CollName); 
 				p += strlen(p)+1;
 				GetKey(p, RKeys);
-				CollProp->FKeyArray.Add(new FOREIGN_KEY(FKeys, RKeys));
+				CollProp->FKeyArray.push_back(new FOREIGN_KEY(FKeys, RKeys));
 				CollProp->ForeignKeyString[keyNum].ReleaseBuffer();
 			}
 		}
 	}
 	
 	//translate BitAttrString to AttId
-	for (int BitIndID=1; BitIndID< BitIndProps.GetSize(); BitIndID++)
+	for (int BitIndID=1; BitIndID< BitIndProps.size(); BitIndID++)
 	{
 		BitIndProps[BitIndID]->IndexAttr = GetAttId(BitIndProps[BitIndID]->IndexAttrString);
 	}
 	
-	//check KeyOrder.GetSize() == Keys.GetSize()
+	//check KeyOrder.size() == Keys.size()
 	if (CollProp->Order == sorted)
-		if (CollProp->KeyOrder.GetSize() != CollProp->Keys->GetSize())
+		if (CollProp->KeyOrder.size() != CollProp->Keys->GetSize())
 			OUTPUT_ERROR("KeyOrder size and Keys size is not equal!");
 		
 }
@@ -356,37 +353,37 @@ CAT::~CAT()
 	int i;
 	
 	// free collection properties		
-	for(i=1; i<CollProps.GetSize(); i++)
+	for(i=1; i<CollProps.size(); i++)
 		delete CollProps[i];
 	
 	// free attributes
-	for(i=1; i<Attrs.GetSize(); i++)
+	for(i=1; i<Attrs.size(); i++)
 		delete Attrs[i];
 	
 	// free index properties		
-	for(i=1; i<IndProps.GetSize(); i++)
+	for(i=1; i<IndProps.size(); i++)
 		delete IndProps[i];
 	
 	// free bit index properties		
-	for(i=1; i<BitIndProps.GetSize(); i++)
+	for(i=1; i<BitIndProps.size(); i++)
 		delete BitIndProps[i];
 	
 	// free attribute names table		
-	for(i=1; i<AttNames.GetSize(); i++)
+	for(i=1; i<AttNames.size(); i++)
 		delete AttNames[i];
 	
 	// free index names table		
-	for(i=1; i<IndNames.GetSize(); i++)
+	for(i=1; i<IndNames.size(); i++)
 		delete IndNames[i];
 	
 	// free bitindex names table		
-	for(i=1; i<BitIndNames.GetSize(); i++)
+	for(i=1; i<BitIndNames.size(); i++)
 		delete BitIndNames[i];
-    CollTable.RemoveAll();
-	AttTable.RemoveAll();
-	IndTable.RemoveAll();
-	AttCollTable.RemoveAll();
-	BitIndTable.RemoveAll();
+    CollTable.clear();
+	AttTable.clear();
+	IndTable.clear();
+	AttCollTable.clear();
+	BitIndTable.clear();
 }
 
 
@@ -395,7 +392,7 @@ CAT::~CAT()
 void CAT::AddColl(CString CollName, COLL_PROP *CollProp)
 {
 	int CollId = GetCollId(CollName);
-	if(CollId >= CollProps.GetSize() )	CollProps.SetSize(CollId+1);
+	if(CollId >= CollProps.size() )	CollProps.resize(CollId+1);
 	CollProps [CollId] = CollProp;
 }
 
@@ -407,20 +404,20 @@ void CAT::AddAttr(CString CollName, CString AttName, ATTR *Attr, DOM_TYPE domain
 {
 	// If Attribute is new, add it to AttProps.  Add AttProp to AttProps table.
 	int AttId = GetAttId(CollName , AttName);
-	if(AttId >= Attrs.GetSize() ) 	Attrs.SetSize(AttId+1);
+	if(AttId >= Attrs.size() ) 	Attrs.resize(AttId+1);
 	Attr->AttId = AttId;
 	Attrs [AttId] = Attr;
-	if(AttId >= Domains.GetSize() ) 	Domains.SetSize(AttId+1);
+	if(AttId >= Domains.size() ) 	Domains.resize(AttId+1);
 	Domains[AttId] = domain;
 	
 	// If Collection is new, add it to AttNames.  Add Attribute to AttNames
 	int CollId = GetCollId(CollName);
-	if(CollId >= AttNames.GetSize() )		// if the entry not exist, new it
-	{	AttNames.SetSize(CollId+1);
+	if(CollId >= AttNames.size() )		// if the entry not exist, new it
+	{	AttNames.resize(CollId+1);
 		AttNames[CollId] = new INT_ARRAY;
 	}
 	
-	AttNames[CollId] -> Add (AttId);		
+	AttNames[CollId] -> push_back (AttId);		
 }
 
 // If Index, COllection are new, add them to IndProps, IndNames, respectively.
@@ -430,17 +427,17 @@ void CAT::AddIndex(CString CollName, CString IndexName, IND_PROP *IndProp)
 {
 	// If Index is new, add it to IndProps.  Add IndProp to IndProps
 	int IndId = GetIndId(CollName , IndexName);
-	if(IndId >= IndProps.GetSize() ) 	IndProps.SetSize(IndId+1);
+	if(IndId >= IndProps.size() ) 	IndProps.resize(IndId+1);
 	IndProps [IndId] = IndProp;
 	
 	// If Index is new, add it to IndProps.  Add IndProp to IndProps
 	int CollId = GetCollId(CollName);
-	if(CollId >= IndNames.GetSize() )		// if the entry not exist, new it
-	{	IndNames.SetSize(CollId+1);
+	if(CollId >= IndNames.size() )		// if the entry not exist, new it
+	{	IndNames.resize(CollId+1);
 		IndNames[CollId] = new INT_ARRAY;
 	}
 	
-	IndNames[CollId] -> Add (IndId);		
+	IndNames[CollId] -> push_back (IndId);		
 }
 
 // If BitIndex, COllection are new, add them to BitIndProps, BitIndNames, respectively.
@@ -450,17 +447,17 @@ void CAT::AddBitIndex(CString CollName, CString BitIndexName, BIT_IND_PROP *BitI
 {
 	// If BitIndex is new, add it to BitIndProps.  Add BitIndProp to BitIndProps
 	int BitIndId = GetBitIndId(CollName , BitIndexName);
-	if(BitIndId >= BitIndProps.GetSize() ) 	BitIndProps.SetSize(BitIndId+1);
+	if(BitIndId >= BitIndProps.size() ) 	BitIndProps.resize(BitIndId+1);
 	BitIndProps [BitIndId] = BitIndProp;
 	
 	// If Index is new, add it to IndProps.  Add IndProp to IndProps
 	int CollId = GetCollId(CollName);
-	if(CollId >= BitIndNames.GetSize() )		// if the entry not exist, new it
-	{	BitIndNames.SetSize(CollId+1);
+	if(CollId >= BitIndNames.size() )		// if the entry not exist, new it
+	{	BitIndNames.resize(CollId+1);
 		BitIndNames[CollId] = new INT_ARRAY;
 	}
 	
-	BitIndNames[CollId] -> Add (BitIndId);		
+	BitIndNames[CollId] -> push_back (BitIndId);		
 }
 
 // get one KeySET, and add to KEYS_SET
@@ -504,7 +501,7 @@ void CAT::GetKey(char *p, KEYS_SET *Keys)
 //##ModelId=3B0C08770385
 COLL_PROP* 	CAT::GetCollProp(int CollId)
 {
-	if( CollId < CollProps.GetSize() ) return CollProps [CollId];
+	if( CollId < CollProps.size() ) return CollProps [CollId];
 	else return NULL;
 }
 
@@ -512,7 +509,7 @@ COLL_PROP* 	CAT::GetCollProp(int CollId)
 //##ModelId=3B0C0877038F
 ATTR* 	CAT::GetAttr(int AttId)
 {
-	if( AttId < Attrs.GetSize() ) return Attrs [AttId];
+	if( AttId < Attrs.size() ) return Attrs [AttId];
 	else return NULL;
 }
 
@@ -520,7 +517,7 @@ ATTR* 	CAT::GetAttr(int AttId)
 //##ModelId=3B0C087703A3
 DOM_TYPE 	CAT::GetDomain(int AttId)
 {
-	if( AttId < Domains.GetSize() ) return Domains [AttId];
+	if( AttId < Domains.size() ) return Domains [AttId];
 	else return unknown;	//this attribute is not in catalog
 }
 
@@ -528,7 +525,7 @@ DOM_TYPE 	CAT::GetDomain(int AttId)
 //##ModelId=3B0C087703D6
 IND_PROP* 	CAT::GetIndProp(int IndId)
 {
-	if( IndId < IndProps.GetSize() ) return IndProps [IndId];
+	if( IndId < IndProps.size() ) return IndProps [IndId];
 	else return NULL;
 }
 
@@ -536,7 +533,7 @@ IND_PROP* 	CAT::GetIndProp(int IndId)
 //##ModelId=3B0C0878000C
 BIT_IND_PROP* 	CAT::GetBitIndProp(int BitIndId)
 {
-	if( BitIndId < BitIndProps.GetSize() ) return BitIndProps [BitIndId];
+	if( BitIndId < BitIndProps.size() ) return BitIndProps [BitIndId];
 	else return NULL;
 }
 
@@ -544,7 +541,7 @@ BIT_IND_PROP* 	CAT::GetBitIndProp(int BitIndId)
 //##ModelId=3B0C087703C1
 INT_ARRAY* CAT::GetIndNames(int CollId)
 {
-	if( CollId < IndNames.GetSize() ) return IndNames [CollId];
+	if( CollId < IndNames.size() ) return IndNames [CollId];
 	else return NULL;
 }
 
@@ -552,7 +549,7 @@ INT_ARRAY* CAT::GetIndNames(int CollId)
 //##ModelId=3B0C087703E0
 INT_ARRAY* CAT::GetBitIndNames(int CollId)
 {
-	if( CollId < BitIndNames.GetSize() ) return BitIndNames [CollId];
+	if( CollId < BitIndNames.size() ) return BitIndNames [CollId];
 	else return NULL;
 }
 
@@ -560,7 +557,7 @@ INT_ARRAY* CAT::GetBitIndNames(int CollId)
 //##ModelId=3B0C087703B7
 INT_ARRAY* CAT::GetAttNames(int CollId)
 {
-	if( CollId < AttNames.GetSize() ) return AttNames [CollId];
+	if( CollId < AttNames.size() ) return AttNames [CollId];
 	else return NULL;
 }
 
@@ -715,7 +712,7 @@ CString CAT::Dump()
 	
 	// dump collection properties		
 	os += "******* COLL_PROP: ********\r\n";
-	for(int CollId = 1; CollId < CollProps.GetSize(); CollId++)
+	for(int CollId = 1; CollId < CollProps.size(); CollId++)
 	{
 		temp.Format("%s%s%s%s", GetCollName(CollId) , ":\r\n",
 			CollProps[CollId]->Dump() , "\r\n");
@@ -724,7 +721,7 @@ CString CAT::Dump()
 	
 	// dump attribute properties		
 	os += "\r\n******** ATT_PROP: ********\r\n";	  
-	for(int AttId = 1; AttId < Attrs.GetSize(); AttId++)
+	for(int AttId = 1; AttId < Attrs.size(); AttId++)
 	{
 		temp.Format("%s%s%s%s", GetAttName(AttId) , ":\r\n",
 			Attrs[AttId]->Dump() , "\r\n");
@@ -733,7 +730,7 @@ CString CAT::Dump()
 	
 	// dump index properties		
 	os += "\r\n******** IND_PROP: ********\r\n";	  
-	for(int IndId = 1; IndId < IndProps.GetSize(); IndId++)
+	for(int IndId = 1; IndId < IndProps.size(); IndId++)
 	{
 		temp.Format("%s%s%s%s", GetIndName(IndId) , ":\r\n",
 			IndProps[IndId]->Dump() , "\r\n");
@@ -742,7 +739,7 @@ CString CAT::Dump()
 	
 	// dump bit index properties		
 	os += "\r\n******** BIT_IND_PROP: ********\r\n";	  
-	for(int BitIndId = 1; BitIndId < BitIndProps.GetSize(); BitIndId++)
+	for(int BitIndId = 1; BitIndId < BitIndProps.size(); BitIndId++)
 	{
 		temp.Format("%s%s%s%s", GetBitIndName(BitIndId) , ":\r\n",
 			BitIndProps[BitIndId]->Dump() , "\r\n");

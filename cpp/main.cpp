@@ -9,13 +9,13 @@ Columbia Optimizer Framework
   Supported by NSF Grants IRI-9610013 and IRI-9619977
 */
 
-#include "stdafx.h"
-#include "cat.h"
-#include "cm.h"
-#include "tasks.h"
-#include "physop.h"
+#include "../header/stdafx.h"
+#include "../header/cat.h"
+#include "../header/cm.h"
+#include "../header/tasks.h"
+#include "../header/physop.h"
 
-#include "global.h"			// global variables
+#include "../header/global.h"			// global variables
 
 
 #define LINEWIDTH 256		// buffer length of one text line
@@ -24,8 +24,7 @@ Columbia Optimizer Framework
 #define KEYWORD_PIGGYBACK "PiggyBack"
 
 #ifdef _DEBUG
-	#define new DEBUG_NEW
-	 CMemoryState oldMemState, newMemState, diffMemState;
+	//  CMemoryState oldMemState, newMemState, diffMemState;
 #endif
 
 #ifdef _DEBUG
@@ -48,9 +47,8 @@ void Optimizer()
 	if(RSFile=="ruleset") RSFile = AppDir + "\\ruleset";
 	
 	//Open general trace file and COVE trace file, clear main output window
-	OutputFile.Open( AppDir + "\\colout.txt" , CFile::modeCreate | CFile::modeWrite );
-	OutputCOVE.Open( AppDir + "\\script.cove" , CFile::modeCreate | CFile::modeWrite );
-	OutputWindow->ClearWindow();
+	OutputFile.open( (AppDir + "\\colout.txt").str_);
+	OutputCOVE.open( (AppDir + "\\script.cove").str_ );
     
 	// clean the statistics
     for(int i=0; i < CLASS_NUM; i++)
@@ -67,7 +65,7 @@ void Optimizer()
 	
 	// Create objects to manage Opt stats, Cost model, Rule set, Heuristic cost.
 	OptStat = new OPT_STAT;	
-	Cm = new CM(CMFile);
+	Cm = new CM(CMFile.str_);
 	PTRACE("cost model content:\r\n%s", Cm->Dump());
 	RuleSet = new RULE_SET(RSFile);
 	PTRACE("Rule set content:\r\n%s", RuleSet->Dump());
@@ -76,9 +74,9 @@ void Optimizer()
 	
 #ifdef _DEBUG
 	//Initialize Rule Firing Statistics
-	TopMatch.SetSize(RuleSet->RuleCount);
-	Bindings.SetSize(RuleSet->RuleCount);
-	Conditions.SetSize(RuleSet->RuleCount);	//625
+	TopMatch.resize(RuleSet->RuleCount);
+	Bindings.resize(RuleSet->RuleCount);
+	Conditions.resize(RuleSet->RuleCount);	//625
 	for (int RuleNum = 0; RuleNum < RuleSet->RuleCount ; RuleNum++)
 	{
 		TopMatch[RuleNum] = 0;
@@ -109,7 +107,7 @@ void Optimizer()
 	{
 		//Open BQueryFile
 		if(BQueryFile=="bquery") BQueryFile = AppDir + "\\bquery";	//default case
-		if((fp = fopen(BQueryFile,"r"))==NULL) 
+		if((fp = fopen(BQueryFile.str_.c_str(),"r"))==NULL) 
 			OUTPUT_ERROR("can not open the file you chose in the option dialogue");
 		fgets(TextLine,LINEWIDTH,fp);
 		if(feof(fp))OUTPUT_ERROR("Empty Input File");
@@ -205,7 +203,7 @@ void Optimizer()
 				FILE *tempfp;
 				if ((tempfp = fopen(QueryFile.GetBuffer(200), "w")) == NULL)
 					OUTPUT_ERROR("can not create or truncate file 'tempquery'");
-				QueryFile.ReleaseBuffer(-1);
+				QueryFile.ReleaseBuffer();
 				/*
 				here the optimizer reads in one query at a time  
 				until the keyword KEYWORD_QUERY,KEYWORD_NUMOFQRY
@@ -276,16 +274,16 @@ void Optimizer()
 				assert(Ssp->GetGroup(0)->GetWinner(PhysProp) ->GetDone());
 				GlobalEpsBound = (*HeuristicCost) * (GLOBAL_EPS);
 				delete Ssp;
-				for (int i = 0; i < CONT::vc.GetSize(); i++)
+				for (int i = 0; i < CONT::vc.size(); i++)
 					delete CONT::vc[i];
-				CONT::vc.RemoveAll();
+				CONT::vc.clear();
 				delete Cat;
 				GlobepsPruning      = true;
 				ForGlobalEpsPruning = false;
 			}
-#ifdef _DEBUG
-			oldMemState.Checkpoint();
-#endif
+// #ifdef _DEBUG
+// 			oldMemState.Checkpoint();
+// #endif
 			
 			//Since each optimization corrupts the catalog, we must create it anew
 			Cat = new CAT(CatFile);
@@ -388,9 +386,9 @@ void Optimizer()
 				//Delete Contexts, close batch query file, delete search space
 				if(!PiggyBack)
 				{
-					for (i = 0; i < CONT::vc.GetSize(); i++) 
+					for (int i = 0; i < CONT::vc.size(); i++) 
 						delete CONT::vc[i];
-					CONT::vc.RemoveAll();
+					CONT::vc.clear();
 				}
 				//if (RadioVal ==0 && q==NumQuery-1) fclose(fp);
 				PTRACE("used memory before deleting the search space: %dM\r\n", GetUsedMemory()/1000);
@@ -430,9 +428,9 @@ void Optimizer()
 	if (PiggyBack) 
 	{
 		delete Ssp;
-		for (i = 0; i < CONT::vc.GetSize(); i++)
+		for (int i = 0; i < CONT::vc.size(); i++)
 			delete CONT::vc[i];
-		CONT::vc.RemoveAll();
+		CONT::vc.clear();
 	}
 	
    } while (!feof(fp));  // end of do loop  over each batch query sequence
@@ -443,7 +441,7 @@ void Optimizer()
 	  delete OptStat;	
 	  delete Cm;		
 	  delete RuleSet;	
-	  delete (void*) HeuristicCost; 
+	  delete  HeuristicCost; 
 	  
 #ifdef USE_MEMORY_MANAGER
 	  PTRACE("used memory before delete manager: %dM\r\n", GetUsedMemory()/1000);
@@ -453,14 +451,29 @@ void Optimizer()
 	  PTRACE("used memory after delete manager: %dM\r\n", GetUsedMemory()/1000);
 	  
 #ifdef _DEBUG
-	  newMemState.Checkpoint();
-	  if (diffMemState.Difference(oldMemState, newMemState))
-	  {
-		  PTRACE("%s", "Memory leaked after optimizer!\n") ;
-		  oldMemState.DumpAllObjectsSince();
-		  diffMemState.DumpStatistics();
-	  }
+	  // newMemState.Checkpoint();
+	  // if (diffMemState.Difference(oldMemState, newMemState))
+	  // {
+		//   PTRACE("%s", "Memory leaked after optimizer!\n") ;
+		//   oldMemState.DumpAllObjectsSince();
+		//   diffMemState.DumpStatistics();
+	  // }
 #endif
-	  OutputFile.Close();
-	  OutputCOVE.Close();
+	  OutputFile.close();
+	  OutputCOVE.close();
 }
+
+
+int main () { 
+  Optimizer();
+}
+
+// g++ .\test.cpp .\cm.cpp .\supp.cpp .\cat.cpp .\group.cpp .\expr.cpp .\item.cpp .\logop.cpp .\mexpr.cpp .\physop.cpp .\query.cpp .\rules.cpp .\ssp.cpp .\tasks.cpp .\main.cpp
+
+// g++ .\cm.cpp .\supp.cpp .\cat.cpp .\group.cpp .\expr.cpp .\item.cpp .\logop.cpp .\mexpr.cpp .\physop.cpp .\query.cpp .\rules.cpp .\ssp.cpp .\tasks.cpp .\main.cpp
+
+// g++ cm.cpp supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp main.cpp
+
+// CAT::AddIndex
+// CAT::AddBitIndex
+// CAT::AddColl

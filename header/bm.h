@@ -13,7 +13,7 @@ Columbia Optimizer Framework
 #ifndef MEMORY_MANAGER_H
 #define MEMORY_MANAGER_H
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
 // Initial size of array of BLOCK_ANCHORs. Use one array per MEM_MGR class.
 #define INIT_BLOCK_ANCHOR_COUNT 	20

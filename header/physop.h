@@ -540,8 +540,8 @@ public :
 	HGROUP_LIST( HGROUP_LIST& Op)
 		:GbyAtts(CopyArray(Op.GbyAtts, Op.GbySize)), GbySize(Op.GbySize)
 	{	AggOps = new AGG_OP_ARRAY;
-	AggOps->SetSize(Op.AggOps->GetSize());
-	for (int i=0; i<Op.AggOps->GetSize(); i++)
+	AggOps->resize(Op.AggOps->size());
+	for (int i=0; i<Op.AggOps->size(); i++)
 	{
 		(*AggOps)[i] = new AGG_OP( *(*Op.AggOps)[i]);
 	}
@@ -553,7 +553,7 @@ public :
 	//##ModelId=3B0C08700399
 	~HGROUP_LIST() 
 	{	
-		for (int i=0; i<AggOps->GetSize(); i++) delete (*AggOps)[i];
+		for (int i=0; i<AggOps->size(); i++) delete (*AggOps)[i];
 		delete AggOps;
 		delete [] GbyAtts;
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HGROUP_LIST].Delete();

@@ -426,8 +426,8 @@ public:
 		FAttsSize(Op.FAttsSize), FlattenedAtts(CopyArray(Op.FlattenedAtts, Op.FAttsSize))
 	{	
 		AggOps = new AGG_OP_ARRAY;
-		AggOps->SetSize(Op.AggOps->GetSize());
-		for (int i=0; i<Op.AggOps->GetSize(); i++)
+		AggOps->resize(Op.AggOps->size());
+		for (int i=0; i<Op.AggOps->size(); i++)
 		{
 			(*AggOps)[i] = new AGG_OP( *(*Op.AggOps)[i]);
 		}
@@ -441,7 +441,7 @@ public:
 	~AGG_LIST() 
 	{	
 		delete [] GbyAtts;
-		for (int i=0; i<AggOps->GetSize(); i++) delete (*AggOps)[i];
+		for (int i=0; i<AggOps->size(); i++) delete (*AggOps)[i];
 		delete AggOps;
 		delete [] FlattenedAtts;
 		if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].Delete();	

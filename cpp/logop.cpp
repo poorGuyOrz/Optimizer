@@ -12,14 +12,11 @@ as defined in logop.h
   
 	
 */
-#include "stdafx.h"
-#include "cat.h"
-#include "logop.h"
-#include "item.h"
+#include "../header/stdafx.h"
+#include "../header/cat.h"
+#include "../header/logop.h"
+#include "../header/item.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 /*********** GET functions ****************/
 //##ModelId=3B0C087301FB
@@ -41,7 +38,7 @@ GET::GET ( CString collection,  CString rangeVar)
 		CollId = GetCollId(collection);
 	else
 	{
-		//It's a nontrivial range variable.  Add new entries to all
+		//It's a nontrivial range variable.  push_back new entries to all
 		//relevant tables, with name of RangeVar and properties equal to those
 		//of the collection.  
 		int collectionID = GetCollId(collection);
@@ -51,14 +48,14 @@ GET::GET ( CString collection,  CString rangeVar)
 		
 		//Get all atts for this collection, then add to att tables
 		INT_ARRAY* AttArray = Cat -> GetAttNames(collectionID);
-		int Size = AttArray -> GetSize();
+		int Size = AttArray -> size();
 		ATTR * attr;
 		for (int i = 0 ; i < Size; i++)  //For each attribute
 		{
-			attr = new ATTR(* (Cat -> GetAttr(AttArray -> GetAt(i)) ) );
-			DOM_TYPE domain = Cat->GetDomain(AttArray->GetAt(i));
+			attr = new ATTR(* (Cat -> GetAttr(AttArray -> at(i)) ) );
+			DOM_TYPE domain = Cat->GetDomain(AttArray->at(i));
 			Cat -> AddAttr(RangeVar, 
-				TruncName(GetAttName(AttArray -> GetAt(i))) , attr, domain );
+				TruncName(GetAttName(AttArray -> at(i))) , attr, domain );
 		}
 		
 		PTRACE2("Catalog content after fixing AttId-based tables for range %s:\r\n%s", 
@@ -69,16 +66,16 @@ GET::GET ( CString collection,  CString rangeVar)
 		INT_ARRAY* IndArray = Cat -> GetIndNames(collectionID);
 		if (IndArray)
 		{
-			Size = IndArray -> GetSize();
-			for (i = 0 ; i < Size; i++)  //For each index
+			Size = IndArray -> size();
+			for (int i = 0 ; i < Size; i++)  //For each index
 			{
 				IND_PROP *indprop = new IND_PROP;
-				IND_PROP* ip = (Cat -> GetIndProp(IndArray -> GetAt(i)) );
+				IND_PROP* ip = (Cat -> GetIndProp(IndArray -> at(i)) );
 				*indprop = *ip;
 				//Alter keys in the property object so they will refer to new range variable attributes
 				indprop -> update(RangeVar);
 				Cat -> AddIndex(RangeVar, 
-					TruncName(GetIndName(IndArray -> GetAt(i))) , indprop );
+					TruncName(GetIndName(IndArray -> at(i))) , indprop );
 			}
 		}
 		PTRACE2("Catalog content after fixing IndId-based tables for range %s:\r\n%s", 
@@ -88,16 +85,16 @@ GET::GET ( CString collection,  CString rangeVar)
 		INT_ARRAY* BitIndArray = Cat -> GetBitIndNames(collectionID);
 		if (BitIndArray)
 		{
-			Size = BitIndArray -> GetSize();
-			for (i = 0 ; i < Size; i++)  //For each index
+			Size = BitIndArray -> size();
+			for (int i = 0 ; i < Size; i++)  //For each index
 			{
 				BIT_IND_PROP *bitindprop = new BIT_IND_PROP;
-				BIT_IND_PROP* ip = (Cat -> GetBitIndProp(BitIndArray -> GetAt(i)) );
+				BIT_IND_PROP* ip = (Cat -> GetBitIndProp(BitIndArray -> at(i)) );
 				*bitindprop = *ip;
 				//Alter keys in the property object so they will refer to new range variable attributes
 				bitindprop -> update(RangeVar);
 				Cat -> AddBitIndex(RangeVar, 
-					TruncName(GetBitIndName(BitIndArray -> GetAt(i))) , bitindprop );
+					TruncName(GetBitIndName(BitIndArray -> at(i))) , bitindprop );
 			}
 		}
 		PTRACE2("Catalog content after fixing BitIndId-based tables for range %s:\r\n%s", 
@@ -148,7 +145,7 @@ LOG_PROP* GET::FindLogProp (LOG_PROP ** input)
 	INT_ARRAY* AttrNames = Cat->GetAttNames(CollId);
 	assert(AttrNames!=NULL);
 	
-	int Size = AttrNames->GetSize();
+	int Size = AttrNames->size();
 	assert(Size>0);
 	
 	SCHEMA * Schema = new SCHEMA(Size);
@@ -175,10 +172,10 @@ LOG_PROP* GET::FindLogProp (LOG_PROP ** input)
 	LOG_COLL_PROP * result = new LOG_COLL_PROP(CollProp->Card, CollProp->UCard,Schema, 
 		cand_key );
 	//copy the foreign key info from catalog
-	for (i=0; i<CollProp->FKeyArray.GetSize(); i++)
+	for (i=0; i<CollProp->FKeyArray.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*CollProp->FKeyArray[i]);
-		result->FKeyList.Add(fk);
+		result->FKeyList.push_back(fk);
 	}
 	
 	return result;
@@ -293,7 +290,7 @@ LOG_PROP* EQJOIN::FindLogProp (LOG_PROP ** input)
 	//Eqjoin card is card of ref input (as opposed to FK input) divided by RefUcard
 	
 	//check if lattr contains foreign key
-	for (i=0; i<Left->FKeyList.GetSize(); i++)
+	for (i=0; i<Left->FKeyList.size(); i++)
 	{
 		//if lattr contains FK
 		if (Left->FKeyList[i]->ForeignKey->IsSubSet(lattrs, size))
@@ -327,7 +324,7 @@ LOG_PROP* EQJOIN::FindLogProp (LOG_PROP ** input)
 	
 	if (!LeftFK)		//continue to check the right one
 	{
-		for (i=0; i<Right->FKeyList.GetSize(); i++)
+		for (i=0; i<Right->FKeyList.size(); i++)
 		{
 			//if rattr contains FK
 			if (Right->FKeyList[i]->ForeignKey->IsSubSet(rattrs, size))
@@ -446,15 +443,15 @@ LOG_PROP* EQJOIN::FindLogProp (LOG_PROP ** input)
 	LOG_COLL_PROP * result = new LOG_COLL_PROP((float)Card, (float)UCard, Schema, cand_key);
 	
 	//foreign key is the merge of left foreign keys and right foreign keys
-	for (i=0; i<Left->FKeyList.GetSize(); i++)
+	for (i=0; i<Left->FKeyList.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*Left->FKeyList[i]);
-		result->FKeyList.Add(fk);
+		result->FKeyList.push_back(fk);
 	}
-	for (i=0; i<Right->FKeyList.GetSize(); i++)
+	for (i=0; i<Right->FKeyList.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*Right->FKeyList[i]);
-		result->FKeyList.Add(fk);
+		result->FKeyList.push_back(fk);
 	}
 	
 	return result;
@@ -615,10 +612,10 @@ LOG_PROP* PROJECT::FindLogProp (LOG_PROP ** input)
     LOG_COLL_PROP * result = new LOG_COLL_PROP(rel_input->Card, new_ucard, schema, cand_key);
 	
 	//if foreign keys are subset of project attrs, pass this foreign key
-	for (int i=0; i<rel_input->FKeyList.GetSize(); i++)
+	for (int i=0; i<rel_input->FKeyList.size(); i++)
 	{
 		if (rel_input->FKeyList[i]->ForeignKey->IsSubSet(attrs, size))
-			result->FKeyList.Add(new FOREIGN_KEY(*rel_input->FKeyList[i]));
+			result->FKeyList.push_back(new FOREIGN_KEY(*rel_input->FKeyList[i]));
 	}
 	
 	return result;
@@ -684,7 +681,7 @@ LOG_PROP* SELECT::FindLogProp (LOG_PROP ** input)
 			new_cucard = ceil(1 / (1/old_cucard - 1/(rel_input->Card) + 1/new_card) );
 			
 			// "select multiplicity error"
-			ASSERT(new_cucard <= old_cucard + 1);
+			assert(new_cucard <= old_cucard + 1);
 			
 			(*new_schema)[i] -> CuCard = (float)new_cucard;
 		}
@@ -699,10 +696,10 @@ LOG_PROP* SELECT::FindLogProp (LOG_PROP ** input)
 		new_schema, cand_key ) ;
 	
 	//pass the foreign key info 
-	for (i=0; i<rel_input->FKeyList.GetSize(); i++)
+	for (int i=0; i<rel_input->FKeyList.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*rel_input->FKeyList[i]);
-		result->FKeyList.Add(fk);
+		result->FKeyList.push_back(fk);
 	}
 	
 	return result;
@@ -761,10 +758,10 @@ LOG_PROP* RM_DUPLICATES::FindLogProp (LOG_PROP ** input)
 	LOG_COLL_PROP * result = new LOG_COLL_PROP(new_card, new_ucard, new_schema, cand_key ) ;
 	
 	//pass the foreign key info 
-	for (int i=0; i<rel_input->FKeyList.GetSize(); i++)
+	for (int i=0; i<rel_input->FKeyList.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*rel_input->FKeyList[i]);
-		result->FKeyList.Add(fk);
+		result->FKeyList.push_back(fk);
 	}
 	
 	return result;
@@ -791,7 +788,7 @@ AGG_LIST::AGG_LIST(int * gby_atts, int gby_size, AGG_OP_ARRAY * agg_ops)
 {
 	//produce a flattened list
 	if (AggOps) {
-		int NumOps = AggOps->GetSize();
+		int NumOps = AggOps->size();
 		FAttsSize = 0;
 		int i, j, index;
 		int * TempAtts;
@@ -873,7 +870,7 @@ LOG_PROP* AGG_LIST::FindLogProp (LOG_PROP ** input)
     
 	// add ATTR_EXP for every AGG_OP
 	
-	int NumOps = AggOps->GetSize();
+	int NumOps = AggOps->size();
 	SCHEMA * agg_schema = new SCHEMA(NumOps);
 	for (i=0; i< NumOps; i++)
 	{
@@ -909,10 +906,10 @@ LOG_PROP* AGG_LIST::FindLogProp (LOG_PROP ** input)
 	LOG_COLL_PROP * result = new LOG_COLL_PROP(new_card, new_cucard, result_schema, cand_key ) ;
 	
 	//if foreign keys are subset of gby attrs, pass this foreign key
-	for (i=0; i<rel_input->FKeyList.GetSize(); i++)
+	for (i=0; i<rel_input->FKeyList.size(); i++)
 	{
 		if (rel_input->FKeyList[i]->ForeignKey->IsSubSet(GbyAtts, GbySize))
-			result->FKeyList.Add(new FOREIGN_KEY(*rel_input->FKeyList[i]));
+			result->FKeyList.push_back(new FOREIGN_KEY(*rel_input->FKeyList[i]));
 	}
 	return result;
 } // AGG_LIST::FindLogProp
@@ -939,7 +936,7 @@ CString AGG_LIST::Dump()
 	//dump AggOps
 	temp.Format("%s", "( Aggregating: ");
 	os += temp;
-	int NumOps = AggOps->GetSize();
+	int NumOps = AggOps->size();
 	for (i=0; i< NumOps-1; i++)
 	{
 		temp = (* AggOps)[i]->Dump();
@@ -970,7 +967,7 @@ bool AGG_LIST::operator== (OP * other)
 	// traverse the agg_ops
 	if (result)
 	{
-		int NumOps = AggOps->GetSize();
+		int NumOps = AggOps->size();
 		for (int i=0; i<NumOps && result; i++)
 		{
 			AGG_OP * oth_op = ( * ((AGG_LIST*)other)->AggOps)[i];
@@ -1011,10 +1008,10 @@ LOG_PROP* FUNC_OP::FindLogProp (LOG_PROP ** input)
 		new LOG_COLL_PROP(rel_input->Card, rel_input->UCard, result_schema, cand_key ) ;
 	
 	//pass the foreign key info 
-	for (int i=0; i<rel_input->FKeyList.GetSize(); i++)
+	for (int i=0; i<rel_input->FKeyList.size(); i++)
 	{
 		FOREIGN_KEY * fk = new FOREIGN_KEY(*rel_input->FKeyList[i]);
-		result->FKeyList.Add(fk);
+		result->FKeyList.push_back(fk);
 	}
 	
 	return result;

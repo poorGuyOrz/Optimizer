@@ -9,7 +9,7 @@ Columbia Optimizer Framework
   Supported by NSF Grants IRI-9610013 and IRI-9619977
 */
 
-#include "logop.h"
+#include "../header/logop.h"
 
 // Each array maps an integer into the elements of the array at that integer
 // location, i.e. maps i to array[i].
@@ -158,8 +158,8 @@ CM*			Cm;			// read cost model in
 SSP*		Ssp;		// Create Search space
 KEYS_SET    IntOrdersSet; // set of interesting orders
 
-CFile OutputFile;	// result file
-CFile OutputCOVE;	// script file
+ofstream OutputFile;	// result file
+ofstream OutputCOVE;	// script file
 PTASKS	PTasks;		// pending task
 
 // **************  include physcial mexpr in group or not *****************

@@ -12,15 +12,12 @@ Columbia Optimizer Framework
 	
 */
 
-#include "stdafx.h"
-#include "query.h"
+#include "../header/stdafx.h"
+#include "../header/query.h"
 
 #define LINEWIDTH	255		// buffer length of one text line
 #define MAXLENGTH	10240	// max length of the lisp expression        
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 // Keyword definition
 #define KEYWORD_GET 		         "GET"
@@ -88,7 +85,7 @@ QUERY::QUERY(CString QueryFile)
 	
 	SET_TRACE Trace(false);
 	
-	if((fp = fopen(QueryFile,"r"))==NULL) 
+	if((fp = fopen(QueryFile.str_.c_str(),"r"))==NULL) 
 		OUTPUT_ERROR("can not open file 'query'!");
 	
 	// skip the comment lines or blank lines
@@ -306,7 +303,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		p += strlen(KEYWORD_INT);
 		p = SkipSpace(p);
 		p++;	// skip '('
-		Op = new CONST_INT_OP( atoi( ParseOneParameter(p) ) );
+		Op = new CONST_INT_OP( atoi( ParseOneParameter(p).str_.c_str() ) );
 		free(OneElement);
 		
 		return new EXPR(Op);
@@ -364,7 +361,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		int Size = GbyKeysSet.GetSize();
 		
-		int NumOps = AggOps->GetSize();
+		int NumOps = AggOps->size();
 		Op = new AGG_LIST( GbyKeysSet.CopyOut(), Size, AggOps );
 		
 		return new EXPR(Op, Expr);
@@ -427,7 +424,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		while (*p!='<' && *p!=')') p++; 		// skip the char before '<'
 		if(*p==')') 
 		{
-			for (int i=0; i<KeysSet->GetSize(); i++) sort_prop->KeyOrder.Add(ascending);
+			for (int i=0; i<KeysSet->GetSize(); i++) sort_prop->KeyOrder.push_back(ascending);
 		}
 		else 
 		{
@@ -445,13 +442,13 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 				{
 					*p=0;			// get a str
 					str = SkipSpace(str);
-					sort_prop->KeyOrder.Add(atoKeyOrder(str));    // add the order to KeyOrder
+					sort_prop->KeyOrder.push_back(atoKeyOrder(str));    // add the order to KeyOrder
 					break;
 				}
 				if (*p==',')
 				{
 					*p=0;			// get a str
-					sort_prop->KeyOrder.Add(atoKeyOrder(str));    // add the order to KeyOrder
+					sort_prop->KeyOrder.push_back(atoKeyOrder(str));    // add the order to KeyOrder
 					*p=',';			// restore the char
 					p++; 		
 					continue;
@@ -463,8 +460,8 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		CONT * InitCont = new CONT( sort_prop, new COST(-1), false);
 		//Make this the first context
-		CONT::vc.Add (InitCont);
-		assert(CONT::vc.GetSize() == 1);
+		CONT::vc.push_back (InitCont);
+		assert(CONT::vc.size() == 1);
 		
 		free(OneElement);
 		
@@ -549,7 +546,7 @@ char *QUERY::GetOneElement(char *&Expr)
 		}
 	}
 	
-	OneElement = strdup(Str);
+	OneElement = strdup(Str.str_.c_str());
 	
 	return OneElement;
 }
@@ -595,7 +592,7 @@ void QUERY::ParseAggOps(char *& p, AGG_OP_ARRAY & AggOps)
 	
 	while(*p != RIGHT_BRACKET)
 	{
-		AggOps.Add(GetOneAggOp(p));
+		AggOps.push_back(GetOneAggOp(p));
 		if(*p == COMMA) p++;	// skip ','
 	}
 	
@@ -726,7 +723,7 @@ CString QUERY::Dump()
 	// format the output string, insert '\r' in front of '\n'
 	while ( (pos = ExprBuf.Find('\n')) != -1 ) 
 	{
-		os += ExprBuf.Mid(0,pos);
+		os += ExprBuf.str_.substr (0,pos);
 		os += "\r\n";
 		ExprBuf = ExprBuf.Mid(pos+1);
 	}

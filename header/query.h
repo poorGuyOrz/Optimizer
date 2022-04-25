@@ -13,8 +13,8 @@ Columbia Optimizer Framework
 #ifndef QUERY_H
 #define QUERY_H
 
-#include "logop.h"
-#include "item.h"
+#include "../header/logop.h"
+#include "../header/item.h"
 
 class EXPR;
 class QUERY;
@@ -66,7 +66,7 @@ private:
 	
 	// get the project keys
 	//##ModelId=3B0C086D0364
-	void QUERY::ParsePJKeys(char *& p, KEYS_SET & Keys);
+	void ParsePJKeys(char *& p, KEYS_SET & Keys);
 	
 	// get left and right KEYS_SET
 	//##ModelId=3B0C086D036F
@@ -88,15 +88,15 @@ private:
 	
 	// get an AGG_OP_ARRAY
 	//##ModelId=3B0C086D03B3
-	void QUERY::ParseAggOps(char *&p, AGG_OP_ARRAY & AggOps);
+	void ParseAggOps(char *&p, AGG_OP_ARRAY & AggOps);
 	
 	// get the group by keys
 	//##ModelId=3B0C086D03BE
-	void QUERY::ParseGby(char *&p, KEYS_SET & Keys);
+	void ParseGby(char *&p, KEYS_SET & Keys);
 	
 	//	get one AGG_OP
 	//##ModelId=3B0C086D03C9
-	AGG_OP * QUERY::GetOneAggOp(char *& p);
+	AGG_OP * GetOneAggOp(char *& p);
 };
 
 /*

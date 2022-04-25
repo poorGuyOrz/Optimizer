@@ -11,13 +11,10 @@ Columbia Optimizer Framework
   
 */
 
-#include "stdafx.h"
-#include "tasks.h"
-#include "physop.h"
+#include "../header/stdafx.h"
+#include "../header/tasks.h"
+#include "../header/physop.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 /* Function to compare the promise of rule applications */
 int compare_moves (void const *x, void const *y)
@@ -116,7 +113,7 @@ void PTASKS::push (TASK * task)
 	{
 		CString os;
 		os.Format("PushTaskList {%s}\r\n", task ->Dump() );
-		OutputCOVE.Write(os, os.GetLength());
+		OutputCOVE << (os) << endl;
 	}
 } //PTASKS::push
 
@@ -131,7 +128,7 @@ TASK * PTASKS::pop ()
 	{
 		CString os;
 		os.Format("PopTaskList\r\n");
-		OutputCOVE.Write(os, os.GetLength());
+		OutputCOVE << (os) << endl;
 	}
     
 	return ( task );
@@ -289,14 +286,14 @@ void O_GROUP::perform ()
 				PTasks.push(new O_GROUP (GrpID, ContextID, TaskNo, true));	
 			COST *NewCost = new COST(*(LocalCont -> GetUpperBd()));
 			CONT * NewContext = new CONT(new PHYS_PROP(any), NewCost, false);
-			CONT::vc.Add(NewContext);
+			CONT::vc.push_back(NewContext);
 			if (GlobepsPruning)
 			{
 				COST * eps_bound = new COST(*EpsBound);
-				PTasks.push(new O_GROUP (GrpID, CONT::vc.GetSize()-1, TaskNo, true, eps_bound));
+				PTasks.push(new O_GROUP (GrpID, CONT::vc.size()-1, TaskNo, true, eps_bound));
 			}
 			else
-				PTasks.push(new O_GROUP (GrpID, CONT::vc.GetSize()-1, TaskNo, true));
+				PTasks.push(new O_GROUP (GrpID, CONT::vc.size()-1, TaskNo, true));
 		}
 	}
 	else //Group is optimized
@@ -304,7 +301,7 @@ void O_GROUP::perform ()
 		// if (property is ANY)
 		// assert (this is case 4)
 		// push O_INPUTS on all physical mexprs
-		CArray <M_EXPR *, M_EXPR *> PhysMExprs;
+		vector < M_EXPR *> PhysMExprs;
 		int count = 0;
 		if(LocalReqdProp->GetOrder() == any)
 		{
@@ -313,7 +310,7 @@ void O_GROUP::perform ()
 			for( M_EXPR * PhysMExpr = Group->GetFirstPhysMExpr();
 			PhysMExpr ;  PhysMExpr = PhysMExpr->GetNextMExpr() ) 
 			{
-				PhysMExprs.Add(PhysMExpr);
+				PhysMExprs.push_back(PhysMExpr);
 				count++;
 			}
 			//push the last PhysMExpr
@@ -351,7 +348,7 @@ void O_GROUP::perform ()
 			for( M_EXPR * PhysMExpr = Group->GetFirstPhysMExpr();
 			PhysMExpr ;  PhysMExpr = PhysMExpr->GetNextMExpr() ) 
 			{
-				PhysMExprs.Add(PhysMExpr);
+				PhysMExprs.push_back(PhysMExpr);
 				count++;
 			}
 			//push the last PhysMExpr
@@ -1063,7 +1060,7 @@ void O_INPUTS::perform ()
 					PTRACE("LocalCost is %s", LocalCost->Dump());
 					CostSoFar.FinalCost(LocalCost, InputCost, arity);
 					*InputBd -= CostSoFar; //Subtract CostSoFar
-					*InputBd += *InputCost[input]; //Add IG's contribution to CostSoFar
+					*InputBd += *InputCost[input]; //push_back IG's contribution to CostSoFar
 				}
 				
 				// update the new motivating bounds, but do not do so if need INFBOUND 
@@ -1145,15 +1142,15 @@ void O_INPUTS::perform ()
 					PTRACE("LocalCost is %s", LocalCost->Dump());
 					CostSoFar.FinalCost(LocalCost, InputCost, arity);
 					*InputBd -= CostSoFar; //Subtract CostSoFar
-					*InputBd += *InputCost[input]; //Add IG's contribution to CostSoFar
+					*InputBd += *InputCost[input]; //push_back IG's contribution to CostSoFar
 				}
 				
 				PHYS_PROP *InputProp = new PHYS_PROP(*ReqProp);
 				// update the bound in multiwinner to InputBd
 				CONT * InputContext = new CONT(InputProp, InputBd, false);
-				CONT::vc.Add (InputContext);
+				CONT::vc.push_back (InputContext);
 				//Push O_GROUP
-				int ContID = CONT::vc.GetSize()-1;
+				int ContID = CONT::vc.size()-1;
 				PTRACE2("push O_GROUP %d, %s", IGNo, CONT::vc[ContID] -> Dump());
 				
 				if (GlobepsPruning)
@@ -1822,9 +1819,9 @@ TerminateThisTask :
 				delete [] InputLogProp;
 			}
 			delete LocalCost;
-			AfterArray.Add(element);
+			AfterArray.push_back(element);
 		}
-		int num_afters = AfterArray.GetSize();
+		int num_afters = AfterArray.size();
 		// copy the array to static array
 		AFTERS *Afters = new AFTERS[num_afters];
 		for (int array_index =0; array_index <num_afters; array_index++)

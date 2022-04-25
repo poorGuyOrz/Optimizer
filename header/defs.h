@@ -12,7 +12,7 @@ Columbia Optimizer Framework
 #ifndef DEFS_H
 #define DEFS_H
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
 /*
 ============================================================
@@ -38,9 +38,9 @@ typedef  unsigned long  int  ub4;   /* unsigned 4-byte quantities */
 typedef  unsigned       char ub1;   /* unsigned 1-byte quantities */
 
 //##ModelId=3B0C0876032A
-typedef  CArray < CString, CString >  STRING_ARRAY;
+typedef  vector <  CString >  STRING_ARRAY;
 //##ModelId=3B0C08760348
-typedef  CArray < int, int >  INT_ARRAY;
+typedef  vector <  int >  INT_ARRAY;
 
 //##ModelId=3B0C0876035C
 typedef	unsigned int	BIT_VECTOR;		// Used to implement unique rule set.  Note this
@@ -108,7 +108,7 @@ typedef enum	ORDER_AD{
 } ORDER_AD;
 
 //##ModelId=3B0C087603B6
-typedef CArray <ORDER_AD, ORDER_AD> KeyOrderArray;
+typedef vector < ORDER_AD> KeyOrderArray;
 
 //any means any property
 //##ModelId=3B0C087603D4
@@ -142,68 +142,83 @@ typedef int GRP_ID;     //ID of a Group
 
 // trace one object.  Output is newline==, TraceDepth==, file, line -----, then
 //object in the format given.
-#define PTRACE(format, object)  {if(TraceOn && !ForGlobalEpsPruning){ CString OutputString;	\
-	CString temp;				            \
-	temp.Format(format,object);		        \
-	OutputString.Format("%s%d%s%s%s%d%s",   \
-	"\r\n==", TraceDepth, "==",             \
-	Trim(__FILE__),",",__LINE__," ----- "); \
-	OutputString += temp;			        \
-	if(WindowTrace) OutputWindow->Print(OutputString); \
-    if(FileTrace) OutputFile.Write(OutputString, OutputString.GetLength());	}}
-    
+#define PTRACE(format, object)                                                                                     \
+  {                                                                                                                \
+    if (TraceOn && !ForGlobalEpsPruning) {                                                                         \
+      CString OutputString;                                                                                        \
+      CString temp;                                                                                                \
+      temp.Format(format, object);                                                                                 \
+      OutputString.Format("%s%d%s%s%s%d%s", "\r\n==", TraceDepth, "==", Trim(__FILE__), ",", __LINE__, " ----- "); \
+      OutputString += temp;                                                                                        \
+      if (FileTrace) OutputFile << (OutputString) << endl;                                                         \
+    }                                                                                                              \
+  }
 
 // trace two objects.  Format as above.
-#define PTRACE2(format,obj1,obj2)  {if(TraceOn&& !ForGlobalEpsPruning){ CString OutputString,temp;\
-	temp.Format(format,obj1,obj2);		               \
-	OutputString.Format("%s%d%s%s%s%d%s",	           \
-	"\r\n==", TraceDepth, "==",                        \
-	Trim(__FILE__),",",__LINE__," ----- ");            \
-	OutputString += temp;			                   \
-	if(WindowTrace) OutputWindow->Print(OutputString); \
-if(FileTrace) OutputFile.Write(OutputString, OutputString.GetLength());	}}
+#define PTRACE2(format, obj1, obj2)                                                                                \
+  {                                                                                                                \
+    if (TraceOn && !ForGlobalEpsPruning) {                                                                         \
+      CString OutputString, temp;                                                                                  \
+      temp.Format(format, obj1, obj2);                                                                             \
+      OutputString.Format("%s%d%s%s%s%d%s", "\r\n==", TraceDepth, "==", Trim(__FILE__), ",", __LINE__, " ----- "); \
+      OutputString += temp;                                                                                        \
+      if (FileTrace) OutputFile << (OutputString) << endl;                                                         \
+    }                                                                                                              \
+  }
 
-//Print n tabs, then the character string.  No newlines except as in string.
-#define OUTPUTN(n, string) {if (!ForGlobalEpsPruning)\
-{ \
-	CString OutputString, temp; \
-	temp.Format("    ");        \
-	for(int i = 0; i < n ; i++) \
-{ \
-	OutputString += temp; \
-} \
-	temp.Format("%s", string);         \
-	OutputString += temp;              \
-	OutputWindow->Print(OutputString); \
-OutputFile.Write(OutputString, OutputString.GetLength());	}}
+// Print n tabs, then the character string.  No newlines except as in string.
+#define OUTPUTN(n, string)                  \
+  {                                         \
+    if (!ForGlobalEpsPruning) {             \
+      CString OutputString, temp;           \
+      temp.Format("    ");                  \
+      for (int i = 0; i < n; i++) {         \
+        OutputString += temp;               \
+      }                                     \
+      temp.Format("%s", string);            \
+      OutputString += temp;                 \
+      OutputFile << (OutputString) << endl; \
+    }                                       \
+  }
 
 // trace without line and file info.  No newlines except in format input.
-#define WTRACE(format, object)  {if(TraceOn){ CString OutputString;	      \
-	OutputString.Format(format,object) ;	                              \
-	if(WindowTrace) OutputWindow->Print(OutputString);                    \
-if(FileTrace) OutputFile.Write(OutputString, OutputString.GetLength());	}}
+#define WTRACE(format, object)                             \
+  {                                                        \
+    if (TraceOn) {                                         \
+      CString OutputString;                                \
+      OutputString.Format(format, object);                 \
+      if (FileTrace) OutputFile << (OutputString) << endl; \
+    }                                                      \
+  }
 
-// Output the object to window and OutputFile, even if tracing is off.    
+// Output the object to window and OutputFile, even if tracing is off.
 // No newlines except in format input.
-//First one writes to window and trace file, second to file only.
-#define OUTPUT(format, object) {if (!ForGlobalEpsPruning) { CString OutputString;	\
-	OutputString.Format(format,object) ;	                                        \
-	OutputWindow->Print(OutputString);                                              \
-OutputFile.Write(OutputString, OutputString.GetLength());	}}
+// First one writes to window and trace file, second to file only.
+#define OUTPUT(format, object)              \
+  {                                         \
+    if (!ForGlobalEpsPruning) {             \
+      CString OutputString;                 \
+      OutputString.Format(format, object);  \
+      OutputFile << (OutputString) << endl; \
+    }                                       \
+  }
 
-//Write the object to OutputFile
-#define TRACE_FILE(format, object)  { CString OutputString;	\
-	OutputString.Format(format,object) ;	\
-OutputFile.Write(OutputString, OutputString.GetLength());	}
+// Write the object to OutputFile
+#define TRACE_FILE(format, object)        \
+  {                                       \
+    CString OutputString;                 \
+    OutputString.Format(format, object);  \
+    OutputFile << (OutputString) << endl; \
+  }
 
 // display error message to Window and OutputFile
-#define OUTPUT_ERROR(text)	{ CString OutputString;          \
-	OutputString.Format("%s%s%s%s%s%d%s",                    \
-	"\r\nERROR:" , text , ",file:" , Trim(__FILE__) ,        \
-	",line:" , __LINE__ ,"\r\n");                            \
-	OutputWindow->Print(OutputString);                       \
-	OutputFile.Write(OutputString, OutputString.GetLength());\
-abort(); }
+#define OUTPUT_ERROR(text)                                                                                           \
+  {                                                                                                                  \
+    CString OutputString;                                                                                            \
+    OutputString.Format("%s%s%s%s%s%d%s", "\r\nERROR:", text, ",file:", Trim(__FILE__), ",line:", __LINE__, "\r\n"); \
+    OutputFile << (OutputString) << endl;                                                                            \
+    abort();                                                                                                         \
+  }
 
 /* ==========  Optimizer related ============  */
 
@@ -241,8 +256,8 @@ extern STRING_ARRAY  IndTable;		// index name table
 extern INT_ARRAY  AttCollTable;		// attribute to collid table
 extern STRING_ARRAY  BitIndTable;	// Bitind name table
 
-extern CFile OutputFile;	// global output file
-extern CFile OutputCOVE;	// global COVE script file
+extern ofstream OutputFile;	// global output file
+extern ofstream OutputCOVE;	// global COVE script file
 extern int TraceDepth;		// Not the stack depth, but the number of times SET_TRACE
 // objects have been created in current stack functions.
 extern bool TraceOn;		// Are we tracing?

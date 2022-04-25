@@ -12,7 +12,7 @@ TASKS.H - OPTIMIZATION USING TASKS
 #ifndef TASKS_H
 #define TASKS_H
 
-#include "ssp.h"
+#include "../header/ssp.h"
 #include "rules.h"
 
 class TASKS;		//Abstract class for all task classes

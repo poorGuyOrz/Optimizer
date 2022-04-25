@@ -12,12 +12,9 @@ group.cpp -  implementation of class GROUP
 
 	
 */
-#include "stdafx.h"
-#include "ssp.h"
+#include "../header/stdafx.h"
+#include "../header/ssp.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 //##ModelId=3B0C086603C7
 GROUP::GROUP(M_EXPR * MExpr)
@@ -97,13 +94,13 @@ FirstPhysMExpr(NULL), LastPhysMExpr(NULL)
 		temp += " ";
 		
 		CString os;
-		os.Format("addGroup { %d %d \" %s  \"%s} %s",
+		os.Format("addGroup { %d %p \" %s  \"%s} %s",
 			
-			GroupID, int(MExpr), MExpr -> GetOp() -> Dump(),
+			GroupID, (MExpr), MExpr -> GetOp() -> Dump(),
 			temp, LogProp -> DumpCOVE()
 			);
 		
-		OutputCOVE.Write(os, os.GetLength());
+		OutputCOVE << (os) << endl;
 	}
 }
 
@@ -133,7 +130,7 @@ GROUP::~GROUP()
 	}
 	
 #ifndef IRPROP
-	for(int i=0;i<Winners.GetSize();i++)
+	for(int i=0;i<Winners.size();i++)
 		delete Winners[i];
 #endif
 	
@@ -197,13 +194,13 @@ void GROUP::NewMExpr(M_EXPR *MExpr)
 		temp += " ";
 		
 		CString os;
-		os.Format("addExp { %d %d \" %s  \"%s} %s",
+		os.Format("addExp { %d %p \" %s  \"%s} %s",
 			
-			GroupID, int(MExpr), MExpr -> GetOp() -> Dump(),
+			GroupID, (MExpr), MExpr -> GetOp() -> Dump(),
 			temp, LogProp -> DumpCOVE()
 			);
 		
-		OutputCOVE.Write(os, os.GetLength());
+		OutputCOVE << (os) << endl;
 	}
 }  
 
@@ -303,7 +300,7 @@ CString GROUP::Dump()
 	os += "\r\n";
 #else
 	
-	Size = Winners.GetSize();
+	Size = Winners.size();
 	PHYS_PROP * PhysProp;
 	if(!Size) os += "\tNo Winners\r\n";
 	for(int i = 0; i < Size; i++) 
@@ -358,7 +355,7 @@ void GROUP::FastDump()
 #ifdef IRPROP
 	TRACE_FILE("\t%s\n", M_WINNER::mc[GroupID]->Dump());
 #else
-	Size = Winners.GetSize();
+	Size = Winners.size();
 	PHYS_PROP * PhysProp;
 	if(!Size) TRACE_FILE("%s", "\tNo Winners\r\n" );
 	for(int i = 0; i < Size; i++) 

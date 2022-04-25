@@ -12,7 +12,7 @@ Columbia Optimizer Framework
 #ifndef SSP_H
 #define SSP_H
 
-#include "query.h"
+#include "../header/query.h"
 
 #define NEW_GRPID	-1	// used by SSP::CopyIn and M_EXPR::M_EXPR
 // means need to create a new group
@@ -140,7 +140,7 @@ private:
 	
     //Collection of Groups, indexed by GRP_ID
 	//##ModelId=3B0C0865013C
-    CArray<GROUP*, GROUP* > Groups;
+    vector<GROUP* > Groups;
 	
 }; // class SSP
 
@@ -466,7 +466,7 @@ private	:
 	
 	// Winner's circle
 	//##ModelId=3B0C086701B7
-	CArray < WINNER *, WINNER * > Winners;
+	vector <  WINNER * > Winners;
 	
 	// if operator is EQJOIN, estimate the group size, else estimate group size =0
 	// used for halt option
@@ -588,7 +588,7 @@ class M_WINNER
 { 
 public:
 	//##ModelId=3B0C08680192
-	static CArray< M_WINNER * , M_WINNER* > M_WINNER::mc;
+	static vector< M_WINNER* > mc;
 	//##ModelId=3B0C086801A4
 	static COST InfCost;
 	

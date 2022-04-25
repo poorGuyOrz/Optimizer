@@ -12,7 +12,7 @@ Columbia Optimizer Framework
 #ifndef OP_H
 #define OP_H
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
 class OP;	//All operators - Abstract
 
@@ -424,7 +424,7 @@ public:
 };
 
 //##ModelId=3B0C0873019F
-typedef CArray <AGG_OP *, AGG_OP *> AGG_OP_ARRAY;
+typedef vector < AGG_OP *> AGG_OP_ARRAY;
 
 #endif //OP_H
 

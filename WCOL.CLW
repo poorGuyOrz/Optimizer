@@ -4,7 +4,7 @@
 Version=1
 LastClass=COptionDialog
 LastTemplate=CDialog
-NewFileInclude1=#include "stdafx.h"
+NewFileInclude1=#include "../header/stdafx.h"
 NewFileInclude2=#include "wcol.h"
 LastPage=0
 

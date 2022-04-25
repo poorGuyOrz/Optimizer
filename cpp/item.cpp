@@ -15,14 +15,11 @@ item.cpp -
 */
  
 
-#include "stdafx.h"
-#include "item.h"
+#include "../header/stdafx.h"
+#include "../header/item.h"
 
 extern bool ForGlobalEpsPruning;
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 //##ModelId=3B0C08750379
 ATTR_EXP::ATTR_EXP(CString range_var, int * atts, int size)
@@ -117,17 +114,17 @@ LOG_PROP * COMP_OP::FindLogProp (	LOG_PROP ** input)
 			// MINIMUM selectivity .05
 			if (LeftProp->CuCard==1) 
 			{
-				ASSERT(LeftProp->Min == LeftProp->Max);
+				assert(LeftProp->Min == LeftProp->Max);
 				attr_cucard = RightProp->CuCard;
-				ASSERT(attr_cucard >= 1);
+				assert(attr_cucard >= 1);
 				selectivity = MAX(0.05, 1 / attr_cucard); 
 			} 
 			else 
 				if (RightProp->CuCard==1) 
 				{
-					ASSERT(RightProp->Min == RightProp->Max);
+					assert(RightProp->Min == RightProp->Max);
 					attr_cucard = LeftProp->CuCard;
-					ASSERT(attr_cucard >= 1);
+					assert(attr_cucard >= 1);
 					selectivity = MAX(0.05, 1 / attr_cucard); 
 				} 
 				else 
@@ -157,7 +154,7 @@ LOG_PROP * COMP_OP::FindLogProp (	LOG_PROP ** input)
 	{
 		if (LeftProp->CuCard==1) 
 		{
-			ASSERT(LeftProp->Min == LeftProp->Max);
+			assert(LeftProp->Min == LeftProp->Max);
 			const_value = LeftProp->Min;
 			attr_min = RightProp->Min;
 			attr_max = RightProp->Max;
@@ -165,7 +162,7 @@ LOG_PROP * COMP_OP::FindLogProp (	LOG_PROP ** input)
 		} 
 		else 
 		{
-			ASSERT(RightProp->Min == RightProp->Max);
+			assert(RightProp->Min == RightProp->Max);
 			const_value = RightProp->Min;
 			attr_min = LeftProp->Min;
 			attr_max = LeftProp->Max;
@@ -222,10 +219,10 @@ LOG_PROP * COMP_OP::FindLogProp (	LOG_PROP ** input)
 	}
 	
 	//"Small selectivity -- shouldn't be a problem -- but is!"
-    ASSERT (selectivity > .0000001); 
+    assert (selectivity > .0000001); 
 	
 	// "Big selectivity (> 1)"
-    ASSERT (selectivity < 1 );
+    assert (selectivity < 1 );
 	
     LOG_PROP * result = new LOG_ITEM_PROP (-1,-1,-1, (float)selectivity, fv);
 	

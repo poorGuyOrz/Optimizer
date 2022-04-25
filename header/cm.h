@@ -12,7 +12,7 @@ Columbia Optimizer Framework
 #ifndef CM_H
 #define CM_H
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
 class CM;
 
@@ -54,7 +54,7 @@ private:
 public:
 	
 	//##ModelId=3B0C0877015F
-	CM(CString filename);	//read information into cost model from some default file
+	CM(string filename);	//read information into cost model from some default file
 	
 	//##ModelId=3B0C0877016A
 	CString Dump(); //for debugging
@@ -111,4 +111,4 @@ public:
 	
 };
 
-#endif CM_H
+#endif 

@@ -11,7 +11,7 @@ Columbia Optimizer Framework
 #ifndef CAT_H
 #define CAT_H
 
-#include "stdafx.h"
+#include "../header/stdafx.h"
 
 class CAT;
 
@@ -29,21 +29,21 @@ private: 	// Each array maps an integer into the elements of the array at that i
 	        // location, i.e. maps i to array[i].
 	
 	//##ModelId=3B0C087702B4
-	CArray<COLL_PROP* , COLL_PROP*>	CollProps;//Array of collection properties
+	vector< COLL_PROP*>	CollProps;//Array of collection properties
 	//##ModelId=3B0C087702C8
-	CArray<ATTR* , ATTR*>	Attrs; //Array of attributes , index is AttId
+	vector< ATTR*>	Attrs; //Array of attributes , index is AttId
 	//##ModelId=3B0C087702DC
-	CArray<DOM_TYPE, DOM_TYPE> Domains; // Array of domains, index is AttId
+	vector<DOM_TYPE> Domains; // Array of domains, index is AttId
 	//##ModelId=3B0C087702F0
-	CArray<INT_ARRAY* , INT_ARRAY*>	AttNames; //Attribute Names
+	vector< INT_ARRAY*>	AttNames; //Attribute Names
 	//##ModelId=3B0C0877030E
-	CArray<IND_PROP* , IND_PROP*>	IndProps; //Properties of Indexes
+	vector< IND_PROP*>	IndProps; //Properties of Indexes
 	//##ModelId=3B0C08770322
-	CArray<INT_ARRAY* , INT_ARRAY*>	IndNames; // Index Names
+	vector< INT_ARRAY*>	IndNames; // Index Names
 	//##ModelId=3B0C08770336
-	CArray<BIT_IND_PROP* , BIT_IND_PROP*>	BitIndProps; //Properties of BitIndexes
+	vector< BIT_IND_PROP*>	BitIndProps; //Properties of BitIndexes
 	//##ModelId=3B0C08770354
-	CArray<INT_ARRAY* , INT_ARRAY*>	BitIndNames; // BitIndex Names
+	vector< INT_ARRAY*>	BitIndNames; // BitIndex Names
 	
 public:
 	

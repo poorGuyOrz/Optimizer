@@ -11,12 +11,9 @@
 	
 */
 
-#include "stdafx.h"
-#include "ssp.h"
+#include "../header/stdafx.h"
+#include "../header/ssp.h"
 
-#ifdef _DEBUG
-	#define new DEBUG_NEW
-#endif
 
 //##ModelId=3B0C086502F3
 M_EXPR::M_EXPR( EXPR * Expr, GRP_ID grpid)
