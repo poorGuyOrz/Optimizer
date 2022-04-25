@@ -6,7 +6,6 @@
 
 #pragma once
 
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
 #include "cstring.h"
 #include <assert.h>
@@ -18,11 +17,13 @@
 #include <fstream>
 #include <vector>
 #include <string>
+
+#include "json.hpp"
+using json = nlohmann::json;
+
 using namespace std;
 
 #include "defs.h"
 #include "supp.h"
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Developer Studio will insert additional declarations immediately before the previous line.
 

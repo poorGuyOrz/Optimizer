@@ -53,6 +53,7 @@
       "ctime": "cpp",
       "cwchar": "cpp",
       "xstddef": "cpp",
-      "xtr1common": "cpp"
+      "xtr1common": "cpp",
+      "cmj": "cpp"
     }
 }
