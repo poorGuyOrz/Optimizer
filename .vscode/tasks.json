@@ -7,9 +7,21 @@
       "args": [
         "-fdiagnostics-color=always",
         "-g",
-        "${file}",
+        "${workspaceFolder}\\cpp\\supp.cpp",
+        "${workspaceFolder}\\cpp\\cat.cpp",
+        "${workspaceFolder}\\cpp\\group.cpp ",
+        "${workspaceFolder}\\cpp\\expr.cpp ",
+        "${workspaceFolder}\\cpp\\item.cpp ",
+        "${workspaceFolder}\\cpp\\logop.cpp ",
+        "${workspaceFolder}\\cpp\\mexpr.cpp ",
+        "${workspaceFolder}\\cpp\\physop.cpp ",
+        "${workspaceFolder}\\cpp\\query.cpp ",
+        "${workspaceFolder}\\cpp\\rules.cpp ",
+        "${workspaceFolder}\\cpp\\ssp.cpp ",
+        "${workspaceFolder}\\cpp\\tasks.cpp ",
+        "${workspaceFolder}\\cpp\\main.cpp",
         "-o",
-        "${fileDirname}\\${fileBasenameNoExtension}.exe"
+        "$${workspaceFolder}\\cpp\\main.exe"
       ],
       "options": {
         "cwd": "${fileDirname}"
@@ -26,3 +38,4 @@
   ],
   "version": "2.0.0"
 }
+// cm.cpp supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp main.cpp
