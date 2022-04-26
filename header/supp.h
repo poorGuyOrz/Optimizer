@@ -514,39 +514,29 @@ class SCHEMA {
   SCHEMA *projection(int *attrs, int size);
 
   // union the schema of the joined collection
-  //##ModelId=3B0C0862005A
   SCHEMA *UnionSchema(SCHEMA *other);
 
   // return the nth attr in the schema
-  //##ModelId=3B0C08620064
   inline ATTR *operator[](int n) { return Attrs[n]; }
 
-  //##ModelId=3B0C0862006E
   inline int GetSize() { return Size; }
 
   // number of Tables in the schema
-  //##ModelId=3B0C08620078
   inline int GetTableNum() { return TableNum; };
 
   // max cucard of each tables in the schema
-  //##ModelId=3B0C08620079
   float GetTableMaxCuCard(int TableIndex);
 
   // width of each tables in the schema
-  //##ModelId=3B0C08620083
   float GetTableWidth(int TableIndex);
 
   // CollId of the table
-  //##ModelId=3B0C0862008D
   inline int GetTableId(int TableIndex) { return TableId[TableIndex]; };
 
   // store the key-sets of all attributes in the schema
-  //##ModelId=3B0C086200A0
   KEYS_SET *AttrStore();
 
-  //##ModelId=3B0C086200A1
   CString Dump();
-  //##ModelId=3B0C086200AA
   CString DumpCOVE();
 
   // the following is used by Bill's Memory Manager
@@ -554,15 +544,12 @@ class SCHEMA {
 #ifdef USE_MEMORY_MANAGER  // use bill's memory manager
 
  public:
-  //##ModelId=3B0C086200B5
   static BLOCK_ANCHOR *_anchor;
 
  public:
   // overload the new and delete methods
-  //##ModelId=3B0C086200C8
   inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
 
-  //##ModelId=3B0C086200D2
   inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
 #endif
 
@@ -574,19 +561,14 @@ class SCHEMA {
    ============================================================
 */
 
-//##ModelId=3B0C08620140
 class LOG_PROP {
   // Abstract Class so an operator can deal with input logical properties of
   // all types of inputs: collection, item, and whatever else is defined.
  public:
-  //##ModelId=3B0C08620154
   LOG_PROP(){};
-  //##ModelId=3B0C08620155
   virtual ~LOG_PROP(){};
 
-  //##ModelId=3B0C0862015E
   virtual CString Dump() = 0;
-  //##ModelId=3B0C08620160
   virtual CString DumpCOVE() = 0;
 
 };  // class LOG_PROP
@@ -596,24 +578,17 @@ class LOG_PROP {
 LOG_COLL_PROP: LOGICAL PROPERTIES OF COLLECTIONS
 ============================================================
 */
-//##ModelId=3B0C08620259
 class LOG_COLL_PROP : public LOG_PROP {
  public:
-  //##ModelId=3B0C0862026D
-  const float Card;  // Cardinality
-  //##ModelId=3B0C08620277
-  const float UCard;  // Unique Cardinality
-  //##ModelId=3B0C0862028C
+  const float Card;      // Cardinality
+  const float UCard;     // Unique Cardinality
   SCHEMA *const Schema;  // schema includes the column unique
   // cardinalities
 
-  //##ModelId=3B0C086202A0
   KEYS_SET *CandidateKey;  // candidate key
 
-  //##ModelId=3B0C086202B4
   vector<FOREIGN_KEY *> FKeyList;
 
-  //##ModelId=3B0C086202C7
   LOG_COLL_PROP(float card, float ucard, SCHEMA *schema, KEYS_SET *cand_keys = NULL)
       : Card(card), UCard(ucard), Schema(schema), CandidateKey(cand_keys) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_COLL_PROP].New();

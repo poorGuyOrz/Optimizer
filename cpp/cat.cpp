@@ -1,15 +1,4 @@
-/*
-        cat.cpp -  implementation of catalog parser
-        Implements classes in cat.h
-        $Revision: 6 $
-        Columbia Optimizer Framework
-
-    A Joint Research Project of Portland State University
-    and the Oregon Graduate Institute
-    Directed by Leonard Shapiro and David Maier
-    Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-*/
+// cat.cpp -  implementation of catalog parser        Implements classes in cat.h
 
 #include "../header/cat.h"
 
@@ -32,7 +21,6 @@
 #define KEYWORD_KEYORDER "KeyOrder:"
 
 // read catalog text file and store the information into CAT
-//##ModelId=3B0C08770371
 CAT::CAT(CString filename) {
   FILE *fp;                  // file handle
   char TextLine[LINEWIDTH];  // text line buffer

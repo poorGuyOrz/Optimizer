@@ -27,7 +27,7 @@ CString CMFile = "cm";          // cost model file name
 CString RSFile = "ruleset";     // rule set file name
 CString AppDir;                 // directory of the application
 
-bool FileTrace = true;      // trace to file flag
+bool FileTrace = true;       // trace to file flag
 bool PiggyBack = false;      // Retain the MEMO structure for use in the subsequent optimization
 bool COVETrace = false;      // trace to file flag
 bool WindowTrace = false;    // trace to window flag
@@ -55,7 +55,7 @@ double GLOBAL_EPS = 0.5;  // global epsilon value
 COST GlobalEpsBound(0);
 bool ForGlobalEpsPruning = false;
 
-int TraceDepth = 0;    // global Trace depth
+int TraceDepth = 0;   // global Trace depth
 bool TraceOn = true;  // global Trace flag
 
 class OPT_STAT *OptStat;  // Opt statistics object

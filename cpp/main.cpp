@@ -419,6 +419,5 @@ int main() { Optimizer(); }
 // g++ .\cm.cpp .\supp.cpp .\cat.cpp .\group.cpp .\expr.cpp .\item.cpp .\logop.cpp .\mexpr.cpp .\physop.cpp .\query.cpp
 // .\rules.cpp .\ssp.cpp .\tasks.cpp .\main.cpp
 
-// g++ cm.cpp supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp
-// tasks.cpp main.cpp
+// g++ cm.cpp supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp main.cpp
 
