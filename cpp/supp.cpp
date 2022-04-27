@@ -69,7 +69,7 @@ ub4 lookup2(ub4 k,        // the key to be hashed
   return c;
 }
 
-ub4 lookup2(CString k,    // the key to be hashed
+ub4 lookup2(string k,     // the key to be hashed
             ub4 length,   // the length of the key
             ub4 initval)  // the previous hash, or an arbitrary value
 {
@@ -179,7 +179,7 @@ bool is_bit_off(BIT_VECTOR bit_vect, int rule_no)  // Is this bit off?
 
 //*************  Function for KEYS_SET class  ************
 //##ModelId=3B0C085F0395
-bool KEYS_SET::AddKey(CString CollName, CString KeyName) {
+bool KEYS_SET::AddKey(string CollName, string KeyName) {
   int AttId = GetAttId(CollName, KeyName);
 
   // check duplicate element in vector
@@ -234,12 +234,12 @@ int *KEYS_SET::CopyOutOne(int i) {
 
 // Transform each key from A.B to NewName.B (actually the IDs)
 //##ModelId=3B0C085F03BD
-void KEYS_SET::update(CString NewName) {
+void KEYS_SET::update(string NewName) {
   int Size = KeyArray.size();
   for (int i = 0; i < Size; i++) KeyArray[i] = GetAttId(NewName, TruncName(GetAttName(KeyArray[i])));
 }
 
-// CString temp = GetAttName(KeyArray[index]);
+// string temp = GetAttName(KeyArray[index]);
 // returns A.X temp.Format("%s");
 
 // Returns the CuCard of the attribute
@@ -253,7 +253,7 @@ float KEYS_SET::GetAttrCuCard(int index) {
 // choose the attribute with Max CuCard
 //##ModelId=3B0C0860004D
 int KEYS_SET::ChMaxCuCard() {
-  CString cname1, cname2;
+  string cname1, cname2;
   float cucard1, cucard2;
   int collid;
   int win = 0;
@@ -302,22 +302,16 @@ int KEYS_SET::ChMaxCuCard() {
 
 }*/
 
-//##ModelId=3B0C08600061
-CString KEYS_SET::Dump() {
-  CString os;
-  CString temp;
+string KEYS_SET::Dump() {
+  string os;
   os = "(";
   int i;
-  for (i = 0; i < GetSize() - 1; i++) {
-    temp.Format("%s%s", GetAttName(KeyArray[i]), ",");
-    os += temp;
-  }
+  for (i = 0; i < GetSize() - 1; i++) os += GetAttName(KeyArray[i]) + ",";
 
   if (GetSize())
-    temp.Format("%s%s", GetAttName(KeyArray[i]), ")");
+    os += GetAttName(KeyArray[i]) + ")";
   else
-    temp.Format("%s", ")");
-  os += temp;
+    os += ")";
 
   return os;
 }
@@ -338,7 +332,7 @@ COLL_PROP::COLL_PROP(COLL_PROP &other)  // copy constructor
 };
 
 //##ModelId=3B0C0860026A
-void COLL_PROP::update(CString NewName) {
+void COLL_PROP::update(string NewName) {
   Keys->update(NewName);
   CandidateKey->update(NewName);
   for (int i = 0; i < FKeyArray.size(); i++) {
@@ -347,79 +341,48 @@ void COLL_PROP::update(CString NewName) {
 }
 
 // dump collection property content
-//##ModelId=3B0C0860027E
-CString COLL_PROP::Dump() {
-  CString os, temp;
-  os.Format("%s%.0f%s%.0f", "  Card:", Card, "  UCard:", UCard);
-  if (Keys->GetSize() > 0) {
-    temp.Format("%s%s", "  Order:", OrderToString(Order));
-    os += temp;
-  }
+string COLL_PROP::Dump() {
+  string os;
+  os = "  Card:" + to_string(Card) + "  UCard:" + to_string(UCard);
+  if (Keys->GetSize() > 0) os += "  Order:" + OrderToString(Order);
 
-  temp.Format("%s%s", "  Keys:", (*Keys).Dump());
-  os += temp;
+  os += "  Keys:" + (*Keys).Dump();
 
-  temp.Format("%s%s%s", "  CandidateKey:", (*CandidateKey).Dump(), "\r\n");
-  os += temp;
+  os += "  CandidateKey:" + (*CandidateKey).Dump() + "\n";
 
   if (FKeyArray.size() > 0) {
-    temp.Format("%s", "  Foreign Keys:");
-    os += temp;
+    os += "  Foreign Keys:";
     for (int i = 0; i < FKeyArray.size(); i++) {
       if (i < FKeyArray.size() - 1)
-        temp.Format("%s%s", (*FKeyArray[i]).Dump(), "\r");
+        os += (*FKeyArray[i]).Dump() + "\r";
       else
-        temp.Format("%s%s", (*FKeyArray[i]).Dump(), "\r\n");
-      os += temp;
+        os += (*FKeyArray[i]).Dump() + "\n";
     }
   }
 
   return os;
 }
 
-//##ModelId=3B0C08600364
-void IND_PROP::update(CString NewName)
-
-{
-  Keys->update(NewName);
-}
+void IND_PROP::update(string NewName) { Keys->update(NewName); }
 
 // dump index property content
-//##ModelId=3B0C08600378
-CString IND_PROP::Dump() {
-  CString os;
-  os.Format("%s%s%s%s%s", "  Type:", IndexOrderToString(IndType), "  Keys:", (*Keys).Dump(),
-            (Clustered == true ? "  Clustered" : "  not Clustered"));
-
-  return os;
+string IND_PROP::Dump() {
+  return "  Type:" + IndexOrderToString(IndType) + "  Keys:" + (*Keys).Dump() +
+         (Clustered == true ? "  Clustered" : "  not Clustered");
 }
 
-//##ModelId=3B0C08610078
-void BIT_IND_PROP::update(CString NewName)
-
-{
-  BitAttr->update(NewName);
-}
+void BIT_IND_PROP::update(string NewName) { BitAttr->update(NewName); }
 
 // dump index property content
-//##ModelId=3B0C0861008B
-CString BIT_IND_PROP::Dump() {
-  CString os;
-  os.Format("%s%s%s%s", "  Bit Attributes:", (*BitAttr).Dump(), "  Index Attributes:", GetAttName(IndexAttr));
-
-  return os;
+string BIT_IND_PROP::Dump() {
+  return "  Bit Attributes:", (*BitAttr).Dump() + "  Index Attributes:" + GetAttName(IndexAttr);
 }
 
-//##ModelId=3B0C0860010C
-CString FOREIGN_KEY::Dump() {
-  CString os;
-  os.Format("%s%s%s%s%s", "(  Foreign Key:", (*ForeignKey).Dump(), "  reference to:", (*RefKey).Dump(), "  )");
-
-  return os;
+string FOREIGN_KEY::Dump() {
+  return "(  Foreign Key:" + (*ForeignKey).Dump() + "  reference to:" + (*RefKey).Dump() + "  )";
 }
 
-//##ModelId=3B0C086101B0
-ATTR::ATTR(CString range_var, int *atts, int size) {
+ATTR::ATTR(string range_var, int *atts, int size) {
   ATTR_EXP *ae = new ATTR_EXP(range_var, CopyArray(atts, size), size);
   AttId = ae->GetAttNew()->AttId;
   CuCard = ae->GetAttNew()->CuCard;
@@ -428,30 +391,17 @@ ATTR::ATTR(CString range_var, int *atts, int size) {
 
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
   delete ae;
-};  // ATTR::ATTR(CString range_var, int * atts, int size)
+};  // ATTR::ATTR(string range_var, int * atts, int size)
 
 // ATTR dump function
-//##ModelId=3B0C086101CC
-CString ATTR::Dump() {
-  CString os;
-  os.Format("%s%s%s%s%.0f%s%.0f%s%.0f ", GetAttName(AttId), " Domain:", DomainToString(Cat->GetDomain(AttId)),
-            " CuCard:", CuCard, " Min:", Min, " Max:", Max);
-  return os;
+string ATTR::Dump() {
+  return GetAttName(AttId) + " Domain:" + DomainToString(Cat->GetDomain(AttId)) + " CuCard:" + to_string(CuCard) +
+         " Min:" + to_string(Min) + " Max:" + to_string(Max);
 };
 
-//##ModelId=3B0C086101D5
-CString ATTR::attrDump() {
-  CString os;
-  os.Format("%s", GetAttName(AttId));
-  return os;
-}
+string ATTR::attrDump() { return GetAttName(AttId); }
 
-//##ModelId=3B0C086101D6
-CString ATTR::DumpCOVE() {
-  CString os;
-  os.Format("%s %d ", GetAttName(AttId), (int)CuCard);
-  return os;
-};
+string ATTR::DumpCOVE() { return GetAttName(AttId) + " " + to_string((int)CuCard); };
 
 // SCHEMA function
 //##ModelId=3B0C08620028
@@ -609,18 +559,18 @@ SCHEMA::~SCHEMA() {
 
 // SCHEMA dump function
 //##ModelId=3B0C086200A1
-CString SCHEMA::Dump() {
-  CString os;
+string SCHEMA::Dump() {
+  string os;
   for (int i = 0; i < Size; i++) {
     os += (*(Attrs[i])).Dump();
-    os += "\r\n";
+    os += "\n";
   }
   return os;
 }
 
 //##ModelId=3B0C086200AA
-CString SCHEMA::DumpCOVE() {
-  CString os;
+string SCHEMA::DumpCOVE() {
+  string os;
   for (int i = 0; i < Size; i++) os += (*(Attrs[i])).DumpCOVE();
   return os;
 }
@@ -641,35 +591,26 @@ KEYS_SET *SCHEMA::AttrStore() {
 }
 
 // LOG_COLL_PROP dump function
-//##ModelId=3B0C086202E5
-CString LOG_COLL_PROP::Dump() {
-  CString os, temp;
-  os.Format("%s%.0f%s%.0f%s%s%s", "  Card: ", Card, "  UCard: ", UCard, "\r\n", "Schema:\r\n", (*Schema).Dump());
-  if (CandidateKey->GetSize() > 0) {
-    temp.Format("%s%s%s", "CandidateKey:", (*CandidateKey).Dump(), "\r\n");
-    os += temp;
-  }
+string LOG_COLL_PROP::Dump() {
+  string os;
+  os = "  Card: " + to_string(Card) + "  UCard: " + to_string(UCard) + "\nSchema:\n" + (*Schema).Dump();
+  if (CandidateKey->GetSize() > 0) os += "CandidateKey:" + (*CandidateKey).Dump() + "\n";
 
   if (FKeyList.size() > 0) {
-    temp.Format("%s", "  Foreign Keys:");
-    os += temp;
+    os += "  Foreign Keys:";
     for (int i = 0; i < FKeyList.size(); i++) {
       if (i < FKeyList.size() - 1)
-        temp.Format("%s%s", (*FKeyList[i]).Dump(), "\r");
+        os += (*FKeyList[i]).Dump() + "\r";
       else
-        temp.Format("%s%s", (*FKeyList[i]).Dump(), "\r\n");
-      os += temp;
+        os += (*FKeyList[i]).Dump() + "\n";
     }
   }
   return os;
 };
 
 // LOG_COLL_PROP dump function for COVE script
-//##ModelId=3B0C086202E6
-CString LOG_COLL_PROP::DumpCOVE() {
-  CString os;
-  os.Format("%d %d { %s }\r\n", (int)Card, (int)UCard, (*Schema).DumpCOVE());
-  return os;
+string LOG_COLL_PROP::DumpCOVE() {
+  return to_string((int)Card) + " " + to_string(UCard) + " { " + (*Schema).DumpCOVE() + " }\n";
 };
 
 // misc functions
@@ -683,11 +624,11 @@ int GetCollId(int AttId) {
 }
 
 // Get the ids from names
-int GetCollId(CString CollName) {
+int GetCollId(string CollName) {
   int Size = CollTable.size();
   int i = 0;
   for (i = 0; i < Size; i++)
-    if (CollName == CollTable[i]) break;
+    if (CollName == CollTable[i].str_) break;
 
   if (i == Size) CollTable.push_back(CollName);
 
@@ -697,12 +638,12 @@ int GetCollId(CString CollName) {
 // Get Att id from name, using AttTable dictionary
 // If not present, add full Att name to AttTable, entry to AttCollTable
 
-int GetAttId(CString CollName, CString AttName) {
-  CString Name = CollName + "." + AttName;
+int GetAttId(string CollName, string AttName) {
+  string Name = CollName + "." + AttName;
   int Size = AttTable.size();
   int i = 0;
   for (i = 0; i < Size; i++) {
-    if (Name == AttTable[i]) break;
+    if (Name == AttTable[i].str_) break;
   }
 
   if (i == Size)  // the entry not exist, new it
@@ -714,19 +655,19 @@ int GetAttId(CString CollName, CString AttName) {
   return i;
 }
 
-int GetAttId(CString Name) {
-  int pos = Name.Find('.');
+int GetAttId(string Name) {
+  int pos = Name.find('.');
   assert(pos != -1);
 
   int Size = AttTable.size();
   int i = 0;
   for (int i = 0; i < Size; i++)
-    if (Name == AttTable[i]) break;
+    if (Name == AttTable[i].str_) break;
 
   if (i == Size)  // the entry not exist, new it
   {
     AttTable.push_back(Name);
-    CString CollName = Name.Left(pos);
+    string CollName = Name.substr(0, pos);
     AttCollTable.push_back(GetCollId(CollName));
   }
 
@@ -734,12 +675,12 @@ int GetAttId(CString Name) {
 }
 
 // Get the ids from names
-int GetIndId(CString CollName, CString IndName) {
-  CString Name = CollName + "." + IndName;
+int GetIndId(string CollName, string IndName) {
+  string Name = CollName + "." + IndName;
   int i = 0;
   int Size = IndTable.size();
   for (int i = 0; i < Size; i++)
-    if (Name == IndTable[i]) break;
+    if (Name == IndTable[i].str_) break;
 
   if (i == Size)  // the entry not exist, new it
     IndTable.push_back(Name);
@@ -748,12 +689,12 @@ int GetIndId(CString CollName, CString IndName) {
 }
 
 // Get the ids from names
-int GetBitIndId(CString CollName, CString BitIndName) {
-  CString Name = CollName + "." + BitIndName;
+int GetBitIndId(string CollName, string BitIndName) {
+  string Name = CollName + "." + BitIndName;
   int Size = BitIndTable.size();
   int i = 0;
   for (int i = 0; i < Size; i++)
-    if (Name == BitIndTable[i]) break;
+    if (Name == BitIndTable[i].str_) break;
 
   if (i == Size)  // the entry not exist, new it
     BitIndTable.push_back(Name);
@@ -762,36 +703,36 @@ int GetBitIndId(CString CollName, CString BitIndName) {
 }
 
 // Get the names from Ids
-CString GetCollName(int CollId) {
+string GetCollName(int CollId) {
   if (CollId == 0) return "";
   assert(CollId < CollTable.size());
-  return CollTable[CollId];
+  return CollTable[CollId].str_;
 }
 
-CString GetAttName(int AttId) {
+string GetAttName(int AttId) {
   if (AttId == 0) return "";
   assert(AttId < AttTable.size());
-  return AttTable[AttId];
+  return AttTable[AttId].str_;
 }
 
 // Transform A.B to B
-CString TruncName(CString AttName) {
-  const char *p = strstr(AttName.str_.c_str(), ".");
+string TruncName(string AttName) {
+  const char *p = strstr(AttName.c_str(), ".");
   assert(p);  // Input was not of the form A.B
   p++;        // skip over .
   return p;
 }
 
-CString GetIndName(int IndId) {
+string GetIndName(int IndId) {
   if (IndId == 0) return "";
   assert(IndId < IndTable.size());
-  return IndTable[IndId];
+  return IndTable[IndId].str_;
 }
 
-CString GetBitIndName(int BitIndId) {
+string GetBitIndName(int BitIndId) {
   if (BitIndId == 0) return "";
   assert(BitIndId < BitIndTable.size());
-  return BitIndTable[BitIndId];
+  return BitIndTable[BitIndId].str_;
 }
 
 DOM_TYPE atoDomain(char *p) {
@@ -803,7 +744,7 @@ DOM_TYPE atoDomain(char *p) {
   return string_t;
 }
 
-CString DomainToString(DOM_TYPE p) {
+string DomainToString(DOM_TYPE p) {
   if (p == string_t) return "string_t";
   if (p == int_t) return "int_t";
   if (p == real_t) return "real_t";
@@ -828,7 +769,7 @@ ORDER atoCollOrder(char *p) {
   return heap;
 }
 
-CString OrderToString(ORDER p) {
+string OrderToString(ORDER p) {
   if (p == heap) return "heap";
   if (p == hashed) return "hashed";
   if (p == sorted) return "sorted";
@@ -843,7 +784,7 @@ ORDER_INDEX atoIndexOrder(char *p) {
   return btree;
 }
 
-CString IndexOrderToString(ORDER_INDEX p) {
+string IndexOrderToString(ORDER_INDEX p) {
   if (p == btree) return "btree";
   if (p == ORDER_INDEX::hash) return "hash";
   OUTPUT_ERROR("Index order type");
@@ -852,10 +793,7 @@ CString IndexOrderToString(ORDER_INDEX p) {
 
 // return only the file name (without path)
 // used by TRACE function
-CString Trim(CString PathName) {
-  int pos = PathName.ReverseFind('\\');
-  return (PathName.Mid(pos + 1));
-};
+string Trim(string PathName) { return PathName; };
 
 // skip the blank space
 char *SkipSpace(char *p) {
@@ -877,7 +815,7 @@ bool IsCommentOrBlankLine(char *p) {
 
 void parseString(char *p) {
   p = SkipSpace(p);
-  while (*p != ' ' && *p != '\t' && *p != '\n') p++;  // keep the char until blank space
+  while (*p != ' ' && *p != '\t' && *p != '\n' && *p != '\r') p++;  // keep the char until blank space
   *p = 0;
 }
 
@@ -935,36 +873,30 @@ bool PHYS_PROP::operator==(PHYS_PROP &other) {
   return false;
 }  // PHYS_PROP::operator==
 
-//##ModelId=3B0C08630296
-CString PHYS_PROP::Dump() {
-  CString os;
+string PHYS_PROP::Dump() {
+  string os;
 
-  if (Order == any) {
-    os.Format("%s", "Any Prop");
-  } else {
-    os.Format("%s on %s",
-              Order == heap     ? "heap"
-              : Order == sorted ? "sorted"
-              : Order == hashed ? "hashed"
-                                : "UNKNOWN",
-              Keys->Dump());
+  if (Order == any)
+    os = "Any Prop";
+  else {
+    string s;
+    os = (Order == heap ? s = "heap"
+                        : (Order == sorted ? s = "sorted" : (Order == hashed ? s = "hashed" : s = "UNKNOWN"))) +
+         " on " + Keys->Dump();
   }
   if (Order == sorted) {
-    CString temp;
     os += "  KeyOrder: (";
     int i;
+    string s;
     for (i = 0; i < KeyOrder.size() - 1; i++) {
-      temp.Format("%s, ", KeyOrder[i] == ascending ? "ascending" : "descending");
-      os += temp;
+      os += " " + (KeyOrder[i] == ascending ? s = "ascending" : s = "descending");
     }
-    temp.Format("%s)", KeyOrder[i] == ascending ? "ascending" : "descending");
-    os += temp;
+    os += KeyOrder[i] == ascending ? "ascending" : "descending";
   }
 
   return os;
 }
 
-//##ModelId=3B0C0863028C
 void PHYS_PROP::bestKey() {
   // find the index of the KeyArray
   // with maximum unique cardinality
@@ -1021,34 +953,23 @@ void COST::FinalCost(COST *LocalCost, COST **TotalInputCost, int Size) {
   return;
 }
 
-//##ModelId=3B0C08640125
-CString COST::Dump() {
-  CString os;
+string COST::Dump() { return " " + to_string(Value); }
 
-  os.Format(" %.3f ", Value);
-  return os;
-}
-
-//##ModelId=3B0C085F02AF
-CString OPT_STAT::Dump() {
-  CString os, Temp;
-  Temp.Format("Duplicate MExpr: %d \r\n", DupMExpr);
-  os += Temp;
-  Temp.Format("Hashed Logical MExpr: %d \r\n", HashedMExpr);
-  os += Temp;
-  Temp.Format("Max Overflow Buckets: %d \r\n", MaxBucket);
-  os += Temp;
-  Temp.Format("FiredRules: %d \r\n", FiredRule);
-  os += Temp;
+string OPT_STAT::Dump() {
+  string os;
+  os += "Duplicate MExpr: " + to_string(DupMExpr) + "\n";
+  os += "Hashed Logical MExpr: " + to_string(HashedMExpr) + "\n";
+  os += "Max Overflow Buckets: " + to_string(MaxBucket) + "\n";
+  os += "FiredRules: " + to_string(FiredRule) + "\n";
 
   return os;
 }
 
-CString DumpStatistics() {
-  CString os;
-  CString temp;
+string DumpStatistics() {
+  string os;
+  string temp;
 
-  os = "Class Statistics:\r\n";
+  os = "Class Statistics:\n";
   for (int i = 0; i < CLASS_NUM; i++) os += ClassStat[i].Dump();
 
   return os;

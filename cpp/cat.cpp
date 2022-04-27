@@ -21,7 +21,7 @@
 #define KEYWORD_KEYORDER "KeyOrder:"
 
 // read catalog text file and store the information into CAT
-CAT::CAT(CString filename) {
+CAT::CAT(string filename) {
   FILE *fp;                  // file handle
   char TextLine[LINEWIDTH];  // text line buffer
   char *p;
@@ -31,10 +31,10 @@ CAT::CAT(CString filename) {
   IND_PROP *Index;
   BIT_IND_PROP *BitIndexProp;
 
-  CString CollName;
-  CString AttrName;
-  CString IndexName;
-  CString BitIndexName;
+  string CollName;
+  string AttrName;
+  string IndexName;
+  string BitIndexName;
 
   // initialize the global tables with trivial entries
   CollTable.resize(0);
@@ -48,7 +48,7 @@ CAT::CAT(CString filename) {
   IndTable.push_back("");
   BitIndTable.push_back("");  // 632
 
-  if ((fp = fopen(filename.str_.c_str(), "r")) == NULL) OUTPUT_ERROR("can not open file 'catalog'");
+  if ((fp = fopen(filename.c_str(), "r")) == NULL) OUTPUT_ERROR("can not open file 'catalog'");
 
   bool FirstTime = true;
   for (;;) {
@@ -277,7 +277,7 @@ CAT::CAT(CString filename) {
 
   // translate foreign key string to foreignkey
   for (int CollId = 1; CollId < CollProps.size(); CollId++) {
-    CollName = CollTable[CollId];
+    CollName = CollTable[CollId].str_;
     CollProp = CollProps[CollId];
     if (CollProp->ForeignKeyString.size() > 0) {
       for (int keyNum = 0; keyNum < CollProp->ForeignKeyString.size(); keyNum++) {
@@ -338,7 +338,7 @@ CAT::~CAT() {
 
 // Add CollProp for this collection.  If Collection is new, also update CollTable
 //##ModelId=3B0C08780016
-void CAT::AddColl(CString CollName, COLL_PROP *CollProp) {
+void CAT::AddColl(string CollName, COLL_PROP *CollProp) {
   int CollId = GetCollId(CollName);
   if (CollId >= CollProps.size()) CollProps.resize(CollId + 1);
   CollProps[CollId] = CollProp;
@@ -348,7 +348,7 @@ void CAT::AddColl(CString CollName, COLL_PROP *CollProp) {
 // If Attribute or Collection are new, add them to AttProps, AttTable, AttNames, resp.
 // Add Attr to Attrs table, Attribute to Attnames
 //##ModelId=3B0C08780034
-void CAT::AddAttr(CString CollName, CString AttName, ATTR *Attr, DOM_TYPE domain) {
+void CAT::AddAttr(string CollName, string AttName, ATTR *Attr, DOM_TYPE domain) {
   // If Attribute is new, add it to AttProps.  Add AttProp to AttProps table.
   int AttId = GetAttId(CollName, AttName);
   if (AttId >= Attrs.size()) Attrs.resize(AttId + 1);
@@ -371,7 +371,7 @@ void CAT::AddAttr(CString CollName, CString AttName, ATTR *Attr, DOM_TYPE domain
 // If Index, COllection are new, add them to IndProps, IndNames, respectively.
 // Add IndProp, Index to IndProps, IndNames, resp.
 //##ModelId=3B0C08780066
-void CAT::AddIndex(CString CollName, CString IndexName, IND_PROP *IndProp) {
+void CAT::AddIndex(string CollName, string IndexName, IND_PROP *IndProp) {
   // If Index is new, add it to IndProps.  Add IndProp to IndProps
   int IndId = GetIndId(CollName, IndexName);
   if (IndId >= IndProps.size()) IndProps.resize(IndId + 1);
@@ -391,7 +391,7 @@ void CAT::AddIndex(CString CollName, CString IndexName, IND_PROP *IndProp) {
 // If BitIndex, COllection are new, add them to BitIndProps, BitIndNames, respectively.
 // Add BitIndProp, BitIndex to BitIndProps, BitIndNames, resp.
 //##ModelId=3B0C0878008E
-void CAT::AddBitIndex(CString CollName, CString BitIndexName, BIT_IND_PROP *BitIndProp) {
+void CAT::AddBitIndex(string CollName, string BitIndexName, BIT_IND_PROP *BitIndProp) {
   // If BitIndex is new, add it to BitIndProps.  Add BitIndProp to BitIndProps
   int BitIndId = GetBitIndId(CollName, BitIndexName);
   if (BitIndId >= BitIndProps.size()) BitIndProps.resize(BitIndId + 1);
@@ -417,7 +417,7 @@ void CAT::GetKey(char *p, KEYS_SET *Keys) {
   p++;  // skip '('
 
   while (*p != ')') {
-    CString str1, str2;
+    string str1, str2;
     // str1 = p;
     p = SkipSpace(p);
     while (*p != ' ' && *p != '\t' && *p != ',' && *p != ')' && *p != '\n' && *p != '.') str1 += *p++;  // keep the char
@@ -425,11 +425,11 @@ void CAT::GetKey(char *p, KEYS_SET *Keys) {
       p++;
       while (*p != ' ' && *p != '\t' && *p != ',' && *p != ')' && *p != '\n' && *p != '.') str2 += *p++;
       if (*p == ')') {
-        Keys->AddKey(str1, str2);  // add the CString to the collection
+        Keys->AddKey(str1, str2);  // add the string to the collection
         return;
       }
       if (*p == ',') {
-        Keys->AddKey(str1, str2);  // add the CString to the collection
+        Keys->AddKey(str1, str2);  // add the string to the collection
         p++;
         continue;
       }
@@ -459,7 +459,6 @@ ATTR *CAT::GetAttr(int AttId) {
 }
 
 // get attribute property by attribute Id
-//##ModelId=3B0C087703A3
 DOM_TYPE CAT::GetDomain(int AttId) {
   if (AttId < Domains.size())
     return Domains[AttId];
@@ -468,7 +467,6 @@ DOM_TYPE CAT::GetDomain(int AttId) {
 }
 
 // get index property by index Id
-//##ModelId=3B0C087703D6
 IND_PROP *CAT::GetIndProp(int IndId) {
   if (IndId < IndProps.size())
     return IndProps[IndId];
@@ -514,7 +512,7 @@ INT_ARRAY *CAT::GetAttNames(int CollId) {
 
 /*****************   parse Function  **************/
 //##ModelId=3B0C087800B6
-void CAT::parseKeys(char *p, KEYS_SET *Keys, CString CollName) {
+void CAT::parseKeys(char *p, KEYS_SET *Keys, string CollName) {
   char *str;
 
   while (*p != '(') p++;  // skip the char before '('
@@ -529,12 +527,12 @@ void CAT::parseKeys(char *p, KEYS_SET *Keys, CString CollName) {
     if (*p == ')') {
       *p = 0;  // get a str
       str = SkipSpace(str);
-      Keys->AddKey(CollName, str);  // add the CString to the collection
+      Keys->AddKey(CollName, str);  // add the string to the collection
       return;
     }
     if (*p == ',') {
       *p = 0;                       // get a str
-      Keys->AddKey(CollName, str);  // add the CString to the collection
+      Keys->AddKey(CollName, str);  // add the string to the collection
       *p = ',';                     // restore the char
       p++;
       continue;
@@ -546,7 +544,7 @@ void CAT::parseKeys(char *p, KEYS_SET *Keys, CString CollName) {
 
 // fill out attribute, except for AttId, which is filled out when adding attribute
 //##ModelId=3B0C087800DE
-void CAT::parseAttribute(char *p, CString &AttrName, ATTR *Attribute, DOM_TYPE &domain) {
+void CAT::parseAttribute(char *p, string &AttrName, ATTR *Attribute, DOM_TYPE &domain) {
   p = SkipSpace(p);
   parseString(p);  // get the Name
   AttrName = p;
@@ -581,7 +579,7 @@ void CAT::parseAttribute(char *p, CString &AttrName, ATTR *Attribute, DOM_TYPE &
 }
 
 //##ModelId=3B0C08780106
-void CAT::parseIndex(char *p, CString CollName, CString &IndexName, IND_PROP *Index) {
+void CAT::parseIndex(char *p, string CollName, string &IndexName, IND_PROP *Index) {
   p = SkipSpace(p);
   parseString(p);  // get the Name
   IndexName = p;
@@ -602,8 +600,7 @@ void CAT::parseIndex(char *p, CString CollName, CString &IndexName, IND_PROP *In
   Index->Clustered = ((strcmp(p, "T") == 0) ? true : false);
 }
 
-//##ModelId=3B0C08780138
-void CAT::parseBitIndex(char *p, CString CollName, CString &BitIndexName, BIT_IND_PROP *BitIndex) {
+void CAT::parseBitIndex(char *p, string CollName, string &BitIndexName, BIT_IND_PROP *BitIndex) {
   p = SkipSpace(p);
   parseString(p);  // get the Name
   BitIndexName = p;
@@ -643,38 +640,27 @@ void CAT::parseBitIndex(char *p, CString CollName, CString &BitIndexName, BIT_IN
 }
 
 // dump catalog content
-//##ModelId=3B0C087800AC
-CString CAT::Dump() {
-  CString os;
-  CString temp;
+string CAT::Dump() {
+  string os;
+  string temp;
 
   // dump collection properties
-  os += "******* COLL_PROP: ********\r\n";
-  for (int CollId = 1; CollId < CollProps.size(); CollId++) {
-    temp.Format("%s%s%s%s", GetCollName(CollId), ":\r\n", CollProps[CollId]->Dump(), "\r\n");
-    os += temp;
-  }
+  os += "******* COLL_PROP: ********\n";
+  for (int CollId = 1; CollId < CollProps.size(); CollId++)
+    os += GetCollName(CollId) + ":\n" + CollProps[CollId]->Dump() + "\n";
 
   // dump attribute properties
-  os += "\r\n******** ATT_PROP: ********\r\n";
-  for (int AttId = 1; AttId < Attrs.size(); AttId++) {
-    temp.Format("%s%s%s%s", GetAttName(AttId), ":\r\n", Attrs[AttId]->Dump(), "\r\n");
-    os += temp;
-  }
+  os += "\n******** ATT_PROP: ********\n";
+  for (int AttId = 1; AttId < Attrs.size(); AttId++) os += GetAttName(AttId) + ":\n" + Attrs[AttId]->Dump() + "\n";
 
   // dump index properties
-  os += "\r\n******** IND_PROP: ********\r\n";
-  for (int IndId = 1; IndId < IndProps.size(); IndId++) {
-    temp.Format("%s%s%s%s", GetIndName(IndId), ":\r\n", IndProps[IndId]->Dump(), "\r\n");
-    os += temp;
-  }
+  os += "\n******** IND_PROP: ********\n";
+  for (int IndId = 1; IndId < IndProps.size(); IndId++) os += GetIndName(IndId) + ":\n", IndProps[IndId]->Dump() + "\n";
 
   // dump bit index properties
-  os += "\r\n******** BIT_IND_PROP: ********\r\n";
-  for (int BitIndId = 1; BitIndId < BitIndProps.size(); BitIndId++) {
-    temp.Format("%s%s%s%s", GetBitIndName(BitIndId), ":\r\n", BitIndProps[BitIndId]->Dump(), "\r\n");
-    os += temp;
-  }
+  os += "\n******** BIT_IND_PROP: ********\n";
+  for (int BitIndId = 1; BitIndId < BitIndProps.size(); BitIndId++)
+    os += GetBitIndName(BitIndId) + ":\n" + BitIndProps[BitIndId]->Dump() + "\n";
 
   return os;
 }

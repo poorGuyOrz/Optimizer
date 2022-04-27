@@ -1,11 +1,11 @@
 // main.cpp -  main file of the columbia optimizer
 
-#include "../header/stdafx.h"
 #include "../header/cat.h"
 #include "../header/cm.h"
-#include "../header/tasks.h"
+#include "../header/global.h"  // global variables
 #include "../header/physop.h"
-#include "../header/global.h"			// global variables
+#include "../header/stdafx.h"
+#include "../header/tasks.h"
 
 #define LINEWIDTH 256  // buffer length of one text line
 #define KEYWORD_NUMOFQRY "NumOfQuery:"
@@ -16,12 +16,10 @@
 //  CMemoryState oldMemState, newMemState, diffMemState;
 #endif
 
-#ifdef _DEBUG
 // Rule Firing Statistics
 INT_ARRAY TopMatch;
 INT_ARRAY Bindings;
 INT_ARRAY Conditions;
-#endif
 
 /*************  DO THE OPTIMIZATION  ********************/
 void Optimizer() {
@@ -29,14 +27,14 @@ void Optimizer() {
   TaskNo = 0;
   Memo_M_Exprs = 0;
   SET_TRACE Trace(true);
-  AppDir = "..\\";
-  if (CatFile == "catalog") CatFile = AppDir + "\\catalog";
-  if (CMFile == "cm") CMFile = AppDir + "\\CMS\\cmj";
-  if (RSFile == "ruleset") RSFile = AppDir + "\\RuleSets\\ruleset1";
+  AppDir = "../";
+  if (CatFile == "catalog") CatFile = AppDir + "CATALOGS/uniform.txt";
+  if (CMFile == "cm") CMFile = AppDir + "CMS/cmj";
+  if (RSFile == "ruleset") RSFile = AppDir + "RuleSets/ruleset1";
 
   // Open general trace file and COVE trace file, clear main output window
-  OutputFile.open((AppDir + "\\colout.txt").str_);
-  OutputCOVE.open((AppDir + "\\script.cove").str_);
+  OutputFile.open((AppDir + "/colout.txt").str_);
+  OutputCOVE.open((AppDir + "/script.cove").str_);
 
   // clean the statistics
   for (int i = 0; i < CLASS_NUM; i++) {
@@ -53,14 +51,12 @@ void Optimizer() {
   // Create objects to manage Opt stats, Cost model, Rule set, Heuristic cost.
   OptStat = new OPT_STAT;
   Cm = new CM(CMFile.str_);
-  PTRACE("cost model content:\r\n%s", Cm->Dump());
-  cout << Cm->Dump() << endl;
-  RuleSet = new RULE_SET(RSFile);
-  PTRACE("Rule set content:\r\n%s", RuleSet->Dump());
+  PTRACE("cost model content: " << endl << Cm->Dump());
+  RuleSet = new RULE_SET(RSFile.str_);
+  PTRACE("Rule set content:" << endl << RuleSet->Dump());
   COST *HeuristicCost;
   HeuristicCost = new COST(0);
 
-#ifdef _DEBUG
   // Initialize Rule Firing Statistics
   TopMatch.resize(RuleSet->RuleCount);
   Bindings.resize(RuleSet->RuleCount);
@@ -70,7 +66,6 @@ void Optimizer() {
     Bindings[RuleNum] = 0;
     Conditions[RuleNum] = 0;
   }
-#endif
 
   // SQueryFile, BQueryFile have been set to the Single or Batch Query File chosen in
   //   the option dialog.  The CString QueryFile will be set to the name of a file
@@ -87,14 +82,14 @@ void Optimizer() {
   if (RadioVal == 1)  // Single Query case
   {
     if (SQueryFile == "query")
-      QueryFile = AppDir + "\\QUERIES";  // default case
+      QueryFile = AppDir + "QUERIES";  // default case
     else
       QueryFile = SQueryFile;  // value entered in option dialog; should check it exists.
     NumQuery = 1;
   } else if (RadioVal == 0)  // Batch Query case
   {
     // Open BQueryFile
-    if (BQueryFile == "bquery") BQueryFile = AppDir + "\\QUERIES\\testbatbat.txt";  // default case
+    if (BQueryFile == "bquery") BQueryFile = AppDir + "/QUERIES/testbatbat.txt";  // default case
     if ((fp = fopen(BQueryFile.str_.c_str(), "r")) == NULL)
       OUTPUT_ERROR("can not open the file you chose in the option dialogue");
     fgets(TextLine, LINEWIDTH, fp);
@@ -144,7 +139,7 @@ void Optimizer() {
     }
 
     // Header for single line batch output
-    if (SingleLineBatch) OUTPUT("%s", "#\tTTask\tTGrp\tCME\tTME\tFR\tCOST\r\n");
+    if (SingleLineBatch) OUTPUT("%s", "#\tTTask\tTGrp\tCME\tTME\tFR\tCOST\n");
 
     // For each query numbered q
     bool first = true;  // treat the first "Query: n" specially
@@ -166,21 +161,19 @@ void Optimizer() {
         for (int i = 0; i < CLASS_NUM; i++) ClassStat[i].Count = ClassStat[i].Max = ClassStat[i].Total = 0;
         OptStat->DupMExpr = OptStat->FiredRule = OptStat->HashedMExpr = 0;
         OptStat->MaxBucket = OptStat->TotalMExpr = 0;
-#ifdef _DEBUG
         for (int RuleNum = 0; RuleNum < RuleSet->RuleCount; RuleNum++) {
           TopMatch[RuleNum] = 0;
           Bindings[RuleNum] = 0;
           Conditions[RuleNum] = 0;
         }
-#endif
         TaskNo = 0;
         Memo_M_Exprs = 0;
 
-        QueryFile = AppDir + "\\tempquery";
+        QueryFile = AppDir + "tempquery";
         FILE *tempfp;
-        if ((tempfp = fopen(QueryFile.GetBuffer(200), "w")) == NULL)
+        if ((tempfp = fopen(QueryFile.str_.c_str(), "w")) == NULL)
           OUTPUT_ERROR("can not create or truncate file 'tempquery'");
-        QueryFile.ReleaseBuffer();
+        // QueryFile.ReleaseBuffer();
         /*
         here the optimizer reads in one query at a time
         until the keyword KEYWORD_QUERY,KEYWORD_NUMOFQRY
@@ -222,7 +215,7 @@ void Optimizer() {
       if (SingleLineBatch) {
         OUTPUT("%d\t", q);  // First entry in output line in window
       } else
-        OUTPUT("Query: %d\r\n", q + 1);  // In this case it's a full line
+        OUTPUT("Query: %d\n", q + 1);  // In this case it's a full line
 #endif
 
       // if GlobepsPruning, run optimizer without globepsPruning
@@ -230,7 +223,7 @@ void Optimizer() {
       if (GlobepsPruning) {
         GlobepsPruning = false;
         ForGlobalEpsPruning = true;
-        Cat = new CAT(CatFile);
+        Cat = new CAT(CatFile.str_);
         Query = new QUERY(QueryFile);
         Ssp = new SSP;
         Ssp->Init();
@@ -252,14 +245,14 @@ void Optimizer() {
       // #endif
 
       // Since each optimization corrupts the catalog, we must create it anew
-      Cat = new CAT(CatFile);
-      PTRACE("Catalog content:\r\n%s", Cat->Dump());
+      Cat = new CAT(CatFile.str_);
+      PTRACE("Catalog content:" << endl << Cat->Dump());
 
 #ifdef _TABLE_
       assert(!SingleLineBatch);  // These are incompatible
 
       //	Print Heading: EPS ...
-      OUTPUT("%s", "EPS, EPS_BD, CUREXPR, TOTEXPR, TASKS, OPTCOST\r\n");
+      OUTPUT("%s", "EPS, EPS_BD, CUREXPR, TOTEXPR, TASKS, OPTCOST\n");
 
       // For each iteration of the global epsilon counter ii {
       for (double ii = 0; ii <= GLOBAL_EPS * 10; ii++) {
@@ -270,8 +263,8 @@ void Optimizer() {
 
         // Parse and print the query and its interesting orders
         Query = new QUERY(QueryFile);
-        PTRACE("Original Query:\r\n%s", Query->Dump());
-        PTRACE("The interesting orders in the query are:\r\n%s\n", Query->Dump_IntOrders());
+        PTRACE("Original Query:" << endl << Query->Dump());
+        PTRACE("The interesting orders in the query are:\n" << endl << Query->Dump_IntOrders());
 
         // Initialize and print the search space, delete the query
         //  In PiggyBack mode create the search space only for
@@ -285,44 +278,36 @@ void Optimizer() {
         }
 
         Ssp->Init();
-        PTRACE("Initial Search Space:\r\n%s", Ssp->Dump());
+        PTRACE("Initial Search Space:" << endl << Ssp->Dump());
         delete Query;
 
         // Keep track of initial space and time
-        PTRACE("---1--- memory statistics before optimization: %s", DumpStatistics());
-        PTRACE("used memory before opt: %dK\r\n", GetUsedMemory() / 1000);
-        struct _timeb start, finish;
-        char *timeline;
-        _ftime(&start);
-        timeline = ctime(&(start.time));
-        CString tmpbuf;
-        tmpbuf.Format("%.8s.%0.3hu", &timeline[11], start.millitm);
+        PTRACE("---1--- memory statistics before optimization: " << DumpStatistics());
+        // PTRACE("used memory before opt: %dK\n", GetUsedMemory() / 1000);
+        std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+        auto timet = chrono::system_clock::to_time_t(now);
 #ifndef _TABLE_
-        if (!SingleLineBatch) OUTPUT("Optimization beginning time:\t\t%s (hr:min:sec.msec)\r\n", tmpbuf);
+        if (!SingleLineBatch)  // OUTPUT("Optimization beginning time:\t\t%s (hr:min:sec.msec)\n",
+                               // chrono::to_stream(now));
+        {
+          {
+            if (!ForGlobalEpsPruning) {
+              OutputFile << "Optimization beginning time:" << put_time(localtime(&timet), "%c %Z")
+                         << "(hr:min : sec.msec)\n"
+                         << endl;
+            }
+          }
+        }
 #endif
 
         Ssp->optimize();  // Later add an input condition so we can handle ORDER BY
 
 #ifndef _TABLE_
         // OUTPUT elapsed time
-        long time;             // total seconds from start to finish
-        unsigned short msecs;  // milliseconds from start to finish
-        _ftime(&finish);
-        if (finish.millitm >= start.millitm) {
-          time = finish.time - start.time;
-          msecs = finish.millitm - start.millitm;
-        } else {
-          time = finish.time - start.time - 1;
-          msecs = 1000 + finish.millitm - start.millitm;
-        }
-        long hrs, mins, secs;  // Print differences from start to finish
-        secs = time % 60;
-        mins = ((time - secs) / 60) % 60;
-        hrs = (time - secs - mins * 60) / 3600;
-        tmpbuf.Format("%0.2d:%0.2d:%0.2d.%0.3d\r\n", hrs, mins, secs, msecs);
+        std::chrono::duration<double, std::milli> diff = std::chrono::system_clock::now() - now;
         if (!SingleLineBatch) {
-          OUTPUT("Optimization elapsed time:\t\t%s", tmpbuf);
-          OUTPUT("%s", "========  OPTIMAL PLAN =========\r\n");
+          OUTPUT("Optimization elapsed time:\t\t%sms", (diff).count());
+          OUTPUT("%s", "========  OPTIMAL PLAN =========\n");
         }
 #endif
 
@@ -332,12 +317,12 @@ void Optimizer() {
         our Query )
         */
         Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);
-        PTRACE("used memory after opt: %dK\r\n", GetUsedMemory() / 1000);
-        PTRACE("---2--- memory statistics after optimization: %s", DumpStatistics());
+        // PTRACE("used memory after opt: %dK\n", GetUsedMemory() / 1000);
+        PTRACE("---2--- memory statistics after optimization: " << DumpStatistics());
         if (TraceFinalSSP) {
           Ssp->FastDump();
         } else {
-          PTRACE("final Search Space:\r\n%s", Ssp->Dump());
+          PTRACE("final Search Space:" << endl << Ssp->Dump());
         }
 
         // Delete Contexts, close batch query file, delete search space
@@ -346,13 +331,13 @@ void Optimizer() {
           CONT::vc.clear();
         }
         // if (RadioVal ==0 && q==NumQuery-1) fclose(fp);
-        PTRACE("used memory before deleting the search space: %dM\r\n", GetUsedMemory() / 1000);
+        // PTRACE("used memory before deleting the search space: %dM\n", GetUsedMemory() / 1000);
         // Go on with the usual procedure of deleting the search space before
         // reading in the next query of the batch query file if not in the
         // PiggyBack mode
         // else keep the search space for reuse
         if (!PiggyBack) delete Ssp;
-        PTRACE("---3--- memory statistics after freeing searching space: %s", DumpStatistics());
+        PTRACE("---3--- memory statistics after freeing searching space: " << DumpStatistics());
 
         // OUTPUT Rule Set Statistics
 #ifdef _DEBUG
@@ -366,14 +351,14 @@ void Optimizer() {
 #endif
 
       // Report memory, delete catalog
-      PTRACE("used memory before deleting the catalog: %dM\r\n", GetUsedMemory() / 1000);
+      // PTRACE("used memory before deleting the catalog: %dM\n", GetUsedMemory() / 1000);
       delete Cat;
     }                     // for each query
     if (RadioVal) break;  // If single query case, execute only once
 
-    OUTPUT("%s", "\r\n");
+    OUTPUT("%s", "\n");
     OUTPUT("%s", " =============END OF A SEQUENCE================ ");
-    OUTPUT("%s", "\r\n");
+    OUTPUT("%s", "\n");
 
     // this will be executed only if in PiggyBack mode
     // to delete the search space one last time
@@ -392,11 +377,11 @@ void Optimizer() {
   delete HeuristicCost;
 
 #ifdef USE_MEMORY_MANAGER
-  PTRACE("used memory before delete manager: %dM\r\n", GetUsedMemory() / 1000);
+  PTRACE("used memory before delete manager: %dM\n", GetUsedMemory() / 1000);
   delete memory_manager;
 
 #endif
-  PTRACE("used memory after delete manager: %dM\r\n", GetUsedMemory() / 1000);
+  // PTRACE("used memory after delete manager: %dM\n", GetUsedMemory() / 1000);
 
 #ifdef _DEBUG
   // newMemState.Checkpoint();
@@ -419,5 +404,5 @@ int main() { Optimizer(); }
 // g++ .\cm.cpp .\supp.cpp .\cat.cpp .\group.cpp .\expr.cpp .\item.cpp .\logop.cpp .\mexpr.cpp .\physop.cpp .\query.cpp
 // .\rules.cpp .\ssp.cpp .\tasks.cpp .\main.cpp
 
-// g++ cm.cpp supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp main.cpp
-
+// g++ cm.cpp supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp
+// tasks.cpp main.cpp

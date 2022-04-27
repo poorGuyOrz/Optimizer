@@ -43,54 +43,38 @@ from EMP as E, then EMP (actually, its ID) is the CollID and
 E is the RangeVar.
 */
 
-//##ModelId=3B0C087301E5
 class GET : public LOG_OP {
  public:
   // If the query includes FROM EMP e, then EMP is the collection
   // and e is the range variable.
-  //##ModelId=3B0C087301F0
-  GET(CString collection, CString rangeVar);
-  //##ModelId=3B0C087301FB
+  GET(string collection, string rangeVar);
   GET(int collId);  // Range Variable defaults to Collection here
-  //##ModelId=3B0C08730204
   GET(GET &Op);
-  //##ModelId=3B0C0873020E
   OP *Clone() { return new GET(*this); };
 
-  //##ModelId=3B0C08730217
   ~GET() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].Delete();
   };
 
-  //##ModelId=3B0C08730218
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C08730222
   inline int GetArity() { return (0); };
-  //##ModelId=3B0C0873022B
-  inline CString GetName() { return ("GET"); };
-  //##ModelId=3B0C08730235
+  inline string GetName() { return ("GET"); };
   inline int GetNameId() { return GET_ID; };
-  //##ModelId=3B0C0873023F
   inline int GetCollection() { return CollId; };
-  //##ModelId=3B0C08730240
   inline bool operator==(OP *other) {
     return (other->GetNameId() == GetNameId() && ((GET *)other)->CollId == CollId &&
             ((GET *)other)->RangeVar == RangeVar);
   };
 
-  //##ModelId=3B0C0873024A
-  CString Dump();
+  string Dump();
 
   // since this operator has arguments
-  //##ModelId=3B0C08730253
   ub4 hash();
 
  private:
-  //##ModelId=3B0C0873025D
   int CollId;
-  //##ModelId=3B0C08730271
-  CString RangeVar;
+  string RangeVar;
 
 };  // GET
 
@@ -139,7 +123,7 @@ class EQJOIN : public LOG_OP {
   //##ModelId=3B0C0873033B
   inline int GetArity() { return (2); };  // Inputs are left and right streams
   //##ModelId=3B0C08730344
-  inline CString GetName() { return ("EQJOIN"); };  // Name of this operator
+  inline string GetName() { return ("EQJOIN"); };  // Name of this operator
   //##ModelId=3B0C0873034E
   inline int GetNameId() { return EQJOIN_ID; };  // Name of this operator
   //##ModelId=3B0C08730358
@@ -154,7 +138,7 @@ class EQJOIN : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C08730363
-  CString Dump();
+  string Dump();
 
   // the following is used by Bill's Memory Manager
   // Redefine new and delete if memory manager is used.
@@ -204,7 +188,7 @@ class DUMMY : public LOG_OP {
   //##ModelId=3B0C0874004D
   inline int GetArity() { return (2); };  // Inputs are left and right streams
   //##ModelId=3B0C08740056
-  inline CString GetName() { return ("DUMMY"); };  // Name of this operator
+  inline string GetName() { return ("DUMMY"); };  // Name of this operator
   //##ModelId=3B0C08740057
   inline int GetNameId() { return DUMMY_ID; };  // Name of this operator
   //##ModelId=3B0C08740060
@@ -214,7 +198,7 @@ class DUMMY : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C08740074
-  CString Dump();
+  string Dump();
 
 };  // DUMMY
 
@@ -248,9 +232,9 @@ class SELECT : public LOG_OP {
   //##ModelId=3B0C0874011F
   inline int GetArity() {
     return (2);
-  };                                                // For input and predicate
-                                                    //##ModelId=3B0C08740128
-  inline CString GetName() { return ("SELECT"); };  // Name of this operator
+  };                                               // For input and predicate
+                                                   //##ModelId=3B0C08740128
+  inline string GetName() { return ("SELECT"); };  // Name of this operator
   //##ModelId=3B0C08740132
   inline int GetNameId() { return SELECT_ID; };  // Name of this operator
   //##ModelId=3B0C08740133
@@ -260,7 +244,7 @@ class SELECT : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C08740146
-  CString Dump();
+  string Dump();
 };  // SELECT
 
 /*
@@ -298,7 +282,7 @@ class PROJECT : public LOG_OP {
   //##ModelId=3B0C0874022D
   inline int GetArity() { return (1); };  // Only input is the stream of bytes.  What to project is an argument, pattrs
   //##ModelId=3B0C0874022E
-  inline CString GetName() { return ("PROJECT"); };  // Name of this operator
+  inline string GetName() { return ("PROJECT"); };  // Name of this operator
   //##ModelId=3B0C08740237
   inline int GetNameId() { return PROJECT_ID; };  // Name of this operator
   //##ModelId=3B0C08740241
@@ -312,7 +296,7 @@ class PROJECT : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C0874024D
-  CString Dump();
+  string Dump();
 
 };  // PROJECT
 
@@ -345,7 +329,7 @@ class RM_DUPLICATES : public LOG_OP {
   //##ModelId=3B0C0874031E
   inline int GetArity() { return (1); };  // Only input is the stream of bytes.
   //##ModelId=3B0C08740327
-  inline CString GetName() { return ("RM_DUPLICATES"); };  // Name of this operator
+  inline string GetName() { return ("RM_DUPLICATES"); };  // Name of this operator
   //##ModelId=3B0C08740328
   inline int GetNameId() { return RM_DUPLICATES_ID; };  // Name of this operator
   //##ModelId=3B0C08740331
@@ -356,7 +340,7 @@ class RM_DUPLICATES : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C08740345
-  CString Dump();
+  string Dump();
 
 };  // RM_DUPLICATES
 
@@ -425,7 +409,7 @@ class AGG_LIST : public LOG_OP {
   //##ModelId=3B0C087500C7
   inline int GetArity() { return (1); };  // Only input is the stream of bytes.
   //##ModelId=3B0C087500D0
-  inline CString GetName() { return ("AGG_LIST"); };  // Name of this operator
+  inline string GetName() { return ("AGG_LIST"); };  // Name of this operator
   //##ModelId=3B0C087500DA
   inline int GetNameId() { return AGG_LIST_ID; };  // Name of this operator
   //##ModelId=3B0C087500DB
@@ -436,7 +420,7 @@ class AGG_LIST : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C087500EF
-  CString Dump();
+  string Dump();
 
 };  // AGG_LIST
 
@@ -453,14 +437,14 @@ class AGG_LIST : public LOG_OP {
 class FUNC_OP : public LOG_OP {
  public:
   //##ModelId=3B0C087501DF
-  CString RangeVar;
+  string RangeVar;
   //##ModelId=3B0C087501E8
   int *Atts;
   //##ModelId=3B0C087501F2
   int AttsSize;
 
   //##ModelId=3B0C087501FC
-  FUNC_OP(CString range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size) {
+  FUNC_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].New();
   };
 
@@ -484,7 +468,7 @@ class FUNC_OP : public LOG_OP {
   //##ModelId=3B0C08750226
   inline int GetArity() { return (1); };
   //##ModelId=3B0C0875022E
-  inline CString GetName() { return ("FUNC_OP"); };
+  inline string GetName() { return ("FUNC_OP"); };
   //##ModelId=3B0C08750242
   inline int GetNameId() { return FUNC_OP_ID; };
   //##ModelId=3B0C0875024C
@@ -499,5 +483,5 @@ class FUNC_OP : public LOG_OP {
   ub4 hash();
 
   //##ModelId=3B0C08750257
-  CString Dump();
+  string Dump();
 };

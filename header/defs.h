@@ -140,28 +140,12 @@ typedef int GRP_ID;  // ID of a Group
 
 // trace one object.  Output is newline==, TraceDepth==, file, line -----, then
 // object in the format given.
-#define PTRACE(format, object)                                                                                     \
-  {                                                                                                                \
-    if (TraceOn && !ForGlobalEpsPruning) {                                                                         \
-      CString OutputString;                                                                                        \
-      CString temp;                                                                                                \
-      temp.Format(format, object);                                                                                 \
-      OutputString.Format("%s%d%s%s%s%d%s", "\r\n==", TraceDepth, "==", Trim(__FILE__), ",", __LINE__, " ----- "); \
-      OutputString += temp;                                                                                        \
-      if (FileTrace) OutputFile << (OutputString) << endl;                                                         \
-    }                                                                                                              \
-  }
-
-// trace two objects.  Format as above.
-#define PTRACE2(format, obj1, obj2)                                                                                \
-  {                                                                                                                \
-    if (TraceOn && !ForGlobalEpsPruning) {                                                                         \
-      CString OutputString, temp;                                                                                  \
-      temp.Format(format, obj1, obj2);                                                                             \
-      OutputString.Format("%s%d%s%s%s%d%s", "\r\n==", TraceDepth, "==", Trim(__FILE__), ",", __LINE__, " ----- "); \
-      OutputString += temp;                                                                                        \
-      if (FileTrace) OutputFile << (OutputString) << endl;                                                         \
-    }                                                                                                              \
+#define PTRACE(object)                                                                                          \
+  {                                                                                                             \
+    if (TraceOn && !ForGlobalEpsPruning) {                                                                      \
+      if (FileTrace)                                                                                            \
+        OutputFile << "\n==" << TraceDepth << "==" << __FILE__ << ":" << __LINE__ << "-----" << object << endl; \
+    }                                                                                                           \
   }
 
 // Print n tabs, then the character string.  No newlines except as in string.
@@ -201,21 +185,11 @@ typedef int GRP_ID;  // ID of a Group
     }                                       \
   }
 
-// Write the object to OutputFile
-#define TRACE_FILE(format, object)        \
-  {                                       \
-    CString OutputString;                 \
-    OutputString.Format(format, object);  \
-    OutputFile << (OutputString) << endl; \
-  }
-
 // display error message to Window and OutputFile
-#define OUTPUT_ERROR(text)                                                                                           \
-  {                                                                                                                  \
-    CString OutputString;                                                                                            \
-    OutputString.Format("%s%s%s%s%s%d%s", "\r\nERROR:", text, ",file:", Trim(__FILE__), ",line:", __LINE__, "\r\n"); \
-    OutputFile << (OutputString) << endl;                                                                            \
-    abort();                                                                                                         \
+#define OUTPUT_ERROR(text)                                                                                \
+  {                                                                                                       \
+    OutputFile << "\r\nERROR:" << text << ",file:" << (__FILE__) << ",line:" << __LINE__ << "\n" << endl; \
+    abort();                                                                                              \
   }
 
 /* ==========  Optimizer related ============  */
@@ -299,7 +273,6 @@ extern bool NO_PHYS_IN_GROUP;
 
 #pragma warning(disable : 4291)  // Allows Bill's memory mgr to work w/o warnings
 
-
 /* ======= Symbolic Constants ====== */
 
 /*
@@ -318,4 +291,3 @@ NOCART: Do not allow Cartesian products during optimization.
 SAFETY: Used within Bill's memory manager.  Higher level of error checking.
 CONDPRUNE: Use Group Pruning technique as a condition for firing some rules
 */
-

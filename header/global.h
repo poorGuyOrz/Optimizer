@@ -10,6 +10,8 @@ Columbia Optimizer Framework
 */
 
 #include "../header/logop.h"
+#include "../header/physop.h"
+#include "../header/tasks.h"
 
 // Each array maps an integer into the elements of the array at that integer
 // location, i.e. maps i to array[i].

@@ -145,7 +145,7 @@ QUERY::QUERY(CString QueryFile)
 	char *ExprStr = Buf;
 	QueryExpr = ParseExpr(ExprStr);
 	
-	PTRACE("initial query tree: %s", QueryExpr->Dump());
+	PTRACE("initial query tree: "<< QueryExpr->Dump());
 	
 	fclose(fp);
 };
@@ -272,12 +272,12 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		p++;  //skip " after first parameter
 		p = SkipSpace(p);
 		if(*p == ')' ) //One parameter in GET
-			Op = new GET( GetCollId( Str ) );
+			Op = new GET( GetCollId( Str.str_ ) );
 		else  if (*p == ',')//Two parameters in GET
 		{
 			p++;    //skip ,
 			Str2 = ParseOneParameter(p);
-			Op = new GET(Str, Str2);
+			Op = new GET(Str.str_, Str2.str_);
 		}
 		else
 			OUTPUT_ERROR(" GET is missing a COMMA !");
@@ -292,7 +292,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		p += strlen(KEYWORD_ATTR);
 		p = SkipSpace(p);
 		p++;	// skip '('
-		Op = new ATTR_OP( GetAttId(ParseOneParameter(p) ) );
+		Op = new ATTR_OP( GetAttId(ParseOneParameter(p).str_ ) );
 		free(OneElement);
 		
 		return new EXPR(Op);
@@ -314,7 +314,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		p += strlen(KEYWORD_STR);
 		p = SkipSpace(p);
 		p++;	// skip '('
-		Op = new CONST_STR_OP( ParseOneParameter(p) );
+		Op = new CONST_STR_OP( ParseOneParameter(p).str_ );
 		free(OneElement);
 		
 		return new EXPR(Op);
@@ -325,7 +325,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		p += strlen(KEYWORD_SET);
 		p = SkipSpace(p);
 		p++;	// skip '('
-		Op = new CONST_SET_OP( ParseOneParameter(p) );
+		Op = new CONST_SET_OP( ParseOneParameter(p).str_ );
 		free(OneElement);
 		
 		return new EXPR(Op);
@@ -399,7 +399,7 @@ EXPR * QUERY::ParseExpr(char *&ExprStr)
 		
 		free(OneElement);
 		
-		Op = new FUNC_OP( range_var, AttrKeySet.CopyOut(), size);
+		Op = new FUNC_OP( range_var.str_, AttrKeySet.CopyOut(), size);
 		
 		return new EXPR(Op, Expr);
 	}
@@ -687,7 +687,7 @@ void QUERY::GetKey(char *& p, KEYS_SET & Keys)
 		*p!=BLANKSPACE && *p!=TABSPACE )
 		Attr += *p++;	
 	
-	Keys.AddKey(Col,Attr);
+	Keys.AddKey(Col.str_,Attr.str_);
 }
 
 //	get one AGG_OP
@@ -710,7 +710,7 @@ AGG_OP * QUERY::GetOneAggOp(char *& p)
 	while(*p!=RIGHT_BRACKET && *p!=COMMA && 
 		*p!=BLANKSPACE && *p!=TABSPACE )	range_var += *p++;	
 	
-	return ( new AGG_OP(range_var, AttrKeySet.CopyOut(), size) );
+	return ( new AGG_OP(range_var.str_, AttrKeySet.CopyOut(), size) );
 }
 
 
@@ -724,7 +724,7 @@ CString QUERY::Dump()
 	while ( (pos = ExprBuf.Find('\n')) != -1 ) 
 	{
 		os += ExprBuf.str_.substr (0,pos);
-		os += "\r\n";
+		os += "\n";
 		ExprBuf = ExprBuf.Mid(pos+1);
 	}
 	os += ExprBuf;

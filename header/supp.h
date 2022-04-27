@@ -48,14 +48,14 @@ class SET_TRACE {
 // class statistics
 class CLASS_STAT {
  public:
-  CString Name;  // the name of the class
-  int Size;      // the size of the class
-  int Count;     // the count of the class being allocated
-  int Max;       // the max count of the class
-  int Total;     // the total count
+  string Name;  // the name of the class
+  int Size;     // the size of the class
+  int Count;    // the count of the class being allocated
+  int Max;      // the max count of the class
+  int Total;    // the total count
 
  public:
-  CLASS_STAT(CString name, int size) : Name(name), Size(size), Count(0), Max(0), Total(0){};
+  CLASS_STAT(string name, int size) : Name(name), Size(size), Count(0), Max(0), Total(0){};
 
   void New() {
     Count++;
@@ -65,11 +65,9 @@ class CLASS_STAT {
 
   void Delete() { Count--; };
 
-  CString Dump() {
-    CString os;
-    os.Format("MemUse = %d, %-16s --- Size = %d, Total = %d , Max = %d , Count = %d\r\n", Max * Size, Name, Size, Total,
-              Max, Count);
-    return os;
+  string Dump() {
+    return "MemUse = " + to_string(Max * Size) + ", " + Name + " --- Size = " + to_string(Size) +
+           ", Total = " + to_string(Total) + " , Max = " + to_string(Max) + " , Count = " + to_string(Count) + "\n";
   };
 };  // class CLASS_STAT
 
@@ -84,7 +82,7 @@ class OPT_STAT {
 
   OPT_STAT() : TotalMExpr(0), DupMExpr(0), FiredRule(0), HashedMExpr(0), MaxBucket(0){};
 
-  CString Dump();
+  string Dump();
 
 };  // class OPT_STAT
 
@@ -128,14 +126,14 @@ class KEYS_SET {
   };
 
   // return FALSE if duplicate found, and don't add it to the ordered set.
-  bool AddKey(CString CollName, CString KeyName);
+  bool AddKey(string CollName, string KeyName);
   bool AddKey(int AttId);
 
   // check if the attid is in the keys_Set
   bool ContainKey(int AttId);
 
   // Transform each element from A.B to NewName.B (actually the IDs)
-  void update(CString NewName);
+  void update(string NewName);
 
   // return int array from the keys_set
   int *CopyOut();
@@ -148,7 +146,7 @@ class KEYS_SET {
     for (int i = 0; i < other.GetSize(); i++) AddKey(other[i]);
   }
 
-  // return the CString in the order Set
+  // return the string in the order Set
   inline int &operator[](int n) { return KeyArray[n]; }
 
   // return the number of the keys
@@ -206,7 +204,7 @@ class KEYS_SET {
   int ChMaxCuCard();
   // get the cucard of the attribute
   float GetAttrCuCard(int);
-  CString Dump();
+  string Dump();
   void reset() { KeyArray.resize(0); };
   // KEYS_SET* best();
 };
@@ -229,9 +227,9 @@ class FOREIGN_KEY {
     delete RefKey;
   }
 
-  CString Dump();
+  string Dump();
 
-  void update(CString NewName) { ForeignKey->update(NewName); }
+  void update(string NewName) { ForeignKey->update(NewName); }
 };
 
 /*
@@ -240,19 +238,14 @@ PROPERTIES OF STORED OBJECTS- classes COLL_PROP, ATT_PROP and IND_PROP
 ============================================================
 */
 // Properties of Stored Collections
-//##ModelId=3B0C086001B6
 class COLL_PROP {
  public:
   // Logical Properties
-  //##ModelId=3B0C086001C0
-  float Card;  // Cardinality
-  //##ModelId=3B0C086001CA
+  float Card;   // Cardinality
   float UCard;  // Unique Cardinality
-  //##ModelId=3B0C086001DE
   float Width;  // width of the table, fraction of a block
 
   // Beware - this does not delete *Keys.
-  //##ModelId=3B0C086001E8
   COLL_PROP &operator=(COLL_PROP &other)  //  = operator
   {
     Keys = new KEYS_SET(*other.Keys);
@@ -271,46 +264,35 @@ class COLL_PROP {
   };
 
   // Physical properties
-  //##ModelId=3B0C086001F3
-  ORDER Order;  // any, heap, sorted or hashed
-  //##ModelId=3B0C08600207
+  ORDER Order;     // any, heap, sorted or hashed
   KEYS_SET *Keys;  // Keys on which sorted or hashed
   // null if heap or any, nonnull otherwise
-  //##ModelId=3B0C08600225
   KeyOrderArray KeyOrder;  // if order is sorted, nonnull
   // need ascending/descending for each key
 
   // the candidate keys
-  //##ModelId=3B0C08600239
   KEYS_SET *CandidateKey;
 
-  //##ModelId=3B0C0860024D
   vector<FOREIGN_KEY *> FKeyArray;
 
   // initialize member with -1, i.e.,not known
-  //##ModelId=3B0C08600260
   COLL_PROP() : Card(-1), UCard(-1){};
 
   // Transform all keys in the properties to new name
-  //##ModelId=3B0C0860026A
-  void update(CString NewName);
+  void update(string NewName);
 
-  //##ModelId=3B0C08600274
   ~COLL_PROP() {
     delete Keys;
     delete CandidateKey;
     for (int i = 0; i < FKeyArray.size(); i++) delete FKeyArray[i];
   };
 
-  //##ModelId=3B0C0860027E
-  CString Dump();
+  string Dump();
 
   // copy constructor
-  //##ModelId=3B0C08600288
   COLL_PROP(COLL_PROP &other);
 
   // store the foreign key strings, translated to foreign keys at the end of CAT
-  //##ModelId=3B0C0860029D
   STRING_ARRAY ForeignKeyString;
 };
 
@@ -341,9 +323,9 @@ class IND_PROP {
   bool Clustered;
   // Transform each key from A.X to NewName.X
   //##ModelId=3B0C08600364
-  void update(CString NewName);
+  void update(string NewName);
   //##ModelId=3B0C08600378
-  CString Dump();
+  string Dump();
 };
 
 // Bit Index Properties
@@ -358,17 +340,17 @@ class BIT_IND_PROP {
                   // bit indexes are only allowed for tables with single
                   //  attibute keys
   //##ModelId=3B0C08610031
-  CString BitPredString;  // assume store the index for each predicate separately
+  string BitPredString;  // assume store the index for each predicate separately
   //##ModelId=3B0C08610045
-  CString IndexAttrString;
+  string IndexAttrString;
   //##ModelId=3B0C08610059
   BIT_IND_PROP(){};
   //##ModelId=3B0C08610077
   ~BIT_IND_PROP() { delete BitAttr; };
   //##ModelId=3B0C08610078
-  void update(CString NewName);
+  void update(string NewName);
   //##ModelId=3B0C0861008B
-  CString Dump();
+  string Dump();
   //##ModelId=3B0C0861008C
   BIT_IND_PROP &operator=(BIT_IND_PROP &other)  //  = operator
   {
@@ -408,7 +390,7 @@ class ATTR {
   };
 
   //##ModelId=3B0C086101B0
-  ATTR(CString range_var, int *atts, int size);
+  ATTR(string range_var, int *atts, int size);
 
   //##ModelId=3B0C086101C1
   ATTR(ATTR &other) : AttId(other.AttId), CuCard(other.CuCard), Min(other.Min), Max(other.Max) {
@@ -421,11 +403,11 @@ class ATTR {
   };
 
   //##ModelId=3B0C086101CC
-  CString Dump();
+  string Dump();
   //##ModelId=3B0C086101D5
-  CString attrDump();
+  string attrDump();
   //##ModelId=3B0C086101D6
-  CString DumpCOVE();
+  string DumpCOVE();
 
   // the following is used by Bill's Memory Manager
   // Redefine new and delete if memory manager is used.
@@ -536,8 +518,8 @@ class SCHEMA {
   // store the key-sets of all attributes in the schema
   KEYS_SET *AttrStore();
 
-  CString Dump();
-  CString DumpCOVE();
+  string Dump();
+  string DumpCOVE();
 
   // the following is used by Bill's Memory Manager
   // Redefine new and delete if memory manager is used.
@@ -568,8 +550,8 @@ class LOG_PROP {
   LOG_PROP(){};
   virtual ~LOG_PROP(){};
 
-  virtual CString Dump() = 0;
-  virtual CString DumpCOVE() = 0;
+  virtual string Dump() = 0;
+  virtual string DumpCOVE() = 0;
 
 };  // class LOG_PROP
 
@@ -611,9 +593,9 @@ class LOG_COLL_PROP : public LOG_PROP {
   };
 
   //##ModelId=3B0C086202E5
-  CString Dump();
+  string Dump();
   //##ModelId=3B0C086202E6
-  CString DumpCOVE();
+  string DumpCOVE();
 
   // the following is used by Bill's Memory Manager
   // Redefine new and delete if memory manager is used.
@@ -655,30 +637,26 @@ class LOG_ITEM_PROP : public LOG_PROP {
   KEYS_SET FreeVars;
 
  public:
-  //##ModelId=3B0C08630047
   LOG_ITEM_PROP(float max, float min, float CuCard, float selectivity, KEYS_SET &freevars)
       : Max(max), Min(min), CuCard(CuCard), Selectivity(selectivity), FreeVars(freevars) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_ITEM_PROP].New();
   };
 
-  //##ModelId=3B0C08630065
   ~LOG_ITEM_PROP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_ITEM_PROP].Delete();
   };
 
-  //##ModelId=3B0C08630066
-  CString Dump() {
-    CString os;
-    os.Format("Max : %.0f, Min : %.0f, CuCard : %.0f, Selectivity : %.3f, FreeVars : %s\r\n", Max, Min, CuCard,
-              Selectivity, FreeVars.Dump());
+  string Dump() {
+    string os;
+    os = "Max : " + to_string(Max) + ", Min : " + to_string(Min) + ", CuCard : " + to_string(CuCard) +
+         ", Selectivity : " + to_string(Selectivity) + ", FreeVars : " + FreeVars.Dump() + "\n";
     return os;
   };
 
   // Temporary, till we use LOG_ITEM_PROPs in COVE
-  //##ModelId=3B0C08630070
-  CString DumpCOVE() {
-    CString os = "Error";
-    // os.Format("%d %d %s%s%s \r\n",Card, UCard, "{", (*Schema).DumpCOVE(), "}");
+  string DumpCOVE() {
+    string os = "Error";
+    // os.Format("%d %d %s%s%s \n",Card, UCard, "{", (*Schema).DumpCOVE(), "}");
     return os;
   };
 
@@ -744,9 +722,9 @@ class PHYS_PROP {
   bool operator==(PHYS_PROP &other);
 
   //##ModelId=3B0C08630296
-  CString Dump();
+  string Dump();
   //##ModelId=3B0C086302A0
-  CString DumpCOVE();
+  string DumpCOVE();
 
 };  // class PHYS_PROP
 
@@ -896,7 +874,7 @@ class COST {
   }
 
   //##ModelId=3B0C08640125
-  CString Dump();
+  string Dump();
 
   // the following is used by Bill's Memory Manager
   // Redefine new and delete if memory manager is used.
@@ -941,53 +919,37 @@ class CONT
   // The vector of contexts, vc, implements sharing.  Each task which
   // creates a context  adds an entry to this vector.  Finish is true
   //  means the task is done.
-  //##ModelId=3B0C086402DF
   static vector<CONT *> vc;
 
  private:
-  //##ModelId=3B0C086402F3
   PHYS_PROP *ReqdPhys;
-  //##ModelId=3B0C08640311
   COST *UpperBd;
-  //##ModelId=3B0C0864031A
   bool Finished;
 
  public:
-  //##ModelId=3B0C0864032E
   CONT(PHYS_PROP *, COST *Upper, bool done);
 
-  //##ModelId=3B0C0864034C
   ~CONT() {
     delete UpperBd;
     delete ReqdPhys;
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONT].Delete();
   };
 
-  //##ModelId=3B0C0864034D
   inline PHYS_PROP *GetPhysProp() { return (ReqdPhys); };
-  //##ModelId=3B0C08640356
   inline COST *GetUpperBd() { return (UpperBd); };
-  //##ModelId=3B0C08640360
   inline void SetPhysProp(PHYS_PROP *RP) { ReqdPhys = RP; };
 
-  //##ModelId=3B0C0864036A
-  CString Dump() {
-    CString os;
-    os.Format("Prop: %s, UB: %s", ReqdPhys->Dump(), UpperBd->Dump());
+  string Dump() {
+    return "Prop: " + ReqdPhys->Dump() + ", UB: " + UpperBd->Dump();
     //		os.Format("Prop: %s, UB: %s", ReqdPhys==NULL ? "ANY" : ReqdPhys->Dump(), UpperBd->Dump() );
-
-    return os;
   }
 
   // set the flag if the context is done, means we completed the search,
   // may got a final winner, or found out optimal plan for this context not exist
-  //##ModelId=3B0C0864036B
   inline void done() { Finished = true; };
-  //##ModelId=3B0C08640374
   inline bool is_done() { return Finished; };
 
   //  Update bounds, when we get better ones.
-  //##ModelId=3B0C0864037E
   inline void SetUpperBound(COST &NewUB) { *UpperBd = NewUB; };
 
 };  // class CONT
@@ -1017,54 +979,54 @@ double TouchCopyCost(LOG_COLL_PROP *LogProp);
 double FetchingCost(LOG_COLL_PROP *LogProp);
 
 // needed for hashing, used for duplicate elimination.  See ../doc/dupelim
-ub4 lookup2(CString k, ub4 length, ub4 initval);
+ub4 lookup2(string k, ub4 length, ub4 initval);
 ub4 lookup2(ub4 k, ub4 initval);
 
 // Get the names from ids
-CString GetCollName(int CollId);
-CString GetAttName(int AttId);
-CString GetIndName(int IndId);
-CString GetBitIndName(int BitIndId);
+string GetCollName(int CollId);
+string GetAttName(int AttId);
+string GetIndName(int IndId);
+string GetBitIndName(int BitIndId);
 // Transform A.B into B
-CString TruncName(CString AttId);
+string TruncName(string AttId);
 
 // Get the Ids from names
 int GetCollId(int AttId);
-int GetCollId(CString CollName);
-int GetAttId(CString CollName, CString AttName);
-int GetAttId(CString Name);
-int GetIndId(CString CollName, CString IndName);
-int GetBitIndId(CString CollName, CString IndName);
+int GetCollId(string CollName);
+int GetAttId(string CollName, string AttName);
+int GetAttId(string Name);
+int GetIndId(string CollName, string IndName);
+int GetBitIndId(string CollName, string IndName);
 
 // dump the memory usage Statistics
-CString DumpStatistics();
+string DumpStatistics();
 
 // get used physical memory
 int GetUsedMemory();
 
-// convert CString to Domain type
+// convert string to Domain type
 DOM_TYPE atoDomain(char *p);
 
-// conver CString to ORDER_AD type
+// conver string to ORDER_AD type
 ORDER_AD atoKeyOrder(char *p);
 
-// convert CString to ORDER type
+// convert string to ORDER type
 ORDER atoCollOrder(char *p);
 
-// convert CString to ORDER_INDEX type
+// convert string to ORDER_INDEX type
 ORDER_INDEX atoIndexOrder(char *p);
 
-// convert Domain type to CString
-CString DomainToString(DOM_TYPE p);
+// convert Domain type to string
+string DomainToString(DOM_TYPE p);
 
-// convert Domain type to CString
-CString OrderToString(ORDER p);
+// convert Domain type to string
+string OrderToString(ORDER p);
 
-// convert Domain type to CString
-CString IndexOrderToString(ORDER_INDEX p);
+// convert Domain type to string
+string IndexOrderToString(ORDER_INDEX p);
 
 // return only the file name (without path)
-CString Trim(CString pathname);
+string Trim(string pathname);
 
 // skip the spaces in front of the string
 char *SkipSpace(char *p);
@@ -1072,5 +1034,5 @@ char *SkipSpace(char *p);
 // return true if the string line is Comment or blank line
 bool IsCommentOrBlankLine(char *p);
 
-// get a CString from the line buf. (seperated by space char)
+// get a string from the line buf. (seperated by space char)
 void parseString(char *p);

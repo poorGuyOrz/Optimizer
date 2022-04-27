@@ -186,12 +186,12 @@ CString MEMORY_MANAGER::Dump()
 {
 	CString os,temp;
 	
-	os.Format("Allocated block anchor : %d\r\n", _block_anchor_count) ;
+	os.Format("Allocated block anchor : %d\n", _block_anchor_count) ;
 	
     for (int i = 0 ; i < _block_anchor_count ; i++)
     {
 		BLOCK_ANCHOR * anchor_p =  &(_block_anchors[i]) ;
-		temp.Format("Anchor %d --- slot_size: %d, block_size: %d, NewCalls: %d, DeleteCalls: %d, ActualAlloc: %d\r\n",
+		temp.Format("Anchor %d --- slot_size: %d, block_size: %d, NewCalls: %d, DeleteCalls: %d, ActualAlloc: %d\n",
 			i, anchor_p->_slot_size, anchor_p->_block_size, anchor_p->NewCalls, anchor_p->DeleteCalls, anchor_p->ActualAlloc);
 		os += temp;
     }
