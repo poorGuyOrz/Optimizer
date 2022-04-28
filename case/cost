@@ -1,0 +1,14 @@
+{
+  "BF": 100,
+  "BIT_BF": 100000,
+  "CPU_APPLY": 2e-05,
+  "CPU_COMP_MOVE": 3e-05,
+  "CPU_PRED": 1e-05,
+  "CPU_READ": 3e-05,
+  "HASH_COST": 2e-05,
+  "HASH_PROBE": 1e-05,
+  "INDEX_BF": 1000,
+  "INDEX_PROBE": 1e-05,
+  "IO": 0.03,
+  "TOUCH_COPY": 1e-05
+}

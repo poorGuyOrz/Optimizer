@@ -42,20 +42,15 @@ more detail by an expression (class EXPR).
 class SSP  // Search Space
 {
  public:
-  //##ModelId=3B0C08650041
   M_EXPR **HashTbl;  // To identify duplicate MExprs
 
-  //##ModelId=3B0C08650054
   SSP();
 
-  //##ModelId=3B0C08650055
   void Init();  // Create some default number of empty Groups, the number
                 // depending on the initial query.  Read in initial query.
 
-  //##ModelId=3B0C0865005E
   ~SSP();
 
-  //##ModelId=3B0C08650068
   void optimize();  // Later add a conditon.
                     //  Prepare the SSP so an optimal plan can be found
 
@@ -66,7 +61,6 @@ class SSP  // Search Space
   // merge groups.
   // GrpID is the ID of the group where Mexpr will be put.  If GrpID is
   // NEW_GRPID(-1), make a new group with that ID and return its value in GrpID.
-  //##ModelId=3B0C08650069
   M_EXPR *CopyIn(EXPR *Expr, GRP_ID &GrpID);
 
   // Copy out the final plan.  Recursive, each time increasing tabs by

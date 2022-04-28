@@ -1,15 +1,4 @@
-/*  rules.cpp : rules implementation
-        $Revision: 16 $
-                Implements classes in rules.h
-        Columbia Optimizer Framework
-
-        A Joint Research Project of Portland State University
-           and the Oregon Graduate Institute
-        Directed by Leonard Shapiro and David Maier
-        Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-
-*/
+//  rules.cpp : rules implementation                Implements classes in rules.h        Columbia Optimizer Framework
 
 #include "../header/cat.h"
 #include "../header/physop.h"
@@ -126,7 +115,6 @@ RULE_SET::RULE_SET(string filename) : RuleCount(NUMOFRULES) {
   rule_set[R_DUMMY_TO_PDUMMY] = new DUMMY_TO_PDUMMY();
 };  // rule set
 
-//##ModelId=3B0C0868033E
 RULE_SET::~RULE_SET() {
   for (int i = 0; i < RuleCount; i++) delete rule_set[i];
   delete rule_set;

@@ -25,13 +25,11 @@ class AGG_THRU_EQJOIN;
 class SELECT_TO_INDEXED_FILTER;
 class DUMMY_TO_PDUMMY;
 
-//==========
 /*
 This enum list is used for the rule bit vector.  It must be consistent with NUMOFRULES
 and rule_set and with the rule set file read from disk. If there are more than 32 rules,
 put only logical to logical transformations in the rule vector.
 */
-//##ModelId=3B0C086802C6
 typedef enum RULELABELS {
   R_GET_TO_FILE_SCAN,
   R_SELECT_TO_FILTER,
@@ -266,49 +264,36 @@ class BINDERY {
 #define LOG_PROMISE 1
 #define ASSOC_PROMISE 2
 
-//##ModelId=3B0C08690303
 class RULE {
  private:
-  //##ModelId=3B0C08690318
-  EXPR *original;  // original pattern to match
-  //##ModelId=3B0C08690336
+  EXPR *original;    // original pattern to match
   EXPR *substitute;  // replacement for original pattern
                      //"substitute" is used ONLY to tell if the rule is logical or physical,
                      // and, by check(), for consistency checks.  Its pattern is represented
                      // in the method next_substitute()
 
-  //##ModelId=3B0C0869033F
   int arity;  // number of leaf operators in original pattern.
   //  Leaf ops must be numbered 0, 1, 2,..
 
-  //##ModelId=3B0C08690353
   string name;
 
   // Used for unique rule sets
-  //##ModelId=3B0C08690368
   BIT_VECTOR mask;  // Which rules to turn off in "after" expression
-  //##ModelId=3B0C0869037B
-  int index;  // index in the rule set
+  int index;        // index in the rule set
 
  public:
-  //##ModelId=3B0C0869038F
   RULE(string name, int arity, EXPR *original, EXPR *substitute)
       : name(name), arity(arity), mask(0), original(original), substitute(substitute){};
 
-  //##ModelId=3B0C086903AD
   virtual ~RULE() {
     delete original;
     delete substitute;
   };
 
-  //##ModelId=3B0C086903AF
   inline string GetName() { return (name); };
-  //##ModelId=3B0C086903B7
   inline EXPR *GetOriginal() { return (original); };
-  //##ModelId=3B0C086903C1
   inline EXPR *GetSubstitute() { return (substitute); };
 
-  //##ModelId=3B0C086903CB
   bool top_match(OP *op_arg) {
     assert(op_arg->is_logical());  // to make sure never O_EXPR a physcial mexpr
 
@@ -320,7 +305,6 @@ class RULE {
   };
 
   // default value is 1.0, resulting in exhaustive search
-  //##ModelId=3B0C086903D5
   virtual int promise(OP *op_arg, int ContextID) {
     return (substitute->GetOp()->is_physical() ? PHYS_PROMISE : LOG_PROMISE);
   };
@@ -329,7 +313,6 @@ class RULE {
   // context for the search?  mexpr is the multi-expression bound to
   // before, probably mexpr is not needed.
   // Default value is TRUE, i.e., rule applies
-  //##ModelId=3B0C086A0001
   virtual bool condition(EXPR *before, M_EXPR *mexpr, int ContextID) { return true; };
 
   // Given an expression which is a binding (before), this
@@ -337,12 +320,9 @@ class RULE {
   //##ModelId=3B0C086A0015
   virtual EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp) = 0;
 
-  //##ModelId=3B0C086A0029
   bool check();  // check that original & subst. patterns are legal
 
-  //##ModelId=3B0C086A002A
-  inline int get_index() { return (index); };  // get the rule's index in the rule set
-  //##ModelId=3B0C086A0033
+  inline int get_index() { return (index); };       // get the rule's index in the rule set
   inline BIT_VECTOR get_mask() { return (mask); };  // get the rule's mask
 
   inline void set_index(int i) { index = i; };

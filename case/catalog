@@ -1,0 +1,27 @@
+RelName: A
+Card: 2000
+UCard: 2000
+Width: 0.01
+Order: sorted
+OrderKey: (W)
+KeyOrder: (ascending)
+CandidateKey: ()
+NumOfAttr: 4
+//Name(S)   Type(E)     UCard(D)    Max(D)  Min(D)  Comment
+W           real_t      316           316    0
+X           real_t      316           316    0
+X1          real_t      316           316    0
+Y           real_t      316           316    0
+
+RelName: B
+Card: 2000
+UCard: 2000
+Width: 0.01
+Order: sorted
+OrderKey: (X)
+KeyOrder: (ascending)
+CandidateKey: ()
+NumOfAttr: 2
+//Name(S)   Type(E)     UCard(D)    Max(D)  Min(D)  Comment
+X           real_t      316           316    0
+Y           real_t      316           316    0
