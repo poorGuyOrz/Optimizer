@@ -409,23 +409,6 @@ class ATTR {
   //##ModelId=3B0C086101D6
   string DumpCOVE();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C086101EA
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C086101F3
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C086101FE
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
-
 };  // class ATTR
 
 /*
@@ -521,20 +504,6 @@ class SCHEMA {
   string Dump();
   string DumpCOVE();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
-
 };  // class SCHEMA
 
 /*
@@ -597,22 +566,6 @@ class LOG_COLL_PROP : public LOG_PROP {
   //##ModelId=3B0C086202E6
   string DumpCOVE();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C086202FA
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C08620303
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C08620317
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 
 };  // class LOG_COLL_PROP
 
@@ -876,22 +829,6 @@ class COST {
   //##ModelId=3B0C08640125
   string Dump();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C08640130
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C08640139
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C08640144
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 
 };  // class COST
 

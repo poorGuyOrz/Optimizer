@@ -136,28 +136,18 @@ class SSP  // Search Space
    All searching is done with M_EXPRs, so each contains lots of state.
 
 */
-//##ModelId=3B0C08650221
-class M_EXPR
-
-{
+class M_EXPR {
  private:
-  //##ModelId=3B0C08650238
   M_EXPR *HashPtr;  // list within hash bucket
 
-  //##ModelId=3B0C0865024A
   BIT_VECTOR RuleMask;  // If 1, do not fire rule with that index
 
-  //##ModelId=3B0C0865025D
   int counter;  // to keep track of how many winners point to this MEXPR
-  //##ModelId=3B0C0865027C
-  OP *Op;  // Operator
-  //##ModelId=3B0C08650299
+  OP *Op;       // Operator
   GRP_ID *Inputs;
-  //##ModelId=3B0C086502AE
   GRP_ID GrpID;  // I reside in this group
 
   // link to the next mexpr in the same group
-  //##ModelId=3B0C086502D8
   M_EXPR *NextMExpr;
 
   /*
@@ -171,81 +161,118 @@ class M_EXPR
     GRP_ID First = NULL, GRP_ID Second = NULL,
     GRP_ID Third = NULL, GRP_ID Fourth = NULL);
   */
-  //##ModelId=3B0C086502E9
-  ~M_EXPR();
+  ~M_EXPR() {
+    if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].Delete();
+    if (GetArity()) {
+      delete[] Inputs;
+    }
+
+    delete Op;
+    Op = NULL;
+  };
 
   // M_EXPR(OP * Op, GRP_ID* inputs); //Used by CopyIn
 
   // Transform an EXPR into an M_EXPR.  May involve creating new Groups.
   //  GrpID is the ID of the group where the M_EXPR will be put.  If GrpID is
   //  NEW_GRPID(-1), make a new group with that ID.  (Same as SSP::CopyIn)
-  //##ModelId=3B0C086502F3
-  M_EXPR(EXPR *Expr, GRP_ID GrpID);
+  M_EXPR(EXPR *Expr, GRP_ID grpid)
+      : Op(Expr->GetOp()->Clone()),
+        NextMExpr(NULL),
+        GrpID((grpid == NEW_GRPID) ? Ssp->GetNewGrpID() : grpid),
+        HashPtr(NULL),
+        RuleMask(0) {
+    GRP_ID GID;
+    EXPR *input;
+    counter = 0;
 
-  //##ModelId=3B0C08650307
-  M_EXPR(M_EXPR &other);
+    if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].New();
 
-  //##ModelId=3B0C0865031B
+    // copy in the sub-expression
+    int arity = GetArity();
+    if (arity) {
+      Inputs = new GRP_ID[arity];
+      for (int i = 0; i < arity; i++) {
+        input = Expr->GetInput(i);
+
+        if (input->GetOp()->is_leaf())  // deal with LEAF_OP, sharing the existing group
+          GID = ((LEAF_OP *)input->GetOp())->GetGroup();
+        else {
+          // create a new sub group
+          if (Op->GetName() == "DUMMY")
+            GID = NEW_GRPID_NOWIN;  // DUMMY subgroups have only trivial winners
+          else
+            GID = NEW_GRPID;
+          M_EXPR *MExpr = Ssp->CopyIn(input, GID);
+        }
+
+        Inputs[i] = GID;
+      }
+    }  // if(arity)
+  };
+
+  M_EXPR(M_EXPR &other)
+      : GrpID(other.GrpID),
+        HashPtr(other.HashPtr),
+        NextMExpr(other.NextMExpr),
+        Op(other.Op->Clone()),
+        RuleMask(other.RuleMask) {
+    if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].New();
+
+    // Inputs are the only member data left to copy.
+    int arity = Op->GetArity();
+    if (arity) {
+      Inputs = new GRP_ID[arity];
+      while (--arity >= 0) Inputs[arity] = other.GetInput(arity);
+    }
+  };
+
   inline int GetCounter() { return counter; };
-  //##ModelId=3B0C08650325
   inline void IncCounter() { counter++; };
-  //##ModelId=3B0C08650326
   inline void DecCounter() {
     if (counter != 0) counter--;
   };
-  //##ModelId=3B0C0865032F
   inline OP *GetOp() { return (Op); };
-  //##ModelId=3B0C08650339
   inline GRP_ID GetInput(int i) const { return (Inputs[i]); };
-  //##ModelId=3B0C0865034D
   inline void SetInput(int i, GRP_ID grpId) { Inputs[i] = grpId; };
-  //##ModelId=3B0C0865036B
   inline GRP_ID GetGrpID() { return (GrpID); };
-  //##ModelId=3B0C08650375
   inline int GetArity() { return (Op->GetArity()); };
 
-  //##ModelId=3B0C08650380
   inline M_EXPR *GetNextHash() { return HashPtr; };
-  //##ModelId=3B0C08650381
   inline void SetNextHash(M_EXPR *mexpr) { HashPtr = mexpr; };
 
-  //##ModelId=3B0C08650394
   inline void SetNextMExpr(M_EXPR *MExpr) { NextMExpr = MExpr; };
-  //##ModelId=3B0C086503A8
   inline M_EXPR *GetNextMExpr() { return NextMExpr; };
 
   // We just fired this rule, so update dont_fire bit vector
-  //##ModelId=3B0C086503B2
   inline void fire_rule(int rule_no) { bit_on(RuleMask, rule_no); };
 
 #ifdef UNIQ
   // Can I fire this rule?
-  //##ModelId=3B0C086503C6
   inline bool can_fire(int rule_no) { return (is_bit_off(RuleMask, rule_no)); };
 #endif
 
   inline void set_rule_mask(BIT_VECTOR v) { RuleMask = v; };
 
-  ub4 hash();
+  ub4 hash() {
+    ub4 hashval = Op->hash();
 
-  string Dump();
+    // to check the equality of the inputs
+    for (int input_no = Op->GetArity(); --input_no >= 0;) hashval = lookup2(GetInput(input_no), hashval);
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
+    return (hashval % (HtblSize - 1));
+  };
 
- public:
-  //##ModelId=3B0C08660011
-  static BLOCK_ANCHOR *_anchor;
+  string Dump() {
+    string os;
 
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C08660024
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
+    os = (*Op).Dump();
 
-  //##ModelId=3B0C08660038
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
+    int Size = GetArity();
+    for (int i = 0; i < Size; i++) os += " , " + to_string(Inputs[i]);
+
+    return os;
+  };
 
 };  // class M_EXPR
 
@@ -305,7 +332,7 @@ class GROUP {
   ~GROUP();
 
   string Dump();
-  void FastDump();  
+  void FastDump();
 
   // Find first and last (in some sense) MExpression in this Group
   inline M_EXPR *GetFirstLogMExpr() { return FirstLogMExpr; };
@@ -434,21 +461,6 @@ class GROUP {
   static bool firstplan;
 #endif
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C08670239
-  static BLOCK_ANCHOR *_anchor;
-
-  // overload the new and delete methods
-  //##ModelId=3B0C0867024C
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C08670260
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 };  // class GROUP
 
 /*

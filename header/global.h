@@ -115,43 +115,6 @@ CLASS_STAT ClassStat[] =  // class statistics object
 
 int CLASS_NUM = slotsof(ClassStat);  // sizeof of ClassStat
 
-#ifdef USE_MEMORY_MANAGER
-/**********  THE FOLLOWING IS FOR BILL'S MEMORY MANAGER  ****/
-// Pointer to global memory manager.
-MEMORY_MANAGER *memory_manager;
-
-//##ModelId=3B0C085F0147
-BLOCK_ANCHOR *APPLY_RULE::_anchor = NULL;
-//##ModelId=3B0C086101EA
-BLOCK_ANCHOR *ATTR::_anchor = NULL;
-//##ModelId=3B0EA6DA02BD
-BLOCK_ANCHOR *BINDERY::_anchor = NULL;
-//##ModelId=3B0C08640130
-BLOCK_ANCHOR *COST::_anchor = NULL;
-//##ModelId=3B0C08730377
-BLOCK_ANCHOR *EQJOIN::_anchor = NULL;
-//##ModelId=3B0C086E00EF
-BLOCK_ANCHOR *EXPR::_anchor = NULL;
-//##ModelId=3B0C08670239
-BLOCK_ANCHOR *GROUP::_anchor = NULL;
-//##ModelId=3B0C0873004B
-BLOCK_ANCHOR *LEAF_OP::_anchor = NULL;
-//##ModelId=3B0C086202FA
-BLOCK_ANCHOR *LOG_COLL_PROP::_anchor = NULL;
-//##ModelId=3B0C086E02A7
-BLOCK_ANCHOR *LOOPS_JOIN::_anchor = NULL;
-//##ModelId=3B0C08660011
-BLOCK_ANCHOR *M_EXPR::_anchor = NULL;
-//##ModelId=3B0C085E0055
-BLOCK_ANCHOR *O_EXPR::_anchor = NULL;
-//##ModelId=3B0C085E031C
-BLOCK_ANCHOR *O_INPUTS::_anchor = NULL;
-//##ModelId=3B0C086200B5
-BLOCK_ANCHOR *SCHEMA::_anchor = NULL;
-
-#endif  // USE_MEMORY_MANAGER
-
-/**********  END BILL'S MEMORY MANAGER  ****/
 
 RULE_SET *RuleSet;      // Rule set
 CAT *Cat;               // read catalog in

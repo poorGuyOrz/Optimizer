@@ -207,23 +207,6 @@ class BINDERY {
   //##ModelId=3B0EA6DA02B2
   CString print_state();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0EA6DA02BD
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0EA6DA02DA
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size, 5); }
-
-  //##ModelId=3B0EA6DA02E5
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
-
 };  // BINDERY
 
 /*

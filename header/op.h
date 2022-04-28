@@ -316,22 +316,6 @@ class LEAF_OP : public OP
     return NULL;
   };
 
-    // the following is used by Bill's Memory Manager
-    // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C0873004B
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C08730069
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size, 50); }
-
-  //##ModelId=3B0C08730073
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 
 };  // class LEAF_OP
 

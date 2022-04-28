@@ -291,22 +291,6 @@ class O_EXPR : public TASK {
   //##ModelId=3B0C085E0041
   void perform();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C085E0055
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C085E005E
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C085E0072
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 
 };  // O_EXPR
 
@@ -373,22 +357,6 @@ class O_INPUTS : public TASK {
   //##ModelId=3B0C085E0311
   string Dump();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C085E031C
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C085E0325
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C085E0339
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 
 };  // O_INPUTS
 
@@ -425,22 +393,5 @@ class APPLY_RULE : public TASK {
 
   //##ModelId=3B0C085F013C
   string Dump();
-
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C085F0147
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C085F0150
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size, 100); }
-
-  //##ModelId=3B0C085F0164
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
 
 };  // APPLY_RULE

@@ -140,23 +140,6 @@ class EQJOIN : public LOG_OP {
   //##ModelId=3B0C08730363
   string Dump();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C08730377
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C08730380
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C08730394
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
-
 };  // EQJOIN
 
 /*

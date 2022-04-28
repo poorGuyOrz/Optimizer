@@ -12,18 +12,12 @@
 #define KEYWORD_QUERY "Query:"
 #define KEYWORD_PIGGYBACK "PiggyBack"
 
-#ifdef _DEBUG
-//  CMemoryState oldMemState, newMemState, diffMemState;
-#endif
-
 // Rule Firing Statistics
 INT_ARRAY TopMatch;
 INT_ARRAY Bindings;
 INT_ARRAY Conditions;
 
-/*************  DO THE OPTIMIZATION  ********************/
 void Optimizer() {
-  // Initialize
   TaskNo = 0;
   Memo_M_Exprs = 0;
   SET_TRACE Trace(true);
@@ -42,11 +36,6 @@ void Optimizer() {
     ClassStat[i].Max = 0;
     ClassStat[i].Total = 0;
   }
-
-#ifdef USE_MEMORY_MANAGER
-  // Pointer to global memory manager.
-  memory_manager = new MEMORY_MANAGER();
-#endif
 
   // Create objects to manage Opt stats, Cost model, Rule set, Heuristic cost.
   OptStat = new OPT_STAT;
@@ -89,7 +78,7 @@ void Optimizer() {
   } else if (RadioVal == 0)  // Batch Query case
   {
     // Open BQueryFile
-    if (BQueryFile == "bquery") BQueryFile = AppDir + "/QUERIES/testbatbat.txt";  // default case
+    if (BQueryFile == "bquery") BQueryFile = AppDir + "/QUERIES/Batch/bat-TPC17.txt";  // default case
     if ((fp = fopen(BQueryFile.str_.c_str(), "r")) == NULL)
       OUTPUT_ERROR("can not open the file you chose in the option dialogue");
     fgets(TextLine, LINEWIDTH, fp);
@@ -224,7 +213,7 @@ void Optimizer() {
         GlobepsPruning = false;
         ForGlobalEpsPruning = true;
         Cat = new CAT(CatFile.str_);
-        Query = new QUERY(QueryFile);
+        Query = new QUERY(QueryFile.str_);
         Ssp = new SSP;
         Ssp->Init();
         delete Query;
@@ -240,9 +229,6 @@ void Optimizer() {
         GlobepsPruning = true;
         ForGlobalEpsPruning = false;
       }
-      // #ifdef _DEBUG
-      // 			oldMemState.Checkpoint();
-      // #endif
 
       // Since each optimization corrupts the catalog, we must create it anew
       Cat = new CAT(CatFile.str_);
@@ -262,7 +248,7 @@ void Optimizer() {
 #endif
 
         // Parse and print the query and its interesting orders
-        Query = new QUERY(QueryFile);
+        Query = new QUERY(QueryFile.str_);
         PTRACE("Original Query:" << endl << Query->Dump());
         PTRACE("The interesting orders in the query are:\n" << endl << Query->Dump_IntOrders());
 
@@ -376,22 +362,8 @@ void Optimizer() {
   delete RuleSet;
   delete HeuristicCost;
 
-#ifdef USE_MEMORY_MANAGER
-  PTRACE("used memory before delete manager: %dM\n", GetUsedMemory() / 1000);
-  delete memory_manager;
-
-#endif
   // PTRACE("used memory after delete manager: %dM\n", GetUsedMemory() / 1000);
 
-#ifdef _DEBUG
-  // newMemState.Checkpoint();
-  // if (diffMemState.Difference(oldMemState, newMemState))
-  // {
-  //   PTRACE("%s", "Memory leaked after optimizer!\n") ;
-  //   oldMemState.DumpAllObjectsSince();
-  //   diffMemState.DumpStatistics();
-  // }
-#endif
   OutputFile.close();
   OutputCOVE.close();
 }

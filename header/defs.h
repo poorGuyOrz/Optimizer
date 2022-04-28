@@ -203,9 +203,6 @@ class RULE;
 class OPT_STAT;
 class CLASS_STAT;
 class SET_TRACE;
-#ifdef USE_MEMORY_MANAGER
-class MEMORY_MANAGER;
-#endif
 class RULE_SET;
 class CM;
 class KEYS_SET;
@@ -263,9 +260,6 @@ extern RULE_SET *RuleSet;
 extern CM *Cm;
 extern KEYS_SET IntOrdersSet;  // set of Interesting Orders
 
-#ifdef USE_MEMORY_MANAGER
-extern MEMORY_MANAGER *memory_manager;
-#endif
 
 extern bool NO_PHYS_IN_GROUP;
 
@@ -279,7 +273,6 @@ extern bool NO_PHYS_IN_GROUP;
 IRPROP: off == Optimize each group for one property only
                 on == Optimize each group for all Interesting Relevant Properties
 UNIQ:   on == Use the unique rule set rules
-USE_MEMORY_MANAGER: Use memory pooling for selected classes
 SORT_AFTERS: sort possible moves in order of estimated cost
 INFBOUND: When optimizing a group, ignore the initial upper bound; use infinity instead
 FIRSTPLAN: trace when the first complete plan is costed

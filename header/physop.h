@@ -127,23 +127,6 @@ class LOOPS_JOIN : public PHYS_OP {
   //##ModelId=3B0C086E029C
   string Dump();
 
-  // the following is used by Bill's Memory Manager
-  // Redefine new and delete if memory manager is used.
-#ifdef USE_MEMORY_MANAGER  // use bill's memory manager
-
- public:
-  //##ModelId=3B0C086E02A7
-  static BLOCK_ANCHOR *_anchor;
-
- public:
-  // overload the new and delete methods
-  //##ModelId=3B0C086E02BA
-  inline void *operator new(size_t my_size) { return memory_manager->allocate(&_anchor, (int)my_size); }
-
-  //##ModelId=3B0C086E02C4
-  inline void operator delete(void *dead_elem, size_t) { memory_manager->deallocate(_anchor, dead_elem); }
-#endif
-
 };  // LOOPS_JOIN
 
 // Physical Dummy Operator.  Just to give the dummy operator a physical counterpart.

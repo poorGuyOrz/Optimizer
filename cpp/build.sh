@@ -1,1 +1,1 @@
-g++ -g  supp.cpp cat.cpp group.cpp expr.cpp item.cpp logop.cpp mexpr.cpp physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp main.cpp -std=c++17
+g++ -g  supp.cpp cat.cpp group.cpp item.cpp logop.cpp  physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp main.cpp -std=c++17
