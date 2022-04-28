@@ -147,32 +147,24 @@ class Node {
 };
 #endif
 
-//##ModelId=3B0EA6D90080
 class BINDERY {
  private:
-  //##ModelId=3B0EA6D90185
   EXPR *original;  // bind with this original pattern
 
-  //##ModelId=3B0EA6D901CC
   M_EXPR *cur_expr;  // bind the original pattern to this multi-expression
 
-  //##ModelId=3B0EA6D901DF
   bool one_expr;  // Is this an expression bindery?
 
-  //##ModelId=3B0EA6DA01FF
   GRP_ID group_no;  // group no of the cur_expr
 
-  //##ModelId=3B0EA6DB005B
   typedef enum BINDERY_STATE {
     start,          // This is a new MExpression
     valid_binding,  // A binding was found.
     finished,       // Finished with this expression
   } BINDERY_STATE;
 
-  //##ModelId=3B0EA6DA021D
   BINDERY_STATE state;
 
-  //##ModelId=3B0EA6DA023D
   BINDERY **input;  // binderys for input expr's
 #ifdef _REUSE_SIB
   Node *list, *last, *currentBind;
@@ -183,29 +175,23 @@ class BINDERY {
 
  public:
   // Create an Expression bindery
-  //##ModelId=3B0EA6DA0262
   BINDERY(M_EXPR *expr, EXPR *original);
 
   // Create a Group bindery
-  //##ModelId=3B0EA6DA0280
   BINDERY(GRP_ID group_no, EXPR *original);
 
-  //##ModelId=3B0EA6DA0294
   ~BINDERY();
 
   // advance() requests a bindery to produce its next binding, if one
   // exists.  This may cause the state of the bindery to change.
   // advance() returns true if a binding has been found.
-  //##ModelId=3B0EA6DA029E
   bool advance();
 
   // If a valid binding has been found, then return the bound EXPR.
-  //##ModelId=3B0EA6DA02A8
   EXPR *extract_expr();
 
   // print the name of the current state
-  //##ModelId=3B0EA6DA02B2
-  CString print_state();
+  string print_state();
 
 };  // BINDERY
 
@@ -296,7 +282,7 @@ class RULE {
   //  Leaf ops must be numbered 0, 1, 2,..
 
   //##ModelId=3B0C08690353
-  CString name;
+  string name;
 
   // Used for unique rule sets
   //##ModelId=3B0C08690368
@@ -306,7 +292,7 @@ class RULE {
 
  public:
   //##ModelId=3B0C0869038F
-  RULE(CString name, int arity, EXPR *original, EXPR *substitute)
+  RULE(string name, int arity, EXPR *original, EXPR *substitute)
       : name(name), arity(arity), mask(0), original(original), substitute(substitute){};
 
   //##ModelId=3B0C086903AD
@@ -316,7 +302,7 @@ class RULE {
   };
 
   //##ModelId=3B0C086903AF
-  inline CString GetName() { return (name); };
+  inline string GetName() { return (name); };
   //##ModelId=3B0C086903B7
   inline EXPR *GetOriginal() { return (original); };
   //##ModelId=3B0C086903C1
@@ -359,17 +345,10 @@ class RULE {
   //##ModelId=3B0C086A0033
   inline BIT_VECTOR get_mask() { return (mask); };  // get the rule's mask
 
-  //##ModelId=3B0C086A003D
   inline void set_index(int i) { index = i; };
-  //##ModelId=3B0C086A0048
   inline void set_mask(BIT_VECTOR v) { mask = v; };
 
-  //##ModelId=3B0C086A0053
-  CString Dump() {
-    CString os;
-    os.Format("RULE %s ", name);
-    return os;
-  };
+  string Dump() { return "RULE " + name; };
 
     // if not stop generating logical expression when epsilon pruning is applied
     // need these to identify the substitue

@@ -44,7 +44,7 @@ Pair of expr and cost value, used to sort expr according to their cost
 //##ModelId=3B0C085D0053
 typedef struct AFTERS {
   M_EXPR *m_expr;
-  COST *cost;
+  Cost *cost;
 } AFTERS;
 
 /*
@@ -65,30 +65,22 @@ typedef struct AFTERS {
         Tasks must destroy themselves when done!
 */
 
-//##ModelId=3B0C085D007B
 class TASK {
   friend class PTASKS;
 
  private:
-  //##ModelId=3B0C085D008F
   TASK *next;  // Used by class PTASK
 
  protected:
-  //##ModelId=3B0C085D00A3
-  int ContextID;  // Index to CONT::vc, the shared set of contexts
-  //##ModelId=3B0C085D00AD
+  int ContextID;     // Index to CONT::vc, the shared set of contexts
   int ParentTaskNo;  // The task which created me
 
  public:
-  //##ModelId=3B0C085D00C1
   TASK(int ContextID, int ParentTaskNo);
-  //##ModelId=3B0C085D00D5
   ~TASK(){};
 
-  //##ModelId=3B0C085D00D6
   virtual string Dump() = 0;
 
-  //##ModelId=3B0C085D00F3
   virtual void perform() = 0;  // TaskNo is current task number, which will
 };                             // TASK
 
@@ -126,17 +118,17 @@ class PTASKS {
      If there is no cheapest plan (e.g. the upper bound cannot be met),
      the context is stored in the winner's circle with a null plan.
 
-     This task generates all relevant expressions in the group, costs them
+     This task generates all relevant[相關的] expressions in the group, costs them
      and chooses the cheapest one.
 
-     The determination of what is "cheapest" may include such issues as
+     The determination[計算] of what is "cheapest" may include such issues as
      robustness, e.g. this task may choose the multiplan with smallest
      cost+variance.  Here variance is some measure of how much the cost
      varies as the statistics vary.
 
      There are at least two ways to implement this task; we will discover which
      is best.
-
+/// ????????????
      First, Goetz' original way, is to process each multiexpression separately,
      in the order they appear in the list/collection of multiexpressions.  To
      process an expression means to determine all relevant rules, then fire them
@@ -149,20 +141,14 @@ class PTASKS {
 
 */
 
-//##ModelId=3B0C085D01C5
 class O_GROUP : public TASK {
  private:
-  //##ModelId=3B0C085D01DA
-  GRP_ID GrpID;  // Which group to optimize
-  //##ModelId=3B0C085D01ED
-  bool Last;  // if this task is the last task for this group
-  //##ModelId=3B0C085D0202
-  COST *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
+  int GrpID;       // Which group to optimize
+  bool Last;       // if this task is the last task for this group
+  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
                    // else it is zero
  public:
-  //##ModelId=3B0C085D0215
-  O_GROUP(GRP_ID GrpID, int ContextID, int parent_task_no, bool last = true, COST *epsbound = NULL);
-  //##ModelId=3B0C085D0234
+  O_GROUP(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr);
   ~O_GROUP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].Delete();
     if (EpsBound) delete EpsBound;
@@ -170,10 +156,8 @@ class O_GROUP : public TASK {
 
   // Optimize the group by searching for a winner for the context.
   // Initialize or update the winner for the context's property
-  //##ModelId=3B0C085D0235
   void perform();
 
-  //##ModelId=3B0C085D023E
   string Dump();
 
 };  // O_GROUP
@@ -210,15 +194,15 @@ class O_GROUP : public TASK {
 class E_GROUP : public TASK {
  private:
   //##ModelId=3B0C085D02B7
-  GRP_ID GrpID;  // Group to be explored
+  int GrpID;  // Group to be explored
   //##ModelId=3B0C085D02C0
   bool Last;  // is it the last task in this group
   //##ModelId=3B0C085D02DF
-  COST *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
+  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
                    // else it is zero
  public:
   //##ModelId=3B0C085D02E8
-  E_GROUP(GRP_ID GrpID, int ContextID, int parent_task_no, bool last = false, COST *epsbound = NULL);
+  E_GROUP(int GrpID, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
   //##ModelId=3B0C085D0306
   ~E_GROUP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_E_GROUP].Delete();
@@ -251,12 +235,12 @@ class O_EXPR : public TASK {
   //##ModelId=3B0C085D03D8
   bool Last;  // if this task is the last task for the group
   //##ModelId=3B0C085E000E
-  COST *EpsBound;  // if global eps pruning is on, this is the eps bound of this task
+  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound of this task
                    // else it is zero
 
  public:
   //##ModelId=3B0C085E0018
-  O_EXPR(M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false, COST *epsbound = NULL);
+  O_EXPR(M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
 
   //##ModelId=3B0C085E0036
   ~O_EXPR() {
@@ -291,7 +275,6 @@ class O_EXPR : public TASK {
   //##ModelId=3B0C085E0041
   void perform();
 
-
 };  // O_EXPR
 
 /*
@@ -325,11 +308,11 @@ class O_INPUTS : public TASK {
   //##ModelId=3B0C085E022B
   int PrevInputNo;  // keep track of the previous optimized input no
   //##ModelId=3B0C085E0240
-  COST *LocalCost;  // the local cost of the mexpr
+  Cost *LocalCost;  // the local cost of the mexpr
   //##ModelId=3B0C085E0249
   bool Last;  // if this task is the last task for the group
   //##ModelId=3B0C085E0268
-  COST *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
+  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
   // else it is zero
   //##ModelId=3B0C085E0271
   int ContNo;  // keep track of number of contexts
@@ -337,26 +320,25 @@ class O_INPUTS : public TASK {
   // Costs and properties of input winners and groups.  Computed incrementally
   //  by this method.
   //##ModelId=3B0C085E0290
-  COST **InputCost;
+  Cost **InputCost;
   //##ModelId=3B0C085E02A4
   LOG_PROP **InputLogProp;
 
  public:
   //##ModelId=3B0C085E02B7
-  O_INPUTS(M_EXPR *MExpr, int ContextID, int ParentTaskNo, bool last = false, COST *epsbound = NULL, int ContNo = 0);
+  O_INPUTS(M_EXPR *MExpr, int ContextID, int ParentTaskNo, bool last = false, Cost *epsbound = nullptr, int ContNo = 0);
 
   //##ModelId=3B0C085E02E9
   ~O_INPUTS();
 
   // return the new upper bd for the input
   //##ModelId=3B0C085E02F3
-  COST *NewUpperBd(COST *OldUpperBd, int input);
+  Cost *NewUpperBd(Cost *OldUpperBd, int input);
   //##ModelId=3B0C085E0307
   void perform();
 
   //##ModelId=3B0C085E0311
   string Dump();
-
 
 };  // O_INPUTS
 
@@ -378,12 +360,12 @@ class APPLY_RULE : public TASK {
   //##ModelId=3B0C085F00E2
   bool Last;  // if this task is the last task for the group
   //##ModelId=3B0C085F00F7
-  COST *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
+  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
                    // else it is zero
  public:
   //##ModelId=3B0C085F0100
   APPLY_RULE(RULE *rule, M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false,
-             COST *epsbound = NULL);
+             Cost *epsbound = nullptr);
 
   //##ModelId=3B0C085F0132
   ~APPLY_RULE();

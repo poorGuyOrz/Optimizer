@@ -60,7 +60,7 @@ class ATTR_OP : public ITEM_OP {
   inline int GetArity() { return (0); };
   inline string GetName() { return ("ATTR_OP"); };
   inline bool is_const() { return true; };
-  inline COST *get_cost() { return new COST(0); };
+  inline Cost *get_cost() { return new Cost(0); };
 
   string Dump() { return "ATTR(" + GetAttName(AttId) + ")"; }
 };
@@ -117,7 +117,7 @@ class CONST_OP : public ITEM_OP {
   //##ModelId=3B0C08760009
   inline bool is_const() { return true; };
   //##ModelId=3B0C0876000A
-  COST *get_cost() { return new COST(0); };
+  Cost *get_cost() { return new Cost(0); };
 };
 
 // Integer valued constant
@@ -151,7 +151,7 @@ class CONST_INT_OP : public CONST_OP {
   inline int GetArity() { return (0); };
   inline string GetName() { return ("INT_OP"); };
   inline bool is_const() { return true; };
-  // inline COST * get_cost() { return new COST(0); };
+  // inline Cost * get_cost() { return new Cost(0); };
 
   string Dump() { return "INT(%" + to_string(value) + ")"; }
 };  // CONST_INT_OP
@@ -194,7 +194,7 @@ class CONST_STR_OP : public CONST_OP {
   inline string GetName() { return ("STR_OP"); };
   //##ModelId=3B0C08760140
   inline bool is_const() { return true; };
-  // inline COST * get_cost() { return new COST(0); };
+  // inline Cost * get_cost() { return new Cost(0); };
 
   string Dump() { return "STR(" + value + ")"; }
 
@@ -235,7 +235,7 @@ class CONST_SET_OP : public CONST_OP {
   inline string GetName() { return ("SET_OP"); };
   //##ModelId=3B0C087601E0
   inline bool is_const() { return true; };
-  // inline COST * get_cost() { return new COST(0); };
+  // inline Cost * get_cost() { return new Cost(0); };
 
   string Dump() { return "SET(" + value + ")"; };
 

@@ -58,7 +58,7 @@ GROUP::GROUP(M_EXPR *MExpr)
     if (CuCardPruning) cost += FetchingCost((LOG_COLL_PROP *)LogProp);
   }
 
-  LowerBd = new COST(cost);
+  LowerBd = new Cost(cost);
 
   /* if the operator is EQJOIN with m tables, estimate group size
      is 2^m*2.5. else it is zero */

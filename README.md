@@ -6,3 +6,9 @@ New interest in query capabilities for on-line analytical processing (OLAP) and 
 Columbia query optimizer framework provided an effective test environment for aggregation transforms on decision-support queries. This is the source code for the Columbia query optimizer that I wrote during my Master thesis research in Portland State University.
 
 Columbia Query Optimizer Project page: http://web.cecs.pdx.edu/~len/Columbia/
+
+
+* query
+
+
+* ssp

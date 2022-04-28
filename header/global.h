@@ -40,7 +40,7 @@ bool TraceSSP = false;       // global trace flag
 bool Pruning = true;           // pruning flag
 bool CuCardPruning = true;     // cucard pruning flag
 bool GlobepsPruning = false;   // global epsilon pruning flag
-int RadioVal = 0;              // the radio value for queryfile
+int RadioVal = 1;              // the radio value for queryfile
 bool SingleLineBatch = false;  // Single line per query in batch mode
 bool Halt = false;             // halt flat
 int HaltGrpSize = 100;         // halt when number of plans equals to 100% of group
@@ -54,7 +54,7 @@ int HaltImpr = 20;             // halt when the improvement is less than 20%
 double GLOBAL_EPS = 0.5;  // global epsilon value
 // if GlobalepsPruning is not set, this value is 0
 // otherwise, this value will be reset in main
-COST GlobalEpsBound(0);
+Cost GlobalEpsBound(0);
 bool ForGlobalEpsPruning = false;
 
 int TraceDepth = 0;   // global Trace depth
@@ -77,7 +77,7 @@ CLASS_STAT ClassStat[] =  // class statistics object
         CLASS_STAT("CONST_SET_OP", sizeof(class CONST_SET_OP)),
         CLASS_STAT("CONST_STR_OP", sizeof(class CONST_STR_OP)),
         CLASS_STAT("CONT", sizeof(class CONT)),
-        CLASS_STAT("COST", sizeof(class COST)),
+        CLASS_STAT("Cost", sizeof(class Cost)),
         CLASS_STAT("E_GROUP", sizeof(class E_GROUP)),
         CLASS_STAT("EQJOIN", sizeof(class EQJOIN)),
         CLASS_STAT("EXPR", sizeof(class EXPR)),
@@ -119,7 +119,7 @@ int CLASS_NUM = slotsof(ClassStat);  // sizeof of ClassStat
 RULE_SET *RuleSet;      // Rule set
 CAT *Cat;               // read catalog in
 QUERY *Query;           // read query in
-CM *Cm;                 // read cost model in
+CostModel *Cm;                 // read cost model in
 SSP *Ssp;               // Create Search space
 KEYS_SET IntOrdersSet;  // set of interesting orders
 

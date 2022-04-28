@@ -74,7 +74,6 @@ Columbia Optimizer Framework
     return new EXPR(Op, LeftExpr, RightExpr); \
   }
 
-//##ModelId=3B0C086D0313
 QUERY::QUERY(string QueryFile) {
   FILE *fp;                  // file handle
   char TextLine[LINEWIDTH];  // text line buffer
@@ -140,7 +139,7 @@ QUERY::QUERY(string QueryFile) {
   char *ExprStr = Buf;
   QueryExpr = ParseExpr(ExprStr);
 
-  PTRACE("initial query tree: " << QueryExpr->Dump());
+  cout << "initial query tree: " << QueryExpr->Dump() << endl;
 
   fclose(fp);
 };
@@ -157,7 +156,6 @@ QUERY::~QUERY() {
 }
 
 // get an expression
-//##ModelId=3B0C086D034F
 EXPR *QUERY::ParseExpr(char *&ExprStr) {
   EXPR *LeftExpr, *RightExpr;
   EXPR *Expr;
@@ -435,7 +433,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
       }
     }
 
-    CONT *InitCont = new CONT(sort_prop, new COST(-1), false);
+    CONT *InitCont = new CONT(sort_prop, new Cost(-1), false);
     // Make this the first context
     CONT::vc.push_back(InitCont);
     assert(CONT::vc.size() == 1);
@@ -473,7 +471,6 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 }
 
 // get one element of the expression
-//##ModelId=3B0C086D035A
 char *QUERY::GetOneElement(char *&Expr) {
   string Str;
   char *OneElement;
@@ -681,11 +678,10 @@ string QUERY::Dump() {
   //   os += "\n";
   //   ExprBuf = ExprBuf.Mid(pos + 1);
   // }
-  os += ExprBuf;
+  os += QueryExpr->Dump();
 
   return os;
 }
 
 // display the interesting orders
-//##ModelId=3B0C086D0327
 string QUERY::Dump_IntOrders() { return (IntOrdersSet.Dump()); }

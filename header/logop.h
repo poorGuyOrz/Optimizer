@@ -87,7 +87,6 @@ class GET : public LOG_OP {
    we may want to reconsider this decision.
 */
 
-//##ModelId=3B0C087302DF
 class EQJOIN : public LOG_OP {
  public:
   // If the query includes
@@ -95,38 +94,27 @@ class EQJOIN : public LOG_OP {
   // then
   // lattrs is <A.X, C.Z> and
   //  rattrs is <B.Y, D.W>
-  //##ModelId=3B0C087302F3
   int *lattrs;  // left attr's that are the same
                 //##ModelId=3B0C087302FD
   int *rattrs;  // right attr's that are the same
-  //##ModelId=3B0C08730307
   int size;  // number of the attrs
 
  public:
-  //##ModelId=3B0C08730311
   EQJOIN(int *lattrs, int *rattrs, int size);
-  //##ModelId=3B0C08730326
   EQJOIN(EQJOIN &Op);
-  //##ModelId=3B0C08730328
   OP *Clone() { return new EQJOIN(*this); };
 
-  //##ModelId=3B0C08730330
   ~EQJOIN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
 
-  //##ModelId=3B0C08730331
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C0873033B
   inline int GetArity() { return (2); };  // Inputs are left and right streams
-  //##ModelId=3B0C08730344
   inline string GetName() { return ("EQJOIN"); };  // Name of this operator
-  //##ModelId=3B0C0873034E
   inline int GetNameId() { return EQJOIN_ID; };  // Name of this operator
-  //##ModelId=3B0C08730358
   inline bool operator==(OP *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((EQJOIN *)other)->lattrs, lattrs, size) &&  // arguments are equal
@@ -134,10 +122,8 @@ class EQJOIN : public LOG_OP {
   };
 
   // since this operator has arguments
-  //##ModelId=3B0C08730362
   ub4 hash();
 
-  //##ModelId=3B0C08730363
   string Dump();
 
 };  // EQJOIN

@@ -39,12 +39,12 @@ void Optimizer() {
 
   // Create objects to manage Opt stats, Cost model, Rule set, Heuristic cost.
   OptStat = new OPT_STAT;
-  Cm = new CM(CMFile.str_);
+  Cm = new CostModel(CMFile.str_);
   PTRACE("cost model content: " << endl << Cm->Dump());
   RuleSet = new RULE_SET(RSFile.str_);
   PTRACE("Rule set content:" << endl << RuleSet->Dump());
-  COST *HeuristicCost;
-  HeuristicCost = new COST(0);
+  Cost *HeuristicCost;
+  HeuristicCost = new Cost(0);
 
   // Initialize Rule Firing Statistics
   TopMatch.resize(RuleSet->RuleCount);
@@ -71,14 +71,14 @@ void Optimizer() {
   if (RadioVal == 1)  // Single Query case
   {
     if (SQueryFile == "query")
-      QueryFile = AppDir + "QUERIES";  // default case
+      QueryFile = AppDir + "testquery.cl";  // default case
     else
       QueryFile = SQueryFile;  // value entered in option dialog; should check it exists.
     NumQuery = 1;
   } else if (RadioVal == 0)  // Batch Query case
   {
     // Open BQueryFile
-    if (BQueryFile == "bquery") BQueryFile = AppDir + "/QUERIES/Batch/bat-TPC17.txt";  // default case
+    if (BQueryFile == "bquery") BQueryFile = AppDir + "testquery.cl";  // default case
     if ((fp = fopen(BQueryFile.str_.c_str(), "r")) == NULL)
       OUTPUT_ERROR("can not open the file you chose in the option dialogue");
     fgets(TextLine, LINEWIDTH, fp);
@@ -250,7 +250,7 @@ void Optimizer() {
         // Parse and print the query and its interesting orders
         Query = new QUERY(QueryFile.str_);
         PTRACE("Original Query:" << endl << Query->Dump());
-        PTRACE("The interesting orders in the query are:\n" << endl << Query->Dump_IntOrders());
+        PTRACE("The interesting orders in the query are:" << endl << Query->Dump_IntOrders());
 
         // Initialize and print the search space, delete the query
         //  In PiggyBack mode create the search space only for

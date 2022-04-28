@@ -929,7 +929,7 @@ void PHYS_PROP::bestKey() {
 //=============  CONT Methods  ===================
 
 //##ModelId=3B0C0864032E
-CONT::CONT(PHYS_PROP *RP, COST *U, bool D) : ReqdPhys(RP), UpperBd(U), Finished(false) {
+CONT::CONT(PHYS_PROP *RP, Cost *U, bool D) : ReqdPhys(RP), UpperBd(U), Finished(false) {
   // If the Physical Property has >1 attribute, use only the most selective attribute
   if (RP && (RP->GetKeysSet()) && (RP->GetKeysSet()->GetSize() > 1))
     // RP-> SetKeysSet( RP->GetKeysSet() -> best());
@@ -940,10 +940,10 @@ CONT::CONT(PHYS_PROP *RP, COST *U, bool D) : ReqdPhys(RP), UpperBd(U), Finished(
 //##ModelId=3B0C086402DF
 vector<CONT *> CONT::vc;
 
-//=============  COST Methods  ===================
+//=============  Cost Methods  ===================
 
 //##ModelId=3B0C086400B7
-void COST::FinalCost(COST *LocalCost, COST **TotalInputCost, int Size) {
+void Cost::FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size) {
   *this = *LocalCost;
 
   for (int i = Size; --i >= 0;) {
@@ -953,7 +953,7 @@ void COST::FinalCost(COST *LocalCost, COST **TotalInputCost, int Size) {
   return;
 }
 
-string COST::Dump() { return " " + to_string(Value); }
+string Cost::Dump() { return " " + to_string(Value); }
 
 string OPT_STAT::Dump() {
   string os;

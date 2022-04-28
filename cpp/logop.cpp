@@ -161,7 +161,6 @@ EQJOIN::EQJOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(ratt
 #endif
 };
 
-//##ModelId=3B0C08730326
 EQJOIN::EQJOIN(EQJOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].New();

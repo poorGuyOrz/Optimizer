@@ -136,7 +136,7 @@ string RULE_SET::Dump() {
   string os;
 
   for (int i = 0; i < RuleCount; i++) {
-    os += " " + to_string(RuleVector[i]) + " " + rule_set[i]->GetName().str_ + "\n";
+    os += " " + to_string(RuleVector[i]) + " " + rule_set[i]->GetName() + "\n";
   }
   return os;
 }
@@ -614,7 +614,7 @@ EXPR *EQ_TO_LOOPS::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 // Is the plan a goner because an input is group pruned?
 //##ModelId=3B0C086A017E
 bool EQ_TO_LOOPS::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
-  COST inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
+  Cost inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
   inputs += *(Ssp->GetGroup(mexpr->GetInput(1))->GetLowerBd());
 
   if (inputs >= *(CONT::vc[ContextID]->GetUpperBd())) return (false);
@@ -721,7 +721,7 @@ EXPR *EQ_TO_MERGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 // Is the plan a goner because an input is group pruned?
 //##ModelId=3B0C086A0232
 bool EQ_TO_MERGE::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
-  COST inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
+  Cost inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
   inputs += *(Ssp->GetGroup(mexpr->GetInput(1))->GetLowerBd());
 
   if (inputs >= *(CONT::vc[ContextID]->GetUpperBd())) return (false);

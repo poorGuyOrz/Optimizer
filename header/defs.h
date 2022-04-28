@@ -31,17 +31,12 @@ General definitions
 // See ../doc/dupelim and ../doc/dupelim.pcode
 #define LOG2HTBL 13               // LOG2 of number of hash buckets to hold mexprs.
 #define HtblSize (1 << LOG2HTBL)  // hash table size we used
-//##ModelId=3B0C087602F8
-typedef unsigned long int ub4; /* unsigned 4-byte quantities */
-//##ModelId=3B0C0876030C
-typedef unsigned char ub1; /* unsigned 1-byte quantities */
+typedef unsigned long int ub4;    /* unsigned 4-byte quantities */
+typedef unsigned char ub1;        /* unsigned 1-byte quantities */
 
-//##ModelId=3B0C0876032A
 typedef vector<CString> STRING_ARRAY;
-//##ModelId=3B0C08760348
 typedef vector<int> INT_ARRAY;
 
-//##ModelId=3B0C0876035C
 typedef unsigned int BIT_VECTOR;  // Used to implement unique rule set.  Note this
 // restricts the number of transformational (logical) rules.
 
@@ -50,7 +45,6 @@ extern bool ForGlobalEpsPruning;  // If true, we are running the optimizer to ge
 
 // Used to trace the number of objects in each class,
 //  to determine where to use memory pooling.
-//##ModelId=3B0C0876037A
 typedef enum CLASS {
   C_AGG_LIST,
   C_AGG_OP,
@@ -101,14 +95,11 @@ typedef enum CLASS {
   C_WINNER
 } CLASS;
 
-//##ModelId=3B0C08760398
 typedef enum ORDER_AD { ascending, descending } ORDER_AD;
 
-//##ModelId=3B0C087603B6
 typedef vector<ORDER_AD> KeyOrderArray;
 
 // any means any property
-//##ModelId=3B0C087603D4
 typedef enum ORDER {
   any,
   heap,
@@ -116,7 +107,6 @@ typedef enum ORDER {
   hashed  // assume unique hash function for entire system
 } ORDER;
 
-//##ModelId=3B0C0877000A
 typedef enum ORDER_INDEX {
   btree,
   hash  // assume unique hash function for entire system
@@ -124,13 +114,10 @@ typedef enum ORDER_INDEX {
 
 // unknown is needed for attributes generated along the query tree
 // e.g. sum(xxx) as .SUM, whose domain is unknown
-//##ModelId=3B0C0877001E
 typedef enum DOM_TYPE { string_t, int_t, real_t, unknown } DOM_TYPE;
 
-//##ModelId=3B0C0877003C
 typedef int CONT_ID;  // ID of a context
 
-//##ModelId=3B0C0877005A
 typedef int GRP_ID;  // ID of a Group
 
 /*============================================================
@@ -204,7 +191,7 @@ class OPT_STAT;
 class CLASS_STAT;
 class SET_TRACE;
 class RULE_SET;
-class CM;
+class CostModel;
 class KEYS_SET;
 class M_EXPR;
 
@@ -257,9 +244,8 @@ extern PTASKS PTasks;
 extern SSP *Ssp;
 extern CAT *Cat;
 extern RULE_SET *RuleSet;
-extern CM *Cm;
+extern CostModel *Cm;
 extern KEYS_SET IntOrdersSet;  // set of Interesting Orders
-
 
 extern bool NO_PHYS_IN_GROUP;
 

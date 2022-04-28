@@ -19,7 +19,7 @@ class LOG_COLL_PROP;  // For collection types
 class LOG_ITEM_PROP;  // For items (predicates)
 class PHYS_PROP;      // Physical Properties
 class CONT;           // Context: Conditions/Constraints on a search
-class COST;           // Cost of a physical operator or expression
+class Cost;           // Cost of a physical operator or expression
 
 // This class manages tracing.
 // SET_TRACE(false) turns off tracing until the function exits, similar for on.
@@ -683,35 +683,35 @@ class PHYS_PROP {
 
 /*
     ============================================================
-    COST - cost of executing a physical operator, expression or multiexpression
+    Cost - cost of executing a physical operator, expression or multiexpression
     ============================================================
-COST cannot be associated with a multiexpression, since cost is determined
+Cost cannot be associated with a multiexpression, since cost is determined
 by properties desired.  For example, a SELECT will cost
 more if sorted is required.
 
-COST value of -1 = infinite cost.  Any other negative cost
+Cost value of -1 = infinite cost.  Any other negative cost
    is considered an error.
 */
 
 //##ModelId=3B0C08640085
-class COST {
+class Cost {
  private:
   //##ModelId=3B0C08640099
   double Value;  // Later this may be a base class specialized
                  // to various costs: CPU, IO, etc.
  public:
   //##ModelId=3B0C086400A3
-  COST(double Number) : Value(Number) {
+  Cost(double Number) : Value(Number) {
     assert(Number == -1 || Number >= 0);
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].New();
   };
   //##ModelId=3B0C086400AD
-  COST(COST &other) : Value(other.Value) {
+  Cost(Cost &other) : Value(other.Value) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].New();
   };
 
   //##ModelId=3B0C086400AF
-  ~COST() {
+  ~Cost() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].Delete();
   };
 
@@ -719,10 +719,10 @@ class COST {
   //  It is an error if any input is null.
   //  In a parallel environment, this may involve max.
   //##ModelId=3B0C086400B7
-  void FinalCost(COST *LocalCost, COST **TotalInputCost, int Size);
+  void FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size);
 
   //##ModelId=3B0C086400C3
-  inline COST &operator+=(const COST &other) {
+  inline Cost &operator+=(const Cost &other) {
     if (Value == -1 || other.Value == -1)  // -1 means Infinite
       Value = -1;
     else
@@ -732,7 +732,7 @@ class COST {
   }
 
   //##ModelId=3B0C086400CC
-  inline COST &operator*=(double EPS) {
+  inline Cost &operator*=(double EPS) {
     assert(EPS > 0);
 
     if (Value == -1)  // -1 means Infinite
@@ -744,7 +744,7 @@ class COST {
   }
 
   //##ModelId=3B0C086400D6
-  inline COST &operator/=(int arity) {
+  inline Cost &operator/=(int arity) {
     assert(arity > 0);
 
     if (Value == -1)  // -1 means Infinite
@@ -756,7 +756,7 @@ class COST {
   }
 
   //##ModelId=3B0C086400E0
-  inline COST &operator-=(const COST &other) {
+  inline Cost &operator-=(const Cost &other) {
     if (Value == -1 || other.Value == -1)  // -1 means Infinite
       Value = -1;
     else
@@ -766,13 +766,13 @@ class COST {
   }
 
   //##ModelId=3B0C086400EA
-  inline COST &operator=(const COST &other) {
+  inline Cost &operator=(const Cost &other) {
     this->Value = other.Value;
     return (*this);
   }
 
   //##ModelId=3B0C086400F4
-  inline bool operator>=(const COST &other) {
+  inline bool operator>=(const Cost &other) {
     if (Value == -1) return (true);
 
     if (other.Value == -1)  // -1 means Infinite
@@ -782,32 +782,32 @@ class COST {
   }
 
   //##ModelId=3B0C086400FE
-  inline COST &operator*(double EPS) {
+  inline Cost &operator*(double EPS) {
     assert(EPS >= 0);
 
-    COST *temp;
+    Cost *temp;
     if (Value == -1)  // -1 means Infinite
-      temp = new COST(0);
+      temp = new Cost(0);
     else
-      temp = new COST(Value * EPS);
+      temp = new Cost(Value * EPS);
     return (*temp);
   }
 
   //##ModelId=3B0C08640107
-  inline COST &operator/(int arity) {
+  inline Cost &operator/(int arity) {
     assert(arity > 0);
 
-    COST *temp;
+    Cost *temp;
     if (Value == -1)  // -1 means Infinite
-      temp = new COST(0);
+      temp = new Cost(0);
     else
-      temp = new COST(Value / arity);
+      temp = new Cost(Value / arity);
 
     return (*temp);
   }
 
   //##ModelId=3B0C08640111
-  inline bool operator>(const COST &other) {
+  inline bool operator>(const Cost &other) {
     if (Value == -1) return (true);
 
     if (other.Value == -1)  // -1 means Infinite
@@ -817,7 +817,7 @@ class COST {
   }
 
   //##ModelId=3B0C0864011B
-  inline bool operator<(const COST &other) {
+  inline bool operator<(const Cost &other) {
     if (Value == -1) return (false);
 
     if (other.Value == -1)  // -1 means Infinite
@@ -830,14 +830,13 @@ class COST {
   string Dump();
 
 
-};  // class COST
+};  // class Cost
 
 /*
 ============================================================
 CONTEXTs/CONSTRAINTS on a search
 ============================================================
 */
-//##ModelId=3B0C086402CA
 class CONT
 // Each search for the cheapest solution to a problem or
 // subproblem is done relative to some conditions, also called
@@ -860,11 +859,11 @@ class CONT
 
  private:
   PHYS_PROP *ReqdPhys;
-  COST *UpperBd;
+  Cost *UpperBd;
   bool Finished;
 
  public:
-  CONT(PHYS_PROP *, COST *Upper, bool done);
+  CONT(PHYS_PROP *, Cost *Upper, bool done);
 
   ~CONT() {
     delete UpperBd;
@@ -873,7 +872,7 @@ class CONT
   };
 
   inline PHYS_PROP *GetPhysProp() { return (ReqdPhys); };
-  inline COST *GetUpperBd() { return (UpperBd); };
+  inline Cost *GetUpperBd() { return (UpperBd); };
   inline void SetPhysProp(PHYS_PROP *RP) { ReqdPhys = RP; };
 
   string Dump() {
@@ -887,7 +886,7 @@ class CONT
   inline bool is_done() { return Finished; };
 
   //  Update bounds, when we get better ones.
-  inline void SetUpperBound(COST &NewUB) { *UpperBd = NewUB; };
+  inline void SetUpperBound(Cost &NewUB) { *UpperBd = NewUB; };
 
 };  // class CONT
 

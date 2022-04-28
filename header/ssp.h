@@ -353,7 +353,7 @@ class GROUP {
 
   // Get's
   inline LOG_PROP *get_log_prop() { return LogProp; };
-  inline COST *GetLowerBd() { return LowerBd; };
+  inline Cost *GetLowerBd() { return LowerBd; };
   inline double GetEstiGrpSize() { return EstiGrpSize; };
   inline int GetCount() { return count; };
   inline GRP_ID GetGroupID() { return (GroupID); };
@@ -402,7 +402,7 @@ class GROUP {
   // Create a new winner for the property ReqdProp, with these parameters.
   // Used when beginning the first search for ReqdProp.
   //##ModelId=3B0C086700B1
-  void NewWinner(PHYS_PROP *ReqdProp, M_EXPR *MExpr, COST *TotalCost, bool done);
+  void NewWinner(PHYS_PROP *ReqdProp, M_EXPR *MExpr, Cost *TotalCost, bool done);
 
   //##ModelId=3B0C086700BC
   void ShrinkSubGroup();
@@ -439,7 +439,7 @@ class GROUP {
   //##ModelId=3B0C08670185
   LOG_PROP *LogProp;  // Logical properties of this GROUP
   //##ModelId=3B0C086701A3
-  COST *LowerBd;  // lower bound of cost of fetching cucard tuples from disc
+  Cost *LowerBd;  // lower bound of cost of fetching cucard tuples from disc
 
   // Winner's circle
   //##ModelId=3B0C086701B7
@@ -501,18 +501,18 @@ class WINNER {
   //##ModelId=3B0C08670379
   PHYS_PROP *PhysProp;  // PhysProp and Cost typically represent the context of
   //##ModelId=3B0C08670397
-  COST *Cost;  // the most recent search which generated this winner.
+  Cost *cost;  // the most recent search which generated this winner.
 
   //##ModelId=3B0C086703AA
   bool Done;  // Is this a real winner; is the current search complete?
  public:
   //##ModelId=3B0C086703BE
-  WINNER(M_EXPR *, PHYS_PROP *, COST *, bool done = false);
+  WINNER(M_EXPR *, PHYS_PROP *, Cost *, bool done = false);
   //##ModelId=3B0C086703DD
   ~WINNER() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].Delete();
     delete MPlan;
-    delete Cost;
+    delete cost;
   };
 
   //##ModelId=3B0C086703DE
@@ -520,7 +520,7 @@ class WINNER {
   //##ModelId=3B0C086703E7
   inline PHYS_PROP *GetPhysProp() { return (PhysProp); };
   //##ModelId=3B0C086703E8
-  inline COST *GetCost() { return (Cost); };
+  inline Cost *GetCost() { return (cost); };
   //##ModelId=3B0C08680009
   inline bool GetDone() { return (Done); };
   //##ModelId=3B0C08680013
@@ -548,7 +548,7 @@ class M_WINNER {
   //##ModelId=3B0C08680192
   static vector<M_WINNER *> mc;
   //##ModelId=3B0C086801A4
-  static COST InfCost;
+  static Cost InfCost;
 
  private:
   //##ModelId=3B0C086801B7
@@ -558,7 +558,7 @@ class M_WINNER {
   //##ModelId=3B0C086801EA
   PHYS_PROP **PhysProp;
   //##ModelId=3B0C08680208
-  COST **Bound;
+  Cost **Bound;
 
  public:
   //##ModelId=3B0C0868021B
@@ -597,7 +597,7 @@ class M_WINNER {
   inline PHYS_PROP *GetPhysProp(int i) { return (PhysProp[i]); };
 
   // Return the upper bound of the required physical property
-  inline COST *GetUpperBd(PHYS_PROP *PhysProp) {
+  inline Cost *GetUpperBd(PHYS_PROP *PhysProp) {
     for (int i = 0; i < wide; i++) {
       if (*GetPhysProp(i) == *PhysProp) {
         return (Bound[i]);
@@ -607,7 +607,7 @@ class M_WINNER {
   };
 
   //  Update bounds, when we get new bound for the context.
-  inline void SetUpperBound(COST *NewUB, PHYS_PROP *Prop) {
+  inline void SetUpperBound(Cost *NewUB, PHYS_PROP *Prop) {
     for (int i = 0; i < wide; i++) {
       if (*GetPhysProp(i) == *Prop) {
         if (Bound[i] != NULL) delete Bound[i];

@@ -1,17 +1,13 @@
-// CM.H - cost model.  Information about the cost of many basic operations.
+// CostModel.H - cost model.  Information about the cost of many basic operations.
 
 #pragma once
 #include "../header/stdafx.h"
 
-class CM;
+class CostModel;
 
-/*
-============================================================
-Cost Model - class CM
-============================================================
-*/
+// Cost Model - class CostModel
 
-class CM {
+class CostModel {
  private:
   double CPU_READ;
   double TOUCH_COPY;
@@ -27,9 +23,9 @@ class CM {
   double BIT_BF;
 
  public:
-  CM(string filename) {
+  CostModel(string filename) {
     ifstream ifs(filename);
-    if (!ifs.is_open()) OUTPUT_ERROR("can not open CM file");
+    if (!ifs.is_open()) OUTPUT_ERROR("can not open CostModel file");
 
     json j;
     ifs >> j;

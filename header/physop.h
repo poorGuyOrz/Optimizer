@@ -51,7 +51,7 @@ class FILE_SCAN : public PHYS_OP {
   };
 
   //##ModelId=3B0C086E0170
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   // get the physical prop according to the order of the collection
@@ -114,7 +114,7 @@ class LOOPS_JOIN : public PHYS_OP {
   };
 
   //##ModelId=3B0C086E026B
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C086E0276
@@ -146,7 +146,7 @@ class PDUMMY : public PHYS_OP {
   ~PDUMMY(){};
 
   //##ModelId=3B0C086E0346
-  COST *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
   //##ModelId=3B0C086E0350
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
@@ -194,7 +194,7 @@ class LOOPS_INDEX_JOIN : public PHYS_OP {
   };
 
   //##ModelId=3B0C086F0059
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C086F0064
@@ -243,7 +243,7 @@ class MERGE_JOIN : public PHYS_OP {
   };
 
   //##ModelId=3B0C086F0167
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C086F0171
@@ -283,7 +283,7 @@ class HASH_JOIN : public PHYS_OP {
   };
 
   //##ModelId=3B0C086F0261
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C086F026B
@@ -321,7 +321,7 @@ class P_PROJECT : public PHYS_OP {
   };
 
   //##ModelId=3B0C086F0367
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C086F0372
@@ -362,7 +362,7 @@ class FILTER : public PHYS_OP {
   inline OP *Clone() { return new FILTER(*this); };
 
   //##ModelId=3B0C08700050
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C0870005C
@@ -401,7 +401,7 @@ class QSORT : public PHYS_OP {
   };
 
   //##ModelId=3B0C0870014C
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C0870015F
@@ -437,7 +437,7 @@ class HASH_DUPLICATES : public PHYS_OP {
   };
 
   //##ModelId=3B0C0870023B
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C08700245
@@ -493,7 +493,7 @@ class HGROUP_LIST : public PHYS_OP {
   };
 
   //##ModelId=3B0C087003A3
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C087003AD
@@ -540,7 +540,7 @@ class P_FUNC_OP : public PHYS_OP {
   };
 
   //##ModelId=3B0C0871011B
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C08710125
@@ -589,7 +589,7 @@ class BIT_JOIN : public PHYS_OP {
   };
 
   //##ModelId=3B0C087102D4
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C087102DF
@@ -628,7 +628,7 @@ class INDEXED_FILTER : public PHYS_OP {
   inline OP *Clone() { return new INDEXED_FILTER(*this); };
 
   //##ModelId=3B0C08720053
-  COST *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   //##ModelId=3B0C0872005D

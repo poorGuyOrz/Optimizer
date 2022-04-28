@@ -76,7 +76,7 @@ class OP
   virtual bool is_const() { return false; };
 
   //##ModelId=3B0C08720157
-  virtual COST *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) = 0;
+  virtual Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) = 0;
 };  // class OP
 
 /*
@@ -115,7 +115,7 @@ class LOG_OP : public OP  // Logical Operator Abstract Class
   // add assert to the following functions,
   // make sure these methods of LOG_OP never called(log_op does not get cost)
   //##ModelId=3B0C087201B2
-  COST *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
     return NULL;
   };
@@ -151,7 +151,7 @@ class PHYS_OP : public OP  // Physical Operator
   // including output but not input costs.  Thus we compute output costs
   // only once, and get input costs from (as part of) the input operators' cost.
   //##ModelId=3B0C08720221
-  virtual COST *FindLocalCost(LOG_PROP *LocalLogProp,        // uses primarily the card of the Group
+  virtual Cost *FindLocalCost(LOG_PROP *LocalLogProp,        // uses primarily the card of the Group
                               LOG_PROP **InputLogProp) = 0;  // uses primarily cardinalities
 
   /*  Some algorithms and implementation rules require that
@@ -209,7 +209,7 @@ class ITEM_OP : public OP  // Item Operator - both logical and physical
 
   // For now we assume no expensive predicates
   //##ModelId=3B0C087202A3
-  COST *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) { return (new COST(0)); };
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) { return (new Cost(0)); };
 
   //##ModelId=3B0C087202AE
   LOG_PROP *FindLogProp(LOG_PROP **input) {
@@ -305,7 +305,7 @@ class LEAF_OP : public OP
   };
 
   //##ModelId=3B0C0873002D
-  COST *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
     return NULL;
   };

@@ -8,7 +8,7 @@
 #define SHRINK_INERVAL 10000
 #define MAX_AVAIL_MEM 40000000  // available memory bound to 50M
 
-extern COST GlobalEpsBound;
+extern Cost GlobalEpsBound;
 
 SSP::SSP() : NewGrpID(-1) {
   // initialize HashTbl to contain HashTableSize elements, each initially NULL.
@@ -16,7 +16,7 @@ SSP::SSP() : NewGrpID(-1) {
   for (ub4 i = 0; i < HtblSize; i++) HashTbl[i] = NULL;
 }
 
-//##ModelId=3B0C08650055
+
 void SSP::Init() {
   EXPR *Expr = Query->GetEXPR();
 
@@ -256,7 +256,6 @@ GRP_ID SSP::MergeGroups(GRP_ID group_no1, GRP_ID group_no2) {
   return ToGid;
 }  // SSP::MergeGroups
 
-//##ModelId=3B0C08650069
 M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
   GROUP *Group;
   bool win = true;  // will we initialize nontrivial winners in this group?
@@ -415,9 +414,9 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
     OUTPUTN(tabs, os);
 
 #ifdef IRPROP
-    COST *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
+    Cost *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
 #else
-    COST *WinnerCost = ThisWinner->GetCost();
+    Cost *WinnerCost = ThisWinner->GetCost();
 #endif
     os = WinnerCost->Dump() + "\n";
 
@@ -472,9 +471,9 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
       // Extract cost of the winner, write it to the output string and
       //  print output string to window.
 #ifndef IRPROP
-    COST *WinnerCost = ThisWinner->GetCost();
+    Cost *WinnerCost = ThisWinner->GetCost();
 #else
-    COST *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
+    Cost *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
 #endif
     os = WinnerCost->Dump() + "\n";
 
@@ -546,11 +545,11 @@ bool GROUP::search_circle(int GrpNo, PHYS_PROP *PhysProp, bool &moreSearch) {
   else
     moreSearch = false;  // the group is completely optimized
 
-  COST *CCost = new COST(-1);
+  Cost *CCost = new Cost(-1);
   if (!moreSearch)  // group is optimized
   {
     M_EXPR *MWin = M_WINNER::mc[GrpNo]->GetBPlan(PhysProp);
-    COST *WinCost = M_WINNER::mc[GrpNo]->GetUpperBd(PhysProp);
+    Cost *WinCost = M_WINNER::mc[GrpNo]->GetUpperBd(PhysProp);
     if (MWin != NULL) {
       // winner's cost is within the context's bound
       if (*CCost >= *WinCost) {
@@ -601,8 +600,8 @@ bool GROUP::search_circle(CONT *C, bool &moreSearch) {
   // If there is a winner, denote its plan, cost components by M and WCost
   // Context cost component is CCost
   M_EXPR *M = Winner->GetMPlan();
-  COST *WCost = Winner->GetCost();
-  COST *CCost = C->GetUpperBd();
+  Cost *WCost = Winner->GetCost();
+  Cost *CCost = C->GetUpperBd();
   assert(CCost);  // Did we get rid of all cruft?
 
   if (M)  // there is a non-null winner
@@ -644,7 +643,7 @@ WINNER *GROUP::GetWinner(PHYS_PROP *PhysProp) {
 
 }  // GROUP::GetWinner
 
-void GROUP::NewWinner(PHYS_PROP *ReqdProp, M_EXPR *MExpr, COST *TotalCost, bool done) {
+void GROUP::NewWinner(PHYS_PROP *ReqdProp, M_EXPR *MExpr, Cost *TotalCost, bool done) {
   if (COVETrace && MExpr)  // New Winner
   {
     OutputCOVE << "NewWin " << to_string(MExpr->GetGrpID()) << " \"" << ReqdProp->Dump() << "\"" << TotalCost->Dump()
@@ -685,9 +684,8 @@ bool GROUP::CheckWinnerDone() {
   return (false);
 }  // GROUP::CheckWinnerDone
 
-//##ModelId=3B0C086703BE
-WINNER::WINNER(M_EXPR *MExpr, PHYS_PROP *PhysProp, COST *Cost, bool done)
-    : Cost(Cost), MPlan((MExpr == NULL) ? NULL : (new M_EXPR(*MExpr))), PhysProp(PhysProp), Done(done) {
+WINNER::WINNER(M_EXPR *MExpr, PHYS_PROP *PhysProp, Cost *cost, bool done)
+    : cost(cost), MPlan((MExpr == NULL) ? NULL : (new M_EXPR(*MExpr))), PhysProp(PhysProp), Done(done) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].New();
 };
 
@@ -697,7 +695,7 @@ M_WINNER::M_WINNER(int S) {
 
   wide = S;
   PhysProp = new PHYS_PROP *[S];
-  Bound = new COST *[S];
+  Bound = new Cost *[S];
   BPlan = new M_EXPR *[S];
 
   // set the first physical property as "any" for all groups
@@ -705,7 +703,7 @@ M_WINNER::M_WINNER(int S) {
 
   // set the cost to INF and plan to NULL initially for all groups
   for (int i = 0; i < S; i++) {
-    Bound[i] = new COST(-1);
+    Bound[i] = new Cost(-1);
     BPlan[i] = NULL;
   }
 };
@@ -713,12 +711,11 @@ M_WINNER::M_WINNER(int S) {
 //##ModelId=3B0C08680192
 vector<M_WINNER *> M_WINNER::mc;
 //##ModelId=3B0C086801A4
-COST M_WINNER::InfCost(-1);
+Cost M_WINNER::InfCost(-1);
 
 int TaskNo;
 int Memo_M_Exprs;
 
-//##ModelId=3B0C08650068
 void SSP::optimize() {
 #ifdef FIRSTPLAN
   Ssp->GetGroup(0)->setfirstplan(false);
@@ -729,7 +726,7 @@ void SSP::optimize() {
   // Create initial context, with no requested properties, infinite upper bound,
   //  zero lower bound, not yet done.  Later this may be specified by user.
   if (CONT::vc.size() == 0) {
-    CONT *InitCont = new CONT(new PHYS_PROP(any), new COST(-1), false);
+    CONT *InitCont = new CONT(new PHYS_PROP(any), new Cost(-1), false);
     // Make this the first context
     CONT::vc.push_back(InitCont);
   }
@@ -737,7 +734,7 @@ void SSP::optimize() {
 
   // start optimization with root group, 0th context, parent task of zero.
   if (GlobepsPruning) {
-    COST *eps_bound = new COST(GlobalEpsBound);
+    Cost *eps_bound = new Cost(GlobalEpsBound);
     PTasks.push(new O_GROUP(RootGID, 0, 0, true, eps_bound));
   } else
     PTasks.push(new O_GROUP(RootGID, 0, 0));
