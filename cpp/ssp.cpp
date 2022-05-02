@@ -733,6 +733,7 @@ void SSP::optimize() {
   // assert(CONT::vc.size() == 1);
 
   // start optimization with root group, 0th context, parent task of zero.
+  // 初始化group，
   if (GlobepsPruning) {
     Cost *eps_bound = new Cost(GlobalEpsBound);
     PTasks.push(new O_GROUP(RootGID, 0, 0, true, eps_bound));

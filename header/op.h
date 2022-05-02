@@ -18,64 +18,46 @@ class LEAF_OP;  // Leaf operators - place holder for a group, in a pattern.
 OPERATORS AND ARGUMENTS - class OP
 ============================================================
 */
-class OP
 // Abstract Class.  Operator and its arguments.
 // Arguments could be attributes to project on, etc.
-{
+class OP {
  public:
 #ifdef _DEBUG
-  //##ModelId=3B0C087200D5
   string name;  // Name of this operator
 #endif
 
-  //##ModelId=3B0C087200DF
   OP(){};
 
   // add assert to the following virtual functions, make sure the subclasses define them
-  //##ModelId=3B0C087200E9
   virtual OP *Clone() = 0;
 
-  //##ModelId=3B0C087200F3
   virtual ~OP(){};
 
-  //##ModelId=3B0C087200F5
   virtual string Dump() = 0;
-  //##ModelId=3B0C087200FE
   virtual LOG_PROP *FindLogProp(LOG_PROP **input) = 0;
 
   // For example, the operator SELECT has arity 2 (one bulk input, one predicate) and
   // its name is SELECT.  These are not stored as member data since static does not
   // inherit and we don't want one in every object.
-  //##ModelId=3B0C08720107
   virtual string GetName() = 0;
-  //##ModelId=3B0C08720111
   virtual int GetNameId() = 0;
-  //##ModelId=3B0C08720113
   virtual int GetArity() = 0;
 
-  //##ModelId=3B0C0872011C
   virtual bool operator==(OP *other) { return (GetNameId() == other->GetNameId()); };
 
   // Used to compute the hash value of an mexpr.  Used only for logical operators,
   // so we make it abort everywhere else.
-  //##ModelId=3B0C08720126
   virtual ub4 hash() = 0;
 
-  //##ModelId=3B0C08720130
   virtual bool is_logical() { return false; };
-  //##ModelId=3B0C08720139
   virtual bool is_physical() { return false; };
-  //##ModelId=3B0C0872013B
   virtual bool is_leaf() { return false; };
-  //##ModelId=3B0C08720144
   virtual bool is_item() { return false; };
 
   // attr_op, const_int_op, const_set_op, const_str_op are special
   // case in O_INPUT::perform()
-  //##ModelId=3B0C0872014E
   virtual bool is_const() { return false; };
 
-  //##ModelId=3B0C08720157
   virtual Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) = 0;
 };  // class OP
 
@@ -315,7 +297,6 @@ class LEAF_OP : public OP
     assert(false);
     return NULL;
   };
-
 
 };  // class LEAF_OP
 

@@ -415,43 +415,30 @@ class GROUP {
 #endif
 
  private:
-  //##ModelId=3B0C086700E4
   GRP_ID GroupID;  // ID of this group
 
-  //##ModelId=3B0C086700F8
-  M_EXPR *FirstLogMExpr;  // first log M_EXPR in  the GROUP
-  //##ModelId=3B0C08670116
-  M_EXPR *LastLogMExpr;  // last log M_EXPR in  the GROUP
-  //##ModelId=3B0C0867012B
+  M_EXPR *FirstLogMExpr;   // first log M_EXPR in  the GROUP
+  M_EXPR *LastLogMExpr;    // last log M_EXPR in  the GROUP
   M_EXPR *FirstPhysMExpr;  // first phys M_EXPR in  the GROUP
-  //##ModelId=3B0C08670149
-  M_EXPR *LastPhysMExpr;  // last phys M_EXPR in  the GROUP
+  M_EXPR *LastPhysMExpr;   // last phys M_EXPR in  the GROUP
 
-  //##ModelId=3B0C08670167
   struct BIT_STATE State;  //  the state of the group
 
-  //##ModelId=3B0C08670185
   LOG_PROP *LogProp;  // Logical properties of this GROUP
-  //##ModelId=3B0C086701A3
-  Cost *LowerBd;  // lower bound of cost of fetching cucard tuples from disc
+  Cost *LowerBd;      // lower bound of cost of fetching cucard tuples from disc
 
   // Winner's circle
-  //##ModelId=3B0C086701B7
   vector<WINNER *> Winners;
 
   // if operator is EQJOIN, estimate the group size, else estimate group size =0
   // used for halt option
-  //##ModelId=3B0C086701CA
   double EstiGrpSize;
 
-  //##ModelId=3B0C086701E8
   int count;
 
-  //##ModelId=3B0C086701FC
   int EstimateNumTables(M_EXPR *MExpr);
 
 #ifdef FIRSTPLAN
-  //##ModelId=3B0C0867021A
   static bool firstplan;
 #endif
 

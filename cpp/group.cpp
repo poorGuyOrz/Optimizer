@@ -15,7 +15,6 @@ group.cpp -  implementation of class GROUP
 #include "../header/ssp.h"
 #include "../header/stdafx.h"
 
-//##ModelId=3B0C086603C7
 GROUP::GROUP(M_EXPR *MExpr)
     : GroupID(MExpr->GetGrpID()), FirstLogMExpr(MExpr), LastLogMExpr(MExpr), FirstPhysMExpr(NULL), LastPhysMExpr(NULL) {
   if (!ForGlobalEpsPruning) ClassStat[C_GROUP].New();
@@ -84,16 +83,13 @@ GROUP::GROUP(M_EXPR *MExpr)
     temp += " ";
 
     CString os;
-    os.Format("addGroup { %d %p \" %s  \"%s} %s",
-
-              GroupID, (MExpr), MExpr->GetOp()->Dump(), temp, LogProp->DumpCOVE());
+    os.Format("addGroup { %d %p \" %s  \"%s} %s", GroupID, (MExpr), MExpr->GetOp()->Dump(), temp, LogProp->DumpCOVE());
 
     OutputCOVE << (os) << endl;
   }
 }
 
 // free up memory
-//##ModelId=3B0C086603C9
 GROUP::~GROUP() {
   if (!ForGlobalEpsPruning) ClassStat[C_GROUP].Delete();
 
