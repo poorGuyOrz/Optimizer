@@ -187,10 +187,9 @@ LOG_PROP *COMP_OP::FindLogProp(LOG_PROP **input) {
   }
 
   // Assert selectivity in range
-  if (selectivity < .00001) {
+  if (selectivity < .00001)
     // Warning
-    OUTPUT("small selectivity = %.3f\n", selectivity);
-  }
+    OUTPUT("small selectivity = " << selectivity);
 
   //"Small selectivity -- shouldn't be a problem -- but is!"
   assert(selectivity > .0000001);

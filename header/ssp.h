@@ -37,10 +37,9 @@ In our approach to query optimization, each possible solution in the Search
 Space is represented compactly, by what we call a Multi-expression
 (class M_EXPR).  A solution in the search space can also be represented in
 more detail by an expression (class EXPR).
-
 */
-class SSP  // Search Space
-{
+// Search Space
+class SSP {
  public:
   M_EXPR **HashTbl;  // To identify duplicate MExprs
 
@@ -51,8 +50,7 @@ class SSP  // Search Space
 
   ~SSP();
 
-  void optimize();  // Later add a conditon.
-                    //  Prepare the SSP so an optimal plan can be found
+  void optimize();  // Later add a conditon.  Prepare the SSP so an optimal plan can be found
 
   // Convert the EXPR into a Mexpr.
   // If Mexpr is not already in the search space, then copy Mexpr into the
@@ -65,39 +63,30 @@ class SSP  // Search Space
 
   // Copy out the final plan.  Recursive, each time increasing tabs by
   //  one, so the plan is indented.
-  //##ModelId=3B0C0865007C
   void CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs);
 
   // return the next available grpID in SSP
-  //##ModelId=3B0C08650087
   inline GRP_ID GetNewGrpID() { return (++NewGrpID); };
 
   // return the ID of the Root group
-  //##ModelId=3B0C08650090
   inline GRP_ID GetRootGID() { return (RootGID); };
 
   // return the specific group
-  //##ModelId=3B0C0865009A
   inline GROUP *GetGroup(GRP_ID Gid) { return Groups[Gid]; };
 
   // If another expression in the search space is identical to MExpr, return
   //  it, else return NULL.
   //  Identical means operators and arguments, and input groups are the same.
-  //##ModelId=3B0C086500A5
   M_EXPR *FindDup(M_EXPR &MExpr);
 
   // When a duplicate is found in two groups they should be merged into
   //  the same group.  We always merge bigger group_no group to smaller one.
-  //##ModelId=3B0C086500AE
   GRP_ID MergeGroups(GRP_ID group_no1, GRP_ID group_no2);
   // GRP_ID MergeGroups(GROUP & ToGroup, GROUP & FromGroup);
 
-  //##ModelId=3B0C086500B9
   void ShrinkGroup(GRP_ID group_no);  // shrink the group marked completed
-  //##ModelId=3B0C086500C3
-  void Shrink();  // shrink the ssp
+  void Shrink();                      // shrink the ssp
 
-  //##ModelId=3B0C086500CD
   bool IsChanged();  // is the ssp changed?
 
   string Dump();
@@ -107,16 +96,12 @@ class SSP  // Search Space
   string DumpHashTable();
 
  private:
-  //##ModelId=3B0C086500F6
   GRP_ID RootGID;  // ID of the oldest, root group.  Set to NEW_GRPID in SSP""Init then
   // never changes
-  //##ModelId=3B0C08650114
   GRP_ID InitGroupNum;  //(seems to be the same as RootGID)
-  //##ModelId=3B0C08650128
-  GRP_ID NewGrpID;  // ID of the newest group, initially -1
+  GRP_ID NewGrpID;      // ID of the newest group, initially -1
 
   // Collection of Groups, indexed by GRP_ID
-  //##ModelId=3B0C0865013C
   vector<GROUP *> Groups;
 
 };  // class SSP
@@ -263,7 +248,7 @@ class M_EXPR {
     os = (*Op).Dump();
 
     int Size = GetArity();
-    for (int i = 0; i < Size; i++) os += " , " + to_string(Inputs[i]);
+    for (int i = 0; i < Size; i++) os += ", input: " + to_string(Inputs[i]);
 
     return os;
   };
@@ -378,39 +363,30 @@ class GROUP {
   It is likely not very usefull
 
   */
-  //##ModelId=3B0C0867008B
   bool search_circle(CONT *C, bool &moresearch);
 
 #ifdef IRPROP
   // return whether the group is completely optimized or not.
   // GrpNo and moreSearch are irrelevant
-  //##ModelId=3B0C08670095
   bool search_circle(int GrpNo, PHYS_PROP *, bool &moreSearch);
 #endif
 
   // Manipulate Winner's circle
   // Return winner for this property, null if there is none
-  //##ModelId=3B0C086700A7
   WINNER *GetWinner(PHYS_PROP *PhysProp);
   // If there is a winner for ReqdProp, error.
   // Create a new winner for the property ReqdProp, with these parameters.
   // Used when beginning the first search for ReqdProp.
-  //##ModelId=3B0C086700B1
   void NewWinner(PHYS_PROP *ReqdProp, M_EXPR *MExpr, Cost *TotalCost, bool done);
 
-  //##ModelId=3B0C086700BC
   void ShrinkSubGroup();
 
-  //##ModelId=3B0C086700BD
   void DeletePhysMExpr(M_EXPR *PhysMExpr);  // delete a physical mexpr from a group
 
-  //##ModelId=3B0C086700C6
   bool CheckWinnerDone();  // check if there is at least one winner done in this group
 
 #ifdef FIRSTPLAN
-  //##ModelId=3B0C086700CF
   void setfirstplan(bool boolean) { firstplan = boolean; };
-  //##ModelId=3B0C086700D9
   bool getfirstplan() { return firstplan; };
 #endif
 

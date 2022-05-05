@@ -115,11 +115,10 @@ CLASS_STAT ClassStat[] =  // class statistics object
 
 int CLASS_NUM = slotsof(ClassStat);  // sizeof of ClassStat
 
-
 RULE_SET *RuleSet;      // Rule set
 CAT *Cat;               // read catalog in
 QUERY *Query;           // read query in
-CostModel *Cm;                 // read cost model in
+CostModel *Cm;          // read cost model in
 SSP *Ssp;               // Create Search space
 KEYS_SET IntOrdersSet;  // set of interesting orders
 

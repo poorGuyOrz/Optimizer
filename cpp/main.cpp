@@ -128,7 +128,7 @@ void Optimizer() {
     }
 
     // Header for single line batch output
-    if (SingleLineBatch) OUTPUT("%s", "#\tTTask\tTGrp\tCME\tTME\tFR\tCOST\n");
+    if (SingleLineBatch) OUTPUT("#\tTTask\tTGrp\tCME\tTME\tFR\tCOST\n");
 
     // For each query numbered q
     bool first = true;  // treat the first "Query: n" specially
@@ -202,9 +202,9 @@ void Optimizer() {
       // Print the number of the query
 #ifndef _TABLE_
       if (SingleLineBatch) {
-        OUTPUT("%d\t", q);  // First entry in output line in window
+        OUTPUT(q << "\t");  // First entry in output line in window
       } else
-        OUTPUT("Query: %d\n", q + 1);  // In this case it's a full line
+        OUTPUT("Query: " << q + 1 << "\n");  // In this case it's a full line
 #endif
 
       // if GlobepsPruning, run optimizer without globepsPruning
@@ -238,7 +238,7 @@ void Optimizer() {
       assert(!SingleLineBatch);  // These are incompatible
 
       //	Print Heading: EPS ...
-      OUTPUT("%s", "EPS, EPS_BD, CUREXPR, TOTEXPR, TASKS, OPTCOST\n");
+      OUTPUT("EPS, EPS_BD, CUREXPR, TOTEXPR, TASKS, OPTCOST\n");
 
       // For each iteration of the global epsilon counter ii {
       for (double ii = 0; ii <= GLOBAL_EPS * 10; ii++) {
@@ -292,8 +292,8 @@ void Optimizer() {
         // OUTPUT elapsed time
         std::chrono::duration<double, std::milli> diff = std::chrono::system_clock::now() - now;
         if (!SingleLineBatch) {
-          OUTPUT("Optimization elapsed time:\t\t%sms", (diff).count());
-          OUTPUT("%s", "========  OPTIMAL PLAN =========\n");
+          OUTPUT("Optimization elapsed time:\t\t" << (diff).count() << "ms");
+          OUTPUT("========  OPTIMAL PLAN =========\n");
         }
 #endif
 
@@ -342,9 +342,9 @@ void Optimizer() {
     }                     // for each query
     if (RadioVal) break;  // If single query case, execute only once
 
-    OUTPUT("%s", "\n");
-    OUTPUT("%s", " =============END OF A SEQUENCE================ ");
-    OUTPUT("%s", "\n");
+    OUTPUT("\n");
+    OUTPUT(" =============END OF A SEQUENCE================ ");
+    OUTPUT("\n");
 
     // this will be executed only if in PiggyBack mode
     // to delete the search space one last time

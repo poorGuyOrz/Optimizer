@@ -120,34 +120,27 @@ typedef int CONT_ID;  // ID of a context
 
 typedef int GRP_ID;  // ID of a Group
 
-/*============================================================
-    TRACE stuff
-  ============================================================
-*/
-
-// trace one object.  Output is newline==, TraceDepth==, file, line -----, then
-// object in the format given.
-#define PTRACE(object)                                                                                          \
-  {                                                                                                             \
-    if (TraceOn && !ForGlobalEpsPruning) {                                                                      \
-      if (FileTrace)                                                                                            \
-        OutputFile << "\n==" << TraceDepth << "==" << __FILE__ << ":" << __LINE__ << "-----" << object << endl; \
-    }                                                                                                           \
+#define PTRACE(object)                                                                                       \
+  {                                                                                                          \
+    if (TraceOn && !ForGlobalEpsPruning) {                                                                   \
+      if (FileTrace)                                                                                         \
+        OutputFile << TraceDepth << ":" << setiosflags(ios::right) << setw(12) << __FILE__ << ":" << setw(4) \
+                   << __LINE__ << setiosflags(ios::right) << setw(8) << ">>>>>: " << object << endl;         \
+    }                                                                                                        \
   }
 
 // Print n tabs, then the character string.  No newlines except as in string.
-#define OUTPUTN(n, string)                  \
-  {                                         \
-    if (!ForGlobalEpsPruning) {             \
-      CString OutputString, temp;           \
-      temp.Format("    ");                  \
-      for (int i = 0; i < n; i++) {         \
-        OutputString += temp;               \
-      }                                     \
-      temp.Format("%s", string);            \
-      OutputString += temp;                 \
-      OutputFile << (OutputString) << endl; \
-    }                                       \
+#define OUTPUTN(n, str)               \
+  {                                   \
+    if (!ForGlobalEpsPruning) {       \
+      string OutputString;            \
+      OutputString = "    ";          \
+      for (int i = 0; i < n; i++) {   \
+        OutputString += OutputString; \
+      }                               \
+      OutputString += str;            \
+      OutputFile << (OutputString);   \
+    }                                 \
   }
 
 // trace without line and file info.  No newlines except in format input.
@@ -163,13 +156,9 @@ typedef int GRP_ID;  // ID of a Group
 // Output the object to window and OutputFile, even if tracing is off.
 // No newlines except in format input.
 // First one writes to window and trace file, second to file only.
-#define OUTPUT(format, object)              \
-  {                                         \
-    if (!ForGlobalEpsPruning) {             \
-      CString OutputString;                 \
-      OutputString.Format(format, object);  \
-      OutputFile << (OutputString) << endl; \
-    }                                       \
+#define OUTPUT(object)                \
+  {                                   \
+    { OutputFile << object << endl; } \
   }
 
 // display error message to Window and OutputFile

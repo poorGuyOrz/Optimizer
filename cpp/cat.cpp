@@ -281,7 +281,7 @@ CAT::CAT(string filename) {
     CollProp = CollProps[CollId];
     if (CollProp->ForeignKeyString.size() > 0) {
       for (int keyNum = 0; keyNum < CollProp->ForeignKeyString.size(); keyNum++) {
-        p = CollProp->ForeignKeyString[keyNum].GetBuffer(CollProp->ForeignKeyString[keyNum].GetLength());
+        p = CollProp->ForeignKeyString[keyNum].str_.data();
         KEYS_SET *FKeys = new KEYS_SET;
         KEYS_SET *RKeys = new KEYS_SET;
         parseKeys(p, FKeys, CollName);
@@ -305,7 +305,6 @@ CAT::CAT(string filename) {
 }
 
 // free memory of catalog structure
-//##ModelId=3B0C0877037B
 CAT::~CAT() {
   int i;
 
@@ -337,7 +336,6 @@ CAT::~CAT() {
 }
 
 // Add CollProp for this collection.  If Collection is new, also update CollTable
-//##ModelId=3B0C08780016
 void CAT::AddColl(string CollName, COLL_PROP *CollProp) {
   int CollId = GetCollId(CollName);
   if (CollId >= CollProps.size()) CollProps.resize(CollId + 1);
@@ -370,7 +368,6 @@ void CAT::AddAttr(string CollName, string AttName, ATTR *Attr, DOM_TYPE domain) 
 
 // If Index, COllection are new, add them to IndProps, IndNames, respectively.
 // Add IndProp, Index to IndProps, IndNames, resp.
-//##ModelId=3B0C08780066
 void CAT::AddIndex(string CollName, string IndexName, IND_PROP *IndProp) {
   // If Index is new, add it to IndProps.  Add IndProp to IndProps
   int IndId = GetIndId(CollName, IndexName);
@@ -578,7 +575,6 @@ void CAT::parseAttribute(char *p, string &AttrName, ATTR *Attribute, DOM_TYPE &d
   Attribute->Min = (float)atof(p);
 }
 
-//##ModelId=3B0C08780106
 void CAT::parseIndex(char *p, string CollName, string &IndexName, IND_PROP *Index) {
   p = SkipSpace(p);
   parseString(p);  // get the Name

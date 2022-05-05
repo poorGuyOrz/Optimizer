@@ -953,7 +953,7 @@ void Cost::FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size) {
   return;
 }
 
-string Cost::Dump() { return " " + to_string(Value); }
+string Cost::Dump() { return to_string(Value); }
 
 string OPT_STAT::Dump() {
   string os;

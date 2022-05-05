@@ -1,7 +1,5 @@
 // ssp.cpp -  implementation of class SSP
 
-/*  ssp.cpp -   search space implementation */
-
 #include "../header/stdafx.h"
 #include "../header/tasks.h"
 
@@ -11,11 +9,11 @@
 extern Cost GlobalEpsBound;
 
 SSP::SSP() : NewGrpID(-1) {
-  // initialize HashTbl to contain HashTableSize elements, each initially NULL.
+  // initialize HashTbl to contain HashTableSize elements, each initially nullptr.
   HashTbl = new M_EXPR *[HtblSize];
-  for (ub4 i = 0; i < HtblSize; i++) HashTbl[i] = NULL;
+  // 8192
+  for (ub4 i = 0; i < HtblSize; i++) HashTbl[i] = nullptr;
 }
-
 
 void SSP::Init() {
   EXPR *Expr = Query->GetEXPR();
@@ -26,14 +24,10 @@ void SSP::Init() {
 
   InitGroupNum = NewGrpID;
   if (COVETrace)  // End Initializing Search Space
-  {
-    string os = "EndInit\n";
-    OutputCOVE << (os) << endl;
-  }
+    OutputCOVE << "EndInit\n" << endl;
 }
 
 // free up memory
-//##ModelId=3B0C0865005E
 SSP::~SSP() {
   for (int i = 0; i < Groups.size(); i++) delete Groups[i];
   for (int j = 0; j < M_WINNER::mc.size(); j++) delete M_WINNER::mc[j];
@@ -47,7 +41,7 @@ string SSP::DumpHashTable() {
   os = "Hash Table BEGIN:\n";
   int total = 0;
   for (int i = 0; i < HtblSize; i++) {
-    for (M_EXPR *mexpr = HashTbl[i]; mexpr != NULL; mexpr = mexpr->GetNextHash(), total++) os += mexpr->Dump();
+    for (M_EXPR *mexpr = HashTbl[i]; mexpr != nullptr; mexpr = mexpr->GetNextHash(), total++) os += mexpr->Dump();
     if (HashTbl[i]) os += "\n";
   }
   os += "Hash Table END, total " + to_string(total) + " mexpr\n";
@@ -101,11 +95,11 @@ void SSP::ShrinkGroup(GRP_ID group_no) {
   // delete all the mexpr except the first initial one
   mexpr = mexpr->GetNextMExpr();
 
-  while (mexpr != NULL) {
+  while (mexpr != nullptr) {
     // maintain the hash link
     // find my self in the appropriate hash bucket
     ub4 hashval = mexpr->hash();
-    for (p = HashTbl[hashval], prev = NULL; p != mexpr; prev = p, p = p->GetNextHash())
+    for (p = HashTbl[hashval], prev = nullptr; p != mexpr; prev = p, p = p->GetNextHash())
       ;
 
     assert(p == mexpr);
@@ -124,14 +118,14 @@ void SSP::ShrinkGroup(GRP_ID group_no) {
   }
 
   mexpr = Group->GetFirstLogMExpr();
-  mexpr->SetNextMExpr(NULL);
+  mexpr->SetNextMExpr(nullptr);
   // update the lastlogmexpr = firstlogmexpr;
   Group->SetLastLogMExpr(mexpr);
 
   // Shrink the physcal mexpr
   mexpr = Group->GetFirstPhysMExpr();
 
-  while (mexpr != NULL) {
+  while (mexpr != nullptr) {
     p = mexpr;
     mexpr = mexpr->GetNextMExpr();
 
@@ -140,7 +134,7 @@ void SSP::ShrinkGroup(GRP_ID group_no) {
   }
 
   mexpr = Group->GetFirstPhysMExpr();
-  mexpr->SetNextMExpr(NULL);
+  mexpr->SetNextMExpr(nullptr);
   // update the lastlogmexpr = firstlogmexpr;
   Group->SetLastPhysMExpr(mexpr);
 
@@ -184,7 +178,7 @@ M_EXPR *SSP::FindDup(M_EXPR &MExpr) {
   int BucketSize = 0;
   if (!ForGlobalEpsPruning) OptStat->HashedMExpr++;
   // try all expressions in the appropriate hash bucket
-  for (M_EXPR *old = prev; old != NULL; prev = old, old = old->GetNextHash(), BucketSize++) {
+  for (M_EXPR *old = prev; old != nullptr; prev = old, old = old->GetNextHash(), BucketSize++) {
     int input_no;
 
     // See if they have the same arities
@@ -220,7 +214,7 @@ M_EXPR *SSP::FindDup(M_EXPR &MExpr) {
   }            // try all expressions in the appropriate hash bucket
 
   // no duplicate, insert into HashTable
-  if (prev == NULL)
+  if (prev == nullptr)
     HashTbl[hashval] = &MExpr;
   else
     prev->SetNextHash(&MExpr);
@@ -229,7 +223,7 @@ M_EXPR *SSP::FindDup(M_EXPR &MExpr) {
     if (OptStat->MaxBucket < BucketSize) OptStat->MaxBucket = BucketSize;
   }
 
-  return (NULL);
+  return (nullptr);
 }  // SSP::FindDup
 
 // merge two groups when duplicate found in these two groups
@@ -275,7 +269,7 @@ M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
   // find duplicate.  Done only for logical, not physical, expressions.
   if (MExpr->GetOp()->is_logical()) {
     M_EXPR *DupMExpr = FindDup(*MExpr);
-    if (DupMExpr != NULL)  // not null ,there is a duplicate
+    if (DupMExpr != nullptr)  // not null ,there is a duplicate
     {
       if (!ForGlobalEpsPruning) OptStat->DupMExpr++;  // calculate dup mexpr
       PTRACE("duplicate mexpr : " << MExpr->Dump());
@@ -283,7 +277,7 @@ M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
       // the duplicate is in the group the expr wanted to copyin
       if (GrpID == DupMExpr->GetGrpID()) {
         delete MExpr;
-        return NULL;
+        return nullptr;
       }
 
       // If the Mexpr is supposed to be in a new group, set the group id
@@ -295,15 +289,15 @@ M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
         NewGrpID--;
 
         delete MExpr;
-        return NULL;
+        return nullptr;
       } else {
         // otherwise, i.e., GrpID != DupMExpr->GrpID
         // need do the merge
         GrpID = MergeGroups(GrpID, DupMExpr->GetGrpID());
         delete MExpr;
-        return NULL;
+        return nullptr;
       }
-    }  // if( DupMExpr != NULL )
+    }  // if( DupMExpr != nullptr )
   }    // If the expression is logical
 
   // no duplicate found
@@ -359,7 +353,6 @@ M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
   return MExpr;
 }  // SSP::CopyIn
 
-//##ModelId=3B0C0865007C
 void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
   // Find the winner for this Physical Property.
   // print the Winner's Operator and cost
@@ -389,7 +382,7 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
   else if (ThisGroup->GetFirstLogMExpr()->GetOp()->is_item()) {
 #ifdef IRPROP
     WinnerMExpr = M_WINNER::mc[GrpID]->GetBPlan(PhysProp);
-    if (WinnerMExpr == NULL) {
+    if (WinnerMExpr == nullptr) {
       os.Format("No optimal plan for group: %d with phys_prop: %s\n", GrpID, PhysProp->Dump());
       OUTPUTN(tabs, os);
       return;
@@ -397,7 +390,7 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
 #else
     ThisWinner = ThisGroup->GetWinner(PhysProp);
 
-    if (ThisWinner == NULL) {
+    if (ThisWinner == nullptr) {
       os = "No optimal plan for group: " + to_string(GrpID) + " with phys_prop: " + PhysProp->Dump() + "\n";
       OUTPUTN(tabs, os);
       return;
@@ -418,9 +411,9 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
 #else
     Cost *WinnerCost = ThisWinner->GetCost();
 #endif
-    os = WinnerCost->Dump() + "\n";
+    os = WinnerCost->Dump();
 
-    OUTPUT("%s", os);
+    OUTPUT(os);
     PHYS_PROP *InputProp;
     // print the input recursively
     for (int i = 0; i < WinnerMExpr->GetArity(); i++) {
@@ -436,7 +429,7 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
 #ifndef IRPROP
     ThisWinner = ThisGroup->GetWinner(PhysProp);
 
-    if (ThisWinner == NULL) {
+    if (ThisWinner == nullptr) {
       os = "No optimal plan for group: " + to_string(GrpID) + " with phys_prop: " + PhysProp->Dump() + "\n";
       OUTPUTN(tabs, os);
       return;
@@ -447,7 +440,7 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
 
 #else
     WinnerMExpr = M_WINNER::mc[GrpID]->GetBPlan(PhysProp);
-    if (WinnerMExpr == NULL) {
+    if (WinnerMExpr == nullptr) {
       os.Format("No optimal plan for group: %d with phys_prop: %s\n", GrpID, PhysProp->Dump());
       OUTPUTN(tabs, os);
       return;
@@ -457,7 +450,7 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
 
     // Now extract the operator from the expression and write it to the output string
     //  along with   " cost = " .  Print output string to window.
-    assert(WinnerMExpr != NULL);
+    assert(WinnerMExpr != nullptr);
 
     WinnerOp = WinnerMExpr->GetOp();
     os = WinnerOp->Dump();
@@ -478,10 +471,10 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
     os = WinnerCost->Dump() + "\n";
 
 #ifndef _TABLE_
-    OUTPUT("%s", os);
+    OUTPUT(os);
     if (SingleLineBatch)  // In this case we want only the total cost of the Winner
     {
-      OUTPUT("%s", "\n");
+      OUTPUT("\n");
       return;
     }
 #else
@@ -540,7 +533,7 @@ bool GROUP::firstplan = false;
 bool GROUP::search_circle(int GrpNo, PHYS_PROP *PhysProp, bool &moreSearch) {
   // check if there is a winner for property "any"
   M_EXPR *Winner = M_WINNER::mc[GrpNo]->GetBPlan(0);
-  if (Winner == NULL)
+  if (Winner == nullptr)
     moreSearch = true;  // group is not optimized, moreSearch needed
   else
     moreSearch = false;  // the group is completely optimized
@@ -550,7 +543,7 @@ bool GROUP::search_circle(int GrpNo, PHYS_PROP *PhysProp, bool &moreSearch) {
   {
     M_EXPR *MWin = M_WINNER::mc[GrpNo]->GetBPlan(PhysProp);
     Cost *WinCost = M_WINNER::mc[GrpNo]->GetUpperBd(PhysProp);
-    if (MWin != NULL) {
+    if (MWin != nullptr) {
       // winner's cost is within the context's bound
       if (*CCost >= *WinCost) {
         delete CCost;
@@ -559,7 +552,7 @@ bool GROUP::search_circle(int GrpNo, PHYS_PROP *PhysProp, bool &moreSearch) {
         delete CCost;
         return false;
       }
-    } else  // since the group is optimized, NULL plan means winner not possible
+    } else  // since the group is optimized, nullptr plan means winner not possible
     {
       delete CCost;
       return false;
@@ -584,7 +577,6 @@ MPlan is Null			(1)			  (4)
 MPlan not Null										  (2)			  (1)
 
 */
-//##ModelId=3B0C0867008B
 bool GROUP::search_circle(CONT *C, bool &moreSearch) {
   // First search for a winner with property P.
   WINNER *Winner = GetWinner(C->GetPhysProp());
@@ -629,7 +621,6 @@ bool GROUP::search_circle(CONT *C, bool &moreSearch) {
   }
 }
 
-//##ModelId=3B0C086700A7
 WINNER *GROUP::GetWinner(PHYS_PROP *PhysProp) {
   int Size = Winners.size();
   for (int i = 0; i < Size; i++) {
@@ -639,7 +630,7 @@ WINNER *GROUP::GetWinner(PHYS_PROP *PhysProp) {
   }
 
   // No matching winner
-  return (NULL);
+  return (nullptr);
 
 }  // GROUP::GetWinner
 
@@ -685,11 +676,10 @@ bool GROUP::CheckWinnerDone() {
 }  // GROUP::CheckWinnerDone
 
 WINNER::WINNER(M_EXPR *MExpr, PHYS_PROP *PhysProp, Cost *cost, bool done)
-    : cost(cost), MPlan((MExpr == NULL) ? NULL : (new M_EXPR(*MExpr))), PhysProp(PhysProp), Done(done) {
+    : cost(cost), MPlan((MExpr == nullptr) ? nullptr : (new M_EXPR(*MExpr))), PhysProp(PhysProp), Done(done) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].New();
 };
 
-//##ModelId=3B0C0868021B
 M_WINNER::M_WINNER(int S) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_M_WINNER].New();
 
@@ -701,10 +691,10 @@ M_WINNER::M_WINNER(int S) {
   // set the first physical property as "any" for all groups
   PhysProp[0] = new PHYS_PROP(any);
 
-  // set the cost to INF and plan to NULL initially for all groups
+  // set the cost to INF and plan to nullptr initially for all groups
   for (int i = 0; i < S; i++) {
     Bound[i] = new Cost(-1);
-    BPlan[i] = NULL;
+    BPlan[i] = nullptr;
   }
 };
 
@@ -740,7 +730,7 @@ void SSP::optimize() {
   } else
     PTasks.push(new O_GROUP(RootGID, 0, 0));
 
-  PTRACE("initial OPEN:\n " << PTasks.Dump() << endl);
+  PTRACE("initial OPEN:\n " << PTasks.Dump());
 
   // main loop of optimization
   // while there are tasks undone, do one
@@ -777,14 +767,14 @@ void SSP::optimize() {
     string os;
     os = to_string(TaskNo) + "\t" + to_string(ClassStat[C_GROUP].Count) + "\t" + to_string(ClassStat[C_M_EXPR].Count) +
          "\t" + to_string(ClassStat[C_M_EXPR].Total) + "\t" + to_string(OptStat->FiredRule) + "\t";
-    OUTPUT("%s", os);
+    OUTPUT(os);
   } else {
-    OUTPUT("TotalTask : %d\n", TaskNo);
-    OUTPUT("TotalGroup : %d\n", ClassStat[C_GROUP].Count);
-    OUTPUT("CurrentMExpr : %d\n", ClassStat[C_M_EXPR].Count);
-    OUTPUT("TotalMExpr : %d\n", ClassStat[C_M_EXPR].Total);
-    OUTPUT("TotalMExpr in MEMO: %d\n", Memo_M_Exprs);
-    OUTPUT("%s", OptStat->Dump());
+    OUTPUT("TotalTask : " << TaskNo);
+    OUTPUT("TotalGroup : " << ClassStat[C_GROUP].Count);
+    OUTPUT("CurrentMExpr : " << ClassStat[C_M_EXPR].Count);
+    OUTPUT("TotalMExpr : " << ClassStat[C_M_EXPR].Total);
+    OUTPUT("TotalMExpr in MEMO: " << Memo_M_Exprs);
+    OUTPUT(OptStat->Dump());
   }
 #endif
 }  // SSP::optimize()

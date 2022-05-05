@@ -29,7 +29,6 @@ Moves
 Pair of rule and promise, used to sort rules according to their promise
 =======================================
 */
-//##ModelId=3B0C085D003F
 typedef struct MOVE {
   int promise;
   RULE *rule;
@@ -41,7 +40,6 @@ Afters
 Pair of expr and cost value, used to sort expr according to their cost
 =======================================
 */
-//##ModelId=3B0C085D0053
 typedef struct AFTERS {
   M_EXPR *m_expr;
   Cost *cost;
@@ -296,48 +294,32 @@ class O_EXPR : public TASK {
      costed, it calculates the cost of the entire physical expression.
  */
 
-//##ModelId=3B0C085E01E5
 class O_INPUTS : public TASK {
  private:
-  //##ModelId=3B0C085E01FA
   M_EXPR *MExpr;  // expression whose inputs we are optimizing
-  //##ModelId=3B0C085E020D
   int arity;
-  //##ModelId=3B0C085E0217
-  int InputNo;  // input currently being or about to be optimized, initially 0
-  //##ModelId=3B0C085E022B
+  int InputNo;      // input currently being or about to be optimized, initially 0
   int PrevInputNo;  // keep track of the previous optimized input no
-  //##ModelId=3B0C085E0240
   Cost *LocalCost;  // the local cost of the mexpr
-  //##ModelId=3B0C085E0249
-  bool Last;  // if this task is the last task for the group
-  //##ModelId=3B0C085E0268
-  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
+  bool Last;        // if this task is the last task for the group
+  Cost *EpsBound;   // if global eps pruning is on, this is the eps bound for eps pruning
   // else it is zero
-  //##ModelId=3B0C085E0271
   int ContNo;  // keep track of number of contexts
 
   // Costs and properties of input winners and groups.  Computed incrementally
   //  by this method.
-  //##ModelId=3B0C085E0290
   Cost **InputCost;
-  //##ModelId=3B0C085E02A4
   LOG_PROP **InputLogProp;
 
  public:
-  //##ModelId=3B0C085E02B7
   O_INPUTS(M_EXPR *MExpr, int ContextID, int ParentTaskNo, bool last = false, Cost *epsbound = nullptr, int ContNo = 0);
 
-  //##ModelId=3B0C085E02E9
   ~O_INPUTS();
 
   // return the new upper bd for the input
-  //##ModelId=3B0C085E02F3
   Cost *NewUpperBd(Cost *OldUpperBd, int input);
-  //##ModelId=3B0C085E0307
   void perform();
 
-  //##ModelId=3B0C085E0311
   string Dump();
 
 };  // O_INPUTS

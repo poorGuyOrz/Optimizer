@@ -69,12 +69,9 @@ class OP {
 
 //##ModelId=3B0C0872017F
 class LOG_OP : public OP  // Logical Operator Abstract Class
-
 {
  public:
-  //##ModelId=3B0C08720193
   LOG_OP(){};
-  //##ModelId=3B0C08720194
   virtual ~LOG_OP(){};
 
   // OpMatch (other) is true if this and other are the same operator,
@@ -83,20 +80,16 @@ class LOG_OP : public OP  // Logical Operator Abstract Class
   // This should be moved to the OP class if we ever apply rules to
   // other than logical operators.
   // If someone writes a rule which uses member data, it could be made virtual
-  //##ModelId=3B0C0872019E
   inline bool OpMatch(LOG_OP *other) { return (GetNameId() == other->GetNameId()); };
 
-  //##ModelId=3B0C087201A8
   inline bool is_logical() { return true; };
 
-  //##ModelId=3B0C087201A9
   inline ub4 GetInitval() { return (lookup2(GetNameId(), 0)); };
   // Get the initial value for hashing, which depends
   // only on the name of the operator.
 
   // add assert to the following functions,
   // make sure these methods of LOG_OP never called(log_op does not get cost)
-  //##ModelId=3B0C087201B2
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
     return NULL;

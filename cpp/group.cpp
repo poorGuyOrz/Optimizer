@@ -228,19 +228,21 @@ string GROUP::Dump() {
   int Size = 0;
   M_EXPR *MExpr;
 
-  os = "----- Group " + to_string(GroupID) + " : -----" + "\n";
+  os = "Group: " + to_string(GroupID) + "\n";
 
   for (MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
+    os += "\t\tLogic M_Expr: ";
     os += MExpr->Dump();
-    os += " ; ";
+    os += ";\n";
     Size++;
   }
   for (MExpr = FirstPhysMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
+    os += "\t\tPhysc M_Expr: ";
     os += MExpr->Dump();
-    os += " ; ";
+    os += ";\n";
     Size++;
   }
-  os += "\n----- has " + to_string(Size) + " MExprs -----\n";
+  os += "\t----- has " + to_string(Size) + " MExprs -----\n";
 
   // Print Winner's circle
   os += "Winners:\n";

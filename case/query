@@ -1,4 +1,7 @@
-(EQJOIN(A.c1, B.c1),
-  GET("A"),
-  GET("b")
-)
+(EQJOIN(D.A,E.A),
+(EQJOIN(C.Z,D.Z),
+(EQJOIN(AB.Y,C.Y),
+GET("AB"),
+GET("C")),
+GET("D")),
+GET("E")),

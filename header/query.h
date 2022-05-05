@@ -144,14 +144,14 @@ class EXPR  // An EXPR corresponds to a detailed solution to
 
   string Dump() {
     string os;
-    os += "(\n";
+    os += "\n\t(";
     os += (*Op).Dump();
     int i;
     for (i = 0; i < arity; i++) {
-      os += ",\n";
+      os += ",";
       os += Inputs[i]->Dump();
     }
-    os += "\n)";
+    os += ")";
     return os;
   };
 

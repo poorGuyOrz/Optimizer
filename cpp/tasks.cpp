@@ -55,23 +55,18 @@ int compare_afters(void const *x, void const *y) {
 
 // **************** TASKS *********************
 // base class of OPT tasks
-//##ModelId=3B0C085D00C1
 TASK::TASK(int ContextID, int parentTaskNo) : ContextID(ContextID) {
   ParentTaskNo = parentTaskNo;  // for debug
-
-};  // TASK::TASK
+};
 
 // **************** PTASKS *********************
 //   List of un-done tasks
-//##ModelId=3B0C085D0143
-PTASKS::PTASKS() : first(NULL){};  // PTASKS::PTASKS
+PTASKS::PTASKS() : first(NULL){};
 
-//##ModelId=3B0C085D014D
 PTASKS::~PTASKS() {
   while (!empty()) delete pop();
-}  // PTASKS::~PTASKS
+}
 
-//##ModelId=3B0C085D0175
 string PTASKS::Dump() {
   string os;
 
@@ -79,12 +74,10 @@ string PTASKS::Dump() {
     os = "OPEN is empty\n";
   else  // task list has some tasks in it
   {
-    os = "\t---- OPEN START ----\n";
     // loop over all tasks to be done
     int count = 0;
     for (TASK *task = first; task != NULL; task = task->next)
-      os += "\t" + to_string(count++) + " -- " + task->Dump() + "\n";
-    os += "\t---- OPEN END ----";
+      os += "\t" + to_string(count++) + "--" + task->Dump() + "\n";
   }
   return os;
 }  // PTASKS::Dump
@@ -165,7 +158,7 @@ O_GROUP::perform
 */
 void O_GROUP::perform() {
   SET_TRACE Trace(true);
-  PTRACE("O_GROUP " << GrpID << " performing");
+  PTRACE("OptimizeGroupTask: " << GrpID << " is performing");
 
 #ifndef IRPROP
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
@@ -229,7 +222,7 @@ void O_GROUP::perform() {
     assert(moreSearch && !SCReturn);  // assert (this is case 3)
     // if (property is ANY)
     if (LocalReqdProp->GetOrder() == any) {
-      PTRACE("add winner with null plan, push O_EXPR on 1st logical expression");
+      PTRACE("add winner with null plan, push OptimizeExprTask on 1st logical expression");
       Group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
       if (GlobepsPruning) {
         Cost *eps_bound = new Cost(*EpsBound);
@@ -343,25 +336,23 @@ void O_GROUP::perform() {
 string O_GROUP::Dump() {
   string os;
 
-  os = "OPT_GROUP group " + to_string(GrpID) + ",";
-  os += " parent task " + to_string(ParentTaskNo);
+  os = "OptimizeGroupTask group: " + to_string(GrpID) + ",";
+  os += " parent task: " + to_string(ParentTaskNo);
   os += " " + CONT::vc[ContextID]->Dump();
   return os;
 }  // O_GROUP::Dump
 
 // ************  E_GROUP ******************
 //    Task to explore a group
-//##ModelId=3B0C085D02E8
 E_GROUP::E_GROUP(GRP_ID grpID, int ContextID, int parentTaskNo, bool last, Cost *bound)
     : TASK(ContextID, parentTaskNo), GrpID(grpID), Last(last), EpsBound(bound) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_E_GROUP].New();
 };  // E_GROUP::E_GROUP
 
-//##ModelId=3B0C085D0307
 void E_GROUP::perform() {
   SET_TRACE Trace(true);
 
-  PTRACE("E_GROUP " << GrpID << " performing");
+  PTRACE("ExploreGroupTask " << GrpID << " performing");
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
 
   GROUP *Group = Ssp->GetGroup(GrpID);
@@ -403,22 +394,20 @@ void E_GROUP::perform() {
 
 string E_GROUP::Dump() {
   string os;
-  os = "E_GROUP group " + to_string(GrpID) + ",";
+  os = "ExploreGroupTask group " + to_string(GrpID) + ",";
   os += " parent task " + to_string(ParentTaskNo);
   return os;
 }  // E_GROUP::Dump
 
 // ************  O_EXPR ******************
 
-//##ModelId=3B0C085E0018
 O_EXPR::O_EXPR(M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last, Cost *bound)
     : TASK(ContextID, parent_task_no), MExpr(mexpr), explore(explore), Last(last), EpsBound(bound) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_EXPR].New();
 };  // O_EXPR::O_EXPR
 
-//##ModelId=3B0C085E0041
 void O_EXPR::perform() {
-  PTRACE("O_EXPR performing, " << (explore ? "exploring" : "optimizing") << " mexpr: " << MExpr->Dump());
+  PTRACE("OptimizeExprTask performing, " << (explore ? "exploring" : "optimizing") << " mexpr: " << MExpr->Dump());
 #ifdef IRPROP
   int GrpNo = MExpr->GetGrpID();
   PTRACE("ContextID: %d, %s", ContextID, (M_WINNER::mc[GrpNo]->GetPhysProp(ContextID))->Dump());
@@ -533,7 +522,6 @@ string O_EXPR::Dump() {
 
 /*********** O_INPUTS FUNCTIONS ***************/
 
-//##ModelId=3B0C085E02B7
 O_INPUTS::O_INPUTS(M_EXPR *MExpr, int ContextID, int ParentTaskNo, bool last, Cost *bound, int ContNo)
     : MExpr(MExpr),
       TASK(ContextID, ParentTaskNo),
@@ -674,7 +662,6 @@ Replace existing winner with current mexpression and its cost, don't change done
 Update the upper bound of the current context
 */
 
-//##ModelId=3B0C085E0307
 void O_INPUTS::perform() {
   PTRACE("O_INPUT performing Input " << InputNo << ", expr: " << MExpr->Dump());
 #ifdef IRPROP
@@ -1046,7 +1033,7 @@ void O_INPUTS::perform() {
 #ifdef FIRSTPLAN
   // If we are in the root group and no plan in it has been costed
   if (!(MExpr->GetGrpID()) && !(LocalGroup->getfirstplan())) {
-    OUTPUT("First Plan is costed at task %d\n", TaskNo);
+    OUTPUT("First Plan is costed at task " << TaskNo);
     LocalGroup->setfirstplan(true);
 #ifndef _TABLE_
     long time;             // total seconds from start to finish
@@ -1297,7 +1284,7 @@ APPLY_RULE::~APPLY_RULE() {
 void APPLY_RULE::perform() {
   CONT *Context = CONT::vc[ContextID];
 
-  PTRACE("APPLY_RULE performing, rule: " << Rule->GetName() << " expression: " << MExpr->Dump());
+  PTRACE("ApplyRuleTask performing, rule: " << Rule->GetName() << " expression: " << MExpr->Dump());
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
   PTRACE("Last flag is " << Last);
 
@@ -1335,8 +1322,7 @@ void APPLY_RULE::perform() {
   if (!ForGlobalEpsPruning) OptStat->FiredRule++;  // Count invocations of this task
 
   // main variables for the loop over all possible bindings
-  BINDERY *bindery;  // Expression bindery.
-                     //    Used to bind MExpr to rule's original pattern
+  BINDERY *bindery;  // Expression bindery. Used to bind MExpr to rule's original pattern
   EXPR *before;      // see below
   EXPR *after;       // see below
   M_EXPR *NewMExpr;  // see below
@@ -1654,5 +1640,5 @@ void APPLY_RULE::perform() {
 }  // APPLY_RULE::perform
 
 string APPLY_RULE::Dump() {
-  return "APPLY_RULE rule: " + Rule->Dump() + ", mexpr " + MExpr->Dump() + ", parent task " + to_string(ParentTaskNo);
+  return "ApplyRuleTask rule: " + Rule->Dump() + ", mexpr " + MExpr->Dump() + ", parent task " + to_string(ParentTaskNo);
 }  // Dump
