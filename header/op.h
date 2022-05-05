@@ -22,9 +22,7 @@ OPERATORS AND ARGUMENTS - class OP
 // Arguments could be attributes to project on, etc.
 class OP {
  public:
-#ifdef _DEBUG
   string name;  // Name of this operator
-#endif
 
   OP(){};
 
@@ -67,7 +65,6 @@ class OP {
    ============================================================
 */
 
-//##ModelId=3B0C0872017F
 class LOG_OP : public OP  // Logical Operator Abstract Class
 {
  public:
@@ -103,20 +100,16 @@ class LOG_OP : public OP  // Logical Operator Abstract Class
     ============================================================
 */
 
-//##ModelId=3B0C087201F8
 class PHYS_OP : public OP  // Physical Operator
 
 {
  public:
-  //##ModelId=3B0C0872020D
   PHYS_OP(){};
-  //##ModelId=3B0C0872020E
   virtual ~PHYS_OP(){};
 
   // FindPhysProp() establishes the physical properties of an
   // algorithm's output.
   //  right now, only implemented by operators with 0 arity. no input_phys_props
-  //##ModelId=3B0C08720217
   virtual PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props = NULL) {
     assert(false);
     return NULL;
@@ -125,7 +118,6 @@ class PHYS_OP : public OP  // Physical Operator
   // FindLocalCost() finds the local cost of the operator,
   // including output but not input costs.  Thus we compute output costs
   // only once, and get input costs from (as part of) the input operators' cost.
-  //##ModelId=3B0C08720221
   virtual Cost *FindLocalCost(LOG_PROP *LocalLogProp,        // uses primarily the card of the Group
                               LOG_PROP **InputLogProp) = 0;  // uses primarily cardinalities
 
@@ -222,14 +214,14 @@ class LEAF_OP : public OP
 {
  private:
   //##ModelId=3B0C08720393
-  GRP_ID Group;  // Identifies the group bound to this leaf, after binding.
+  int Group;  // Identifies the group bound to this leaf, after binding.
                  //  == -1 until binding
   //##ModelId=3B0C087203A7
-  GRP_ID Index;  // Used to distinguish this leaf in a rule
+  int Index;  // Used to distinguish this leaf in a rule
 
  public:
   //##ModelId=3B0C087203BA
-  LEAF_OP(GRP_ID index, GRP_ID group = -1) : Index(index), Group(group) {
+  LEAF_OP(int index, int group = -1) : Index(index), Group(group) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
 #ifdef _DEBUG
     name = GetName();  // for debug
@@ -257,7 +249,7 @@ class LEAF_OP : public OP
   //##ModelId=3B0C087203E2
   inline string GetName() { return ("LEAF_OP"); };
   //##ModelId=3B0C08730004
-  inline GRP_ID GetGroup() { return (Group); };
+  inline int GetGroup() { return (Group); };
   //##ModelId=3B0C08730005
   inline int GetIndex() { return (Index); };
 

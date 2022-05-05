@@ -36,7 +36,7 @@ there are GROUPs representing A join B, A join C, C, etc.
 In our approach to query optimization, each possible solution in the Search
 Space is represented compactly, by what we call a Multi-expression
 (class M_EXPR).  A solution in the search space can also be represented in
-more detail by an expression (class EXPR).
+more detail by an expression (class Expression).
 */
 // Search Space
 class SSP {
@@ -52,27 +52,27 @@ class SSP {
 
   void optimize();  // Later add a conditon.  Prepare the SSP so an optimal plan can be found
 
-  // Convert the EXPR into a Mexpr.
+  // Convert the Expression into a Mexpr.
   // If Mexpr is not already in the search space, then copy Mexpr into the
   // search space and return the new Mexpr.
   // If Mexpr is already in the search space, then either throw it away or
   // merge groups.
   // GrpID is the ID of the group where Mexpr will be put.  If GrpID is
   // NEW_GRPID(-1), make a new group with that ID and return its value in GrpID.
-  M_EXPR *CopyIn(EXPR *Expr, GRP_ID &GrpID);
+  M_EXPR *CopyIn(Expression *Expr, int &GrpID);
 
   // Copy out the final plan.  Recursive, each time increasing tabs by
   //  one, so the plan is indented.
-  void CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs);
+  void CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs);
 
   // return the next available grpID in SSP
-  inline GRP_ID GetNewGrpID() { return (++NewGrpID); };
+  inline int GetNewGrpID() { return (++NewGrpID); };
 
   // return the ID of the Root group
-  inline GRP_ID GetRootGID() { return (RootGID); };
+  inline int GetRootGID() { return (RootGID); };
 
   // return the specific group
-  inline GROUP *GetGroup(GRP_ID Gid) { return Groups[Gid]; };
+  inline GROUP *GetGroup(int Gid) { return Groups[Gid]; };
 
   // If another expression in the search space is identical to MExpr, return
   //  it, else return NULL.
@@ -81,11 +81,11 @@ class SSP {
 
   // When a duplicate is found in two groups they should be merged into
   //  the same group.  We always merge bigger group_no group to smaller one.
-  GRP_ID MergeGroups(GRP_ID group_no1, GRP_ID group_no2);
-  // GRP_ID MergeGroups(GROUP & ToGroup, GROUP & FromGroup);
+  int MergeGroups(int group_no1, int group_no2);
+  // int MergeGroups(GROUP & ToGroup, GROUP & FromGroup);
 
-  void ShrinkGroup(GRP_ID group_no);  // shrink the group marked completed
-  void Shrink();                      // shrink the ssp
+  void ShrinkGroup(int group_no);  // shrink the group marked completed
+  void Shrink();                   // shrink the ssp
 
   bool IsChanged();  // is the ssp changed?
 
@@ -96,12 +96,12 @@ class SSP {
   string DumpHashTable();
 
  private:
-  GRP_ID RootGID;  // ID of the oldest, root group.  Set to NEW_GRPID in SSP""Init then
+  int RootGID;  // ID of the oldest, root group.  Set to NEW_GRPID in SSP""Init then
   // never changes
-  GRP_ID InitGroupNum;  //(seems to be the same as RootGID)
-  GRP_ID NewGrpID;      // ID of the newest group, initially -1
+  int InitGroupNum;  //(seems to be the same as RootGID)
+  int NewGrpID;      // ID of the newest group, initially -1
 
-  // Collection of Groups, indexed by GRP_ID
+  // Collection of Groups, indexed by int
   vector<GROUP *> Groups;
 
 };  // class SSP
@@ -110,7 +110,7 @@ class SSP {
    ============================================================
    MULTI_EXPRESSIONS - class M_EXP
    ============================================================
-   M_EXPR is a compact form of EXPR which utilizes sharing.  Inputs are
+   M_EXPR is a compact form of Expression which utilizes sharing.  Inputs are
    GROUPs instead of EXPRs, so the M_EXPR embodies several EXPRs.
    All searching is done with M_EXPRs, so each contains lots of state.
 
@@ -123,8 +123,8 @@ class M_EXPR {
 
   int counter;  // to keep track of how many winners point to this MEXPR
   OP *Op;       // Operator
-  GRP_ID *Inputs;
-  GRP_ID GrpID;  // I reside in this group
+  int *Inputs;
+  int GrpID;  // I reside in this group
 
   // link to the next mexpr in the same group
   M_EXPR *NextMExpr;
@@ -137,8 +137,8 @@ class M_EXPR {
   */
  public:
   /*M_EXPR(OP * Op,
-    GRP_ID First = NULL, GRP_ID Second = NULL,
-    GRP_ID Third = NULL, GRP_ID Fourth = NULL);
+    int First = NULL, int Second = NULL,
+    int Third = NULL, int Fourth = NULL);
   */
   ~M_EXPR() {
     if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].Delete();
@@ -150,19 +150,19 @@ class M_EXPR {
     Op = NULL;
   };
 
-  // M_EXPR(OP * Op, GRP_ID* inputs); //Used by CopyIn
+  // M_EXPR(OP * Op, int* inputs); //Used by CopyIn
 
-  // Transform an EXPR into an M_EXPR.  May involve creating new Groups.
+  // Transform an Expression into an M_EXPR.  May involve creating new Groups.
   //  GrpID is the ID of the group where the M_EXPR will be put.  If GrpID is
   //  NEW_GRPID(-1), make a new group with that ID.  (Same as SSP::CopyIn)
-  M_EXPR(EXPR *Expr, GRP_ID grpid)
+  M_EXPR(Expression *Expr, int grpid)
       : Op(Expr->GetOp()->Clone()),
         NextMExpr(NULL),
         GrpID((grpid == NEW_GRPID) ? Ssp->GetNewGrpID() : grpid),
         HashPtr(NULL),
         RuleMask(0) {
-    GRP_ID GID;
-    EXPR *input;
+    int GID;
+    Expression *input;
     counter = 0;
 
     if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].New();
@@ -170,7 +170,7 @@ class M_EXPR {
     // copy in the sub-expression
     int arity = GetArity();
     if (arity) {
-      Inputs = new GRP_ID[arity];
+      Inputs = new int[arity];
       for (int i = 0; i < arity; i++) {
         input = Expr->GetInput(i);
 
@@ -201,7 +201,7 @@ class M_EXPR {
     // Inputs are the only member data left to copy.
     int arity = Op->GetArity();
     if (arity) {
-      Inputs = new GRP_ID[arity];
+      Inputs = new int[arity];
       while (--arity >= 0) Inputs[arity] = other.GetInput(arity);
     }
   };
@@ -212,9 +212,9 @@ class M_EXPR {
     if (counter != 0) counter--;
   };
   inline OP *GetOp() { return (Op); };
-  inline GRP_ID GetInput(int i) const { return (Inputs[i]); };
-  inline void SetInput(int i, GRP_ID grpId) { Inputs[i] = grpId; };
-  inline GRP_ID GetGrpID() { return (GrpID); };
+  inline int GetInput(int i) const { return (Inputs[i]); };
+  inline void SetInput(int i, int grpId) { Inputs[i] = grpId; };
+  inline int GetGrpID() { return (GrpID); };
   inline int GetArity() { return (Op->GetArity()); };
 
   inline M_EXPR *GetNextHash() { return HashPtr; };
@@ -335,7 +335,7 @@ class GROUP {
   inline Cost *GetLowerBd() { return LowerBd; };
   inline double GetEstiGrpSize() { return EstiGrpSize; };
   inline int GetCount() { return count; };
-  inline GRP_ID GetGroupID() { return (GroupID); };
+  inline int GetGroupID() { return (GroupID); };
 
   // Add a new MExpr to the group
   void NewMExpr(M_EXPR *MExpr);
@@ -391,7 +391,7 @@ class GROUP {
 #endif
 
  private:
-  GRP_ID GroupID;  // ID of this group
+  int GroupID;  // ID of this group
 
   M_EXPR *FirstLogMExpr;   // first log M_EXPR in  the GROUP
   M_EXPR *LastLogMExpr;    // last log M_EXPR in  the GROUP
@@ -499,28 +499,19 @@ class WINNER {
         revisit that group, thus saving CPU time and memory.
 */
 
-//##ModelId=3B0C0868017B
 class M_WINNER {
  public:
-  //##ModelId=3B0C08680192
   static vector<M_WINNER *> mc;
-  //##ModelId=3B0C086801A4
   static Cost InfCost;
 
  private:
-  //##ModelId=3B0C086801B7
   int wide;  // size of each element
-  //##ModelId=3B0C086801D6
   M_EXPR **BPlan;
-  //##ModelId=3B0C086801EA
   PHYS_PROP **PhysProp;
-  //##ModelId=3B0C08680208
   Cost **Bound;
 
  public:
-  //##ModelId=3B0C0868021B
   M_WINNER(int);
-  //##ModelId=3B0C08680226
   ~M_WINNER() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_M_WINNER].Delete();
     delete[] BPlan;
@@ -532,7 +523,6 @@ class M_WINNER {
     delete[] Bound;
   };
 
-  //##ModelId=3B0C0868022F
   inline int GetWide() { return wide; };
 
   // Return the requested MEXPR indexed by an integer

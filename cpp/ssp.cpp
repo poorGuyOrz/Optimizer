@@ -16,7 +16,7 @@ SSP::SSP() : NewGrpID(-1) {
 }
 
 void SSP::Init() {
-  EXPR *Expr = Query->GetEXPR();
+  Expression *Expr = query->GetEXPR();
 
   // create the initial search space
   RootGID = NEW_GRPID;
@@ -72,7 +72,7 @@ void SSP::Shrink() {
 }
 
 //##ModelId=3B0C086500B9
-void SSP::ShrinkGroup(GRP_ID group_no) {
+void SSP::ShrinkGroup(int group_no) {
   GROUP *Group;
   M_EXPR *mexpr;
   M_EXPR *p;
@@ -231,11 +231,11 @@ M_EXPR *SSP::FindDup(M_EXPR &MExpr) {
 // always merge bigger group_no group to smaller one.
 
 //##ModelId=3B0C086500AE
-GRP_ID SSP::MergeGroups(GRP_ID group_no1, GRP_ID group_no2) {
+int SSP::MergeGroups(int group_no1, int group_no2) {
   // M_EXPR * mexpr;
 
-  GRP_ID ToGid = group_no1;
-  GRP_ID FromGid = group_no2;
+  int ToGid = group_no1;
+  int FromGid = group_no2;
 
   // always merge bigger group_no group to smaller one.
   if (group_no1 > group_no2) {
@@ -250,7 +250,7 @@ GRP_ID SSP::MergeGroups(GRP_ID group_no1, GRP_ID group_no2) {
   return ToGid;
 }  // SSP::MergeGroups
 
-M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
+M_EXPR *SSP::CopyIn(Expression *Expr, int &GrpID) {
   GROUP *Group;
   bool win = true;  // will we initialize nontrivial winners in this group?
   // False if it is a subgroup of a DUMMY operator
@@ -353,7 +353,7 @@ M_EXPR *SSP::CopyIn(EXPR *Expr, GRP_ID &GrpID) {
   return MExpr;
 }  // SSP::CopyIn
 
-void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
+void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
   // Find the winner for this Physical Property.
   // print the Winner's Operator and cost
   GROUP *ThisGroup = Ssp->GetGroup(GrpID);
@@ -487,7 +487,7 @@ void SSP::CopyOut(GRP_ID GrpID, PHYS_PROP *PhysProp, int tabs) {
     PHYS_PROP *ReqProp;
     bool possible;
     for (int i = 0; i < Arity; i++) {
-      GRP_ID input_groupno = WinnerMExpr->GetInput(i);
+      int input_groupno = WinnerMExpr->GetInput(i);
 
       ReqProp =
           ((PHYS_OP *)WinnerOp)->InputReqdProp(PhysProp, Ssp->GetGroup(input_groupno)->get_log_prop(), i, possible);
@@ -726,9 +726,9 @@ void SSP::optimize() {
   // 初始化group，
   if (GlobepsPruning) {
     Cost *eps_bound = new Cost(GlobalEpsBound);
-    PTasks.push(new O_GROUP(RootGID, 0, 0, true, eps_bound));
+    PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true, eps_bound));
   } else
-    PTasks.push(new O_GROUP(RootGID, 0, 0));
+    PTasks.push(new OptimizeGroupTask(RootGID, 0, 0));
 
   PTRACE("initial OPEN:\n " << PTasks.Dump());
 
@@ -738,7 +738,7 @@ void SSP::optimize() {
     TaskNo++;
     PTRACE("Starting task " << TaskNo);
 
-    TASK *NextTask = PTasks.pop();
+    OptimizerTask *NextTask = PTasks.pop();
     NextTask->perform();
 
     if (TraceSSP) {

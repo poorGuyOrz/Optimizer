@@ -23,7 +23,7 @@
 //		keys1 = new KEYS("A","X")
 //		keys2 = new KEYS("B","Z")
 //		joinOp = new EQJOIN(keys1,keys2)
-//		joinExpr = new EXPR(joinOp, getAExpr, getBExpr)
+//		joinExpr = new Expression(joinOp, getAExpr, getBExpr)
 //(GET("A"))
 
 //(EQJOIN (A.X , B.X), 

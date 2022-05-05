@@ -24,11 +24,10 @@ void Optimizer() {
   AppDir = "../";
   if (CatFile == "catalog") CatFile = AppDir + "CATALOGS/uniform.txt";
   if (CMFile == "cm") CMFile = AppDir + "CMS/cmj";
-  if (RSFile == "ruleset") RSFile = AppDir + "RuleSets/ruleset1";
 
   // Open general trace file and COVE trace file, clear main output window
-  OutputFile.open((AppDir + "/colout.txt").str_);
-  OutputCOVE.open((AppDir + "/script.cove").str_);
+  OutputFile.open((AppDir + "/colout.txt"));
+  OutputCOVE.open((AppDir + "/script.cove"));
 
   // clean the statistics
   for (int i = 0; i < CLASS_NUM; i++) {
@@ -39,18 +38,18 @@ void Optimizer() {
 
   // Create objects to manage Opt stats, Cost model, Rule set, Heuristic cost.
   OptStat = new OPT_STAT;
-  Cm = new CostModel(CMFile.str_);
-  PTRACE("cost model content: " << endl << Cm->Dump());
-  RuleSet = new RULE_SET(RSFile.str_);
-  PTRACE("Rule set content:" << endl << RuleSet->Dump());
+  costModel = new CostModel(CMFile);
+  PTRACE("cost model content: " << endl << costModel->Dump());
+  ruleSet = new RuleSet();
+  PTRACE("Rule set content:" << endl << ruleSet->Dump());
   Cost *HeuristicCost;
   HeuristicCost = new Cost(0);
 
   // Initialize Rule Firing Statistics
-  TopMatch.resize(RuleSet->RuleCount);
-  Bindings.resize(RuleSet->RuleCount);
-  Conditions.resize(RuleSet->RuleCount);  // 625
-  for (int RuleNum = 0; RuleNum < RuleSet->RuleCount; RuleNum++) {
+  TopMatch.resize(ruleSet->RuleCount);
+  Bindings.resize(ruleSet->RuleCount);
+  Conditions.resize(ruleSet->RuleCount);  // 625
+  for (int RuleNum = 0; RuleNum < ruleSet->RuleCount; RuleNum++) {
     TopMatch[RuleNum] = 0;
     Bindings[RuleNum] = 0;
     Conditions[RuleNum] = 0;
@@ -63,7 +62,7 @@ void Optimizer() {
   //   contain the current batch query, copied from BQueryFile.  The default case is
   //   handled separately, with files named query and bquery.
   // NumQuery will be set here to the number of queries.
-  CString QueryFile;
+  string QueryFile;
   int NumQuery;
   FILE *fp;                  // for the batch query file BQueryFile
   char TextLine[LINEWIDTH];  // text line buffer
@@ -79,7 +78,7 @@ void Optimizer() {
   {
     // Open BQueryFile
     if (BQueryFile == "bquery") BQueryFile = AppDir + "testquery.cl";  // default case
-    if ((fp = fopen(BQueryFile.str_.c_str(), "r")) == NULL)
+    if ((fp = fopen(BQueryFile.c_str(), "r")) == NULL)
       OUTPUT_ERROR("can not open the file you chose in the option dialogue");
     fgets(TextLine, LINEWIDTH, fp);
     if (feof(fp)) OUTPUT_ERROR("Empty Input File");
@@ -150,7 +149,7 @@ void Optimizer() {
         for (int i = 0; i < CLASS_NUM; i++) ClassStat[i].Count = ClassStat[i].Max = ClassStat[i].Total = 0;
         OptStat->DupMExpr = OptStat->FiredRule = OptStat->HashedMExpr = 0;
         OptStat->MaxBucket = OptStat->TotalMExpr = 0;
-        for (int RuleNum = 0; RuleNum < RuleSet->RuleCount; RuleNum++) {
+        for (int RuleNum = 0; RuleNum < ruleSet->RuleCount; RuleNum++) {
           TopMatch[RuleNum] = 0;
           Bindings[RuleNum] = 0;
           Conditions[RuleNum] = 0;
@@ -160,7 +159,7 @@ void Optimizer() {
 
         QueryFile = AppDir + "tempquery";
         FILE *tempfp;
-        if ((tempfp = fopen(QueryFile.str_.c_str(), "w")) == NULL)
+        if ((tempfp = fopen(QueryFile.c_str(), "w")) == NULL)
           OUTPUT_ERROR("can not create or truncate file 'tempquery'");
         // QueryFile.ReleaseBuffer();
         /*
@@ -204,7 +203,7 @@ void Optimizer() {
       if (SingleLineBatch) {
         OUTPUT(q << "\t");  // First entry in output line in window
       } else
-        OUTPUT("Query: " << q + 1 << "\n");  // In this case it's a full line
+        OUTPUT("query: " << q + 1 << "\n");  // In this case it's a full line
 #endif
 
       // if GlobepsPruning, run optimizer without globepsPruning
@@ -212,11 +211,11 @@ void Optimizer() {
       if (GlobepsPruning) {
         GlobepsPruning = false;
         ForGlobalEpsPruning = true;
-        Cat = new CAT(CatFile.str_);
-        Query = new QUERY(QueryFile.str_);
+        Cat = new CAT(CatFile);
+        query = new Query(QueryFile);
         Ssp = new SSP;
         Ssp->Init();
-        delete Query;
+        delete query;
         Ssp->optimize();
         PHYS_PROP *PhysProp = CONT::vc[0]->GetPhysProp();
         *HeuristicCost = *(Ssp->GetGroup(0)->GetWinner(PhysProp)->GetCost());
@@ -231,14 +230,14 @@ void Optimizer() {
       }
 
       // Since each optimization corrupts the catalog, we must create it anew
-      Cat = new CAT(CatFile.str_);
+      Cat = new CAT(CatFile);
       PTRACE("Catalog content:" << endl << Cat->Dump());
 
 #ifdef _TABLE_
       assert(!SingleLineBatch);  // These are incompatible
 
       //	Print Heading: EPS ...
-      OUTPUT("EPS, EPS_BD, CUREXPR, TOTEXPR, TASKS, OPTCOST\n");
+      OUTPUT("EPS, EPS_BD, CUREXPR, TOTEXPR, OptimizerTask, OPTCOST\n");
 
       // For each iteration of the global epsilon counter ii {
       for (double ii = 0; ii <= GLOBAL_EPS * 10; ii++) {
@@ -248,9 +247,9 @@ void Optimizer() {
 #endif
 
         // Parse and print the query and its interesting orders
-        Query = new QUERY(QueryFile.str_);
-        PTRACE("Original Query:" << endl << Query->Dump());
-        PTRACE("The interesting orders in the query are:" << endl << Query->Dump_IntOrders());
+        query = new Query(QueryFile);
+        PTRACE("Original query:" << endl << query->Dump());
+        PTRACE("The interesting orders in the query are:" << endl << query->Dump_IntOrders());
 
         // Initialize and print the search space, delete the query
         //  In PiggyBack mode create the search space only for
@@ -265,11 +264,10 @@ void Optimizer() {
 
         Ssp->Init();
         PTRACE("Initial Search Space:" << endl << Ssp->Dump());
-        delete Query;
+        delete query;
 
         // Keep track of initial space and time
         PTRACE("---1--- memory statistics before optimization: " << DumpStatistics());
-        // PTRACE("used memory before opt: %dK\n", GetUsedMemory() / 1000);
         std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
         auto timet = chrono::system_clock::to_time_t(now);
 #ifndef _TABLE_
@@ -300,10 +298,9 @@ void Optimizer() {
         // CopyOut optimal plan. TRACE memory, search space.
         PHYS_PROP *PhysProp = CONT::vc[0]->GetPhysProp();
         /* CopyOut the Optimal plan starting from the RootGID (the root group of
-        our Query )
+        our query )
         */
         Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);
-        // PTRACE("used memory after opt: %dK\n", GetUsedMemory() / 1000);
         PTRACE("---2--- memory statistics after optimization: " << DumpStatistics());
         if (TraceFinalSSP) {
           Ssp->FastDump();
@@ -317,7 +314,6 @@ void Optimizer() {
           CONT::vc.clear();
         }
         // if (RadioVal ==0 && q==NumQuery-1) fclose(fp);
-        // PTRACE("used memory before deleting the search space: %dM\n", GetUsedMemory() / 1000);
         // Go on with the usual procedure of deleting the search space before
         // reading in the next query of the batch query file if not in the
         // PiggyBack mode
@@ -326,10 +322,8 @@ void Optimizer() {
         PTRACE("---3--- memory statistics after freeing searching space: " << DumpStatistics());
 
         // OUTPUT Rule Set Statistics
-#ifdef _DEBUG
 #ifndef _TABLE_
-        if (!SingleLineBatch) OUTPUT("%s", RuleSet->DumpStats());
-#endif
+        if (!SingleLineBatch) OUTPUT(ruleSet->DumpStats());
 #endif
 
 #ifdef _TABLE_
@@ -337,7 +331,6 @@ void Optimizer() {
 #endif
 
       // Report memory, delete catalog
-      // PTRACE("used memory before deleting the catalog: %dM\n", GetUsedMemory() / 1000);
       delete Cat;
     }                     // for each query
     if (RadioVal) break;  // If single query case, execute only once
@@ -358,11 +351,10 @@ void Optimizer() {
 
   // Free optimization stat object, cost model, rule set, heuristic cost
   delete OptStat;
-  delete Cm;
-  delete RuleSet;
+  delete costModel;
+  delete ruleSet;
   delete HeuristicCost;
 
-  // PTRACE("used memory after delete manager: %dM\n", GetUsedMemory() / 1000);
 
   OutputFile.close();
   OutputCOVE.close();

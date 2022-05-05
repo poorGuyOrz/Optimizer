@@ -1,5 +1,3 @@
-// CostModel.H - cost model.  Information about the cost of many basic operations.
-
 #pragma once
 #include "../header/stdafx.h"
 

@@ -34,7 +34,7 @@ General definitions
 typedef unsigned long int ub4;    /* unsigned 4-byte quantities */
 typedef unsigned char ub1;        /* unsigned 1-byte quantities */
 
-typedef vector<CString> STRING_ARRAY;
+typedef vector<string> STRING_ARRAY;
 typedef vector<int> INT_ARRAY;
 
 typedef unsigned int BIT_VECTOR;  // Used to implement unique rule set.  Note this
@@ -116,10 +116,6 @@ typedef enum ORDER_INDEX {
 // e.g. sum(xxx) as .SUM, whose domain is unknown
 typedef enum DOM_TYPE { string_t, int_t, real_t, unknown } DOM_TYPE;
 
-typedef int CONT_ID;  // ID of a context
-
-typedef int GRP_ID;  // ID of a Group
-
 #define PTRACE(object)                                                                                       \
   {                                                                                                          \
     if (TraceOn && !ForGlobalEpsPruning) {                                                                   \
@@ -144,13 +140,11 @@ typedef int GRP_ID;  // ID of a Group
   }
 
 // trace without line and file info.  No newlines except in format input.
-#define WTRACE(format, object)                             \
-  {                                                        \
-    if (TraceOn) {                                         \
-      CString OutputString;                                \
-      OutputString.Format(format, object);                 \
-      if (FileTrace) OutputFile << (OutputString) << endl; \
-    }                                                      \
+#define WTRACE(format, object)                       \
+  {                                                  \
+    if (TraceOn) {                                   \
+      if (FileTrace) OutputFile << (object) << endl; \
+    }                                                \
   }
 
 // Output the object to window and OutputFile, even if tracing is off.
@@ -170,16 +164,15 @@ typedef int GRP_ID;  // ID of a Group
 
 /* ==========  Optimizer related ============  */
 
-class CWcolView;
-class QUERY;
-class PTASKS;
+class Query;
+class OptimizerTaskStack;
 class SSP;
 class CAT;
 class RULE;
 class OPT_STAT;
 class CLASS_STAT;
 class SET_TRACE;
-class RULE_SET;
+class RuleSet;
 class CostModel;
 class KEYS_SET;
 class M_EXPR;
@@ -188,12 +181,9 @@ extern OPT_STAT *OptStat;       // stat. info. of Optimizer
 extern CLASS_STAT ClassStat[];  // stat. info of all classes
 extern int CLASS_NUM;
 
-#ifdef _DEBUG
-// Rule Firing Statistics
 extern INT_ARRAY TopMatch;
 extern INT_ARRAY Bindings;
 extern INT_ARRAY Conditions;
-#endif
 
 extern STRING_ARRAY CollTable;    // collection name table
 extern STRING_ARRAY AttTable;     // attribute name table
@@ -227,13 +217,12 @@ extern int Memo_M_Exprs;  // How Many M_EXPRs in the MEMO Structure?
 
 extern double GLOBAL_EPS;  // global epsilon value
 
-extern CWcolView *OutputWindow;
-extern QUERY *Query;
-extern PTASKS PTasks;
+extern Query *query;
+extern OptimizerTaskStack PTasks;
 extern SSP *Ssp;
 extern CAT *Cat;
-extern RULE_SET *RuleSet;
-extern CostModel *Cm;
+extern RuleSet *ruleSet;
+extern CostModel *costModel;
 extern KEYS_SET IntOrdersSet;  // set of Interesting Orders
 
 extern bool NO_PHYS_IN_GROUP;

@@ -5,7 +5,7 @@
 
 class BINDERY;
 class RULE;
-class RULE_SET;
+class RuleSet;
 class GET_TO_FILE_SCAN;
 class SELECT_TO_FILTER;
 class P_TO_PP;
@@ -45,7 +45,6 @@ typedef enum RULELABELS {
   R_RM_TO_HASH_DUPLICATES,
   R_AL_TO_HGL,
   R_FO_TO_PFO,
-  //	R_OBY_TO_QSORT,
   R_AGG_THRU_EQJOIN,
   R_EQ_TO_BIT,
   R_SELECT_TO_INDEXED_FILTER,
@@ -56,15 +55,15 @@ typedef enum RULELABELS {
 
 extern int RuleVector[];  // initialize in Rules.cpp
 
-class RULE_SET {
+class RuleSet {
  private:
-  RULE **rule_set;
+  vector<RULE *> rule_set;
 
  public:
   int RuleCount;  // size of rule_set
 
-  RULE_SET(string filename);
-  ~RULE_SET();
+  RuleSet();
+  ~RuleSet();
 
   string Dump();
   string DumpStats();
@@ -74,10 +73,9 @@ class RULE_SET {
     if (RuleVector[n])
       return rule_set[n];
     else
-      return NULL;
+      return nullptr;
   }
-
-};  // RULE_SET
+};
 
 /*
     BINDERY
@@ -96,7 +94,7 @@ class RULE_SET {
 
    Suppose the multiexpression
                 [ G7 join G4 ] join G10,
-   where Gi is the group with GRP_ID i and [ X ] denotes the group containing X, is in
+   where Gi is the group with int i and [ X ] denotes the group containing X, is in
    the optimizer's search space.  Then there is a binding of the Original pattern to
    this multiexpression, given by binding L(1) to G7, L(2) to G4 and L(3) to G10. An
    object in the BINDERY class, called a bindery, will, over its lifetime, produce
@@ -120,7 +118,7 @@ class RULE_SET {
    pattern to only one multi-expression in a group.  A rule first creates an expression
    bindery.  This expression bindery then spawns one group bindery for each input group,
    as explained above. Group binderys bind to all expressions in a group.  See
-   APPLY_RULE::perform  for details .
+   ApplyRuleTask::perform  for details .
 
    Because Columbia and its predecessors apply rules only to logical expressions, binderys
    bind logical operators only.
@@ -147,13 +145,13 @@ class Node {
 
 class BINDERY {
  private:
-  EXPR *original;  // bind with this original pattern
+  Expression *original;  // bind with this original pattern
 
   M_EXPR *cur_expr;  // bind the original pattern to this multi-expression
 
   bool one_expr;  // Is this an expression bindery?
 
-  GRP_ID group_no;  // group no of the cur_expr
+  int group_no;  // group no of the cur_expr
 
   typedef enum BINDERY_STATE {
     start,          // This is a new MExpression
@@ -173,10 +171,10 @@ class BINDERY {
 
  public:
   // Create an Expression bindery
-  BINDERY(M_EXPR *expr, EXPR *original);
+  BINDERY(M_EXPR *expr, Expression *original);
 
   // Create a Group bindery
-  BINDERY(GRP_ID group_no, EXPR *original);
+  BINDERY(int group_no, Expression *original);
 
   ~BINDERY();
 
@@ -185,8 +183,8 @@ class BINDERY {
   // advance() returns true if a binding has been found.
   bool advance();
 
-  // If a valid binding has been found, then return the bound EXPR.
-  EXPR *extract_expr();
+  // If a valid binding has been found, then return the bound Expression.
+  Expression *extract_expr();
 
   // print the name of the current state
   string print_state();
@@ -206,8 +204,8 @@ class BINDERY {
 
   The original and substitute patterns describe how to produce new
       multi-expressions in the search space.  The production of these new
-      multi-expressions is done by APPLY_RULE::perform(), in two parts:
-  First a BINDERY object produces a binding of the original pattern to an EXPR
+      multi-expressions is done by ApplyRuleTask::perform(), in two parts:
+  First a BINDERY object produces a binding of the original pattern to an Expression
   in the search space.  Then next_substitute() produces the new expression,
   which is integrated into the search space by SSP::include().
 
@@ -218,12 +216,12 @@ class BINDERY {
       original pattern are logical, and for which all operators in the substitute
       pattern are logical except perhaps the root operator.
 
-  In O_EXPR::perform(), the optimizer decides which rules to push onto
+  In OptimizeExprTask::perform(), the optimizer decides which rules to push onto
   the PTASK stack.  It uses top_match() to check whether the root operator
   of the original pattern of a rule matches the root operator of the
       current multiexpression.
 
-  The method O_EXPR::perform() must decide the order in which rules
+  The method OptimizeExprTask::perform() must decide the order in which rules
   are pushed onto the PTASK stack.  For this purpose it uses promise().
   A promise value of 0 or less means do not schedule this rule here.
   Higher promise values mean schedule this rule earlier.
@@ -235,10 +233,10 @@ class BINDERY {
   promise() is used for both exploring and optimizing, though for
   exploration it is currently irrelevant.
 
-  When a rule is applied (in APPLY_RULE::perform), and after a binding
+  When a rule is applied (in ApplyRuleTask::perform), and after a binding
   is found, the method condition() is invoked to determine whether
   the rule actually applies.  condition() has available to it the entire
-  EXPR matched to the rule's original pattern.  For example, the rule which
+  Expression matched to the rule's original pattern.  For example, the rule which
   pushes a select below a join requires a condition about compatibitily
   of schemas.  This condition cannot be checked until after the binding,
   since schemas of input groups are only available from the binding.
@@ -266,11 +264,11 @@ class BINDERY {
 
 class RULE {
  private:
-  EXPR *original;    // original pattern to match
-  EXPR *substitute;  // replacement for original pattern
-                     //"substitute" is used ONLY to tell if the rule is logical or physical,
-                     // and, by check(), for consistency checks.  Its pattern is represented
-                     // in the method next_substitute()
+  Expression *original;    // original pattern to match
+  Expression *substitute;  // replacement for original pattern
+                           //"substitute" is used ONLY to tell if the rule is logical or physical,
+                           // and, by check(), for consistency checks.  Its pattern is represented
+                           // in the method next_substitute()
 
   int arity;  // number of leaf operators in original pattern.
   //  Leaf ops must be numbered 0, 1, 2,..
@@ -282,7 +280,7 @@ class RULE {
   int index;        // index in the rule set
 
  public:
-  RULE(string name, int arity, EXPR *original, EXPR *substitute)
+  RULE(string name, int arity, Expression *original, Expression *substitute)
       : name(name), arity(arity), mask(0), original(original), substitute(substitute){};
 
   virtual ~RULE() {
@@ -291,11 +289,11 @@ class RULE {
   };
 
   inline string GetName() { return (name); };
-  inline EXPR *GetOriginal() { return (original); };
-  inline EXPR *GetSubstitute() { return (substitute); };
+  inline Expression *GetOriginal() { return (original); };
+  inline Expression *GetSubstitute() { return (substitute); };
 
   bool top_match(OP *op_arg) {
-    assert(op_arg->is_logical());  // to make sure never O_EXPR a physcial mexpr
+    assert(op_arg->is_logical());  // to make sure never OptimizeExprTask a physcial mexpr
 
     // if original is a leaf, it represents a group, so it always matches
     if (original->GetOp()->is_leaf()) return true;
@@ -313,12 +311,11 @@ class RULE {
   // context for the search?  mexpr is the multi-expression bound to
   // before, probably mexpr is not needed.
   // Default value is TRUE, i.e., rule applies
-  virtual bool condition(EXPR *before, M_EXPR *mexpr, int ContextID) { return true; };
+  virtual bool condition(Expression *before, M_EXPR *mexpr, int ContextID) { return true; };
 
   // Given an expression which is a binding (before), this
   //  returns the next substitute form (after) of the rule.
-  //##ModelId=3B0C086A0015
-  virtual EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp) = 0;
+  virtual Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp) = 0;
 
   bool check();  // check that original & subst. patterns are legal
 
@@ -346,37 +343,26 @@ class RULE {
          GET TO FILE SCAN
          ============================================================
 */
-//##ModelId=3B0C086A00C0
 class GET_TO_FILE_SCAN : public RULE {
  public:
-  //##ModelId=3B0C086A00CB
   GET_TO_FILE_SCAN();
-  //##ModelId=3B0C086A00D4
   ~GET_TO_FILE_SCAN(){};
-  //##ModelId=3B0C086A00DE
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
-  //##ModelId=3B0C086A00E8
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   int promise(OP *op_arg, int ContextID) { return FILESCAN_PROMISE; };
-
-};  // GET_TO_FILE_SCAN
+};
 
 /*
    ============================================================
    EQJOIN to LOOPS Rule
    ============================================================
 */
-//##ModelId=3B0C086A0156
 class EQ_TO_LOOPS : public RULE {
  public:
-  //##ModelId=3B0C086A0161
   EQ_TO_LOOPS();
-  //##ModelId=3B0C086A016A
   ~EQ_TO_LOOPS(){};
-  //##ModelId=3B0C086A0174
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 #ifdef CONDPRUNE
-  //##ModelId=3B0C086A017E
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 #endif
 
 };  // EQ_TO_LOOPS
@@ -386,18 +372,13 @@ class EQ_TO_LOOPS : public RULE {
    EQJOIN to Merge Join Rule
    ============================================================
 */
-//##ModelId=3B0C086A0200
 class EQ_TO_MERGE : public RULE {
  public:
-  //##ModelId=3B0C086A0214
   EQ_TO_MERGE();
-  //##ModelId=3B0C086A0215
   int promise(OP *op_arg, int ContextID);
-  //##ModelId=3B0C086A0228
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 #ifdef CONDPRUNE
-  //##ModelId=3B0C086A0232
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 #endif
 };  // EQ_TO_MERGE
 
@@ -406,15 +387,11 @@ class EQ_TO_MERGE : public RULE {
 EQJOIN to Hash Join Rule
 ============================================================
 */
-//##ModelId=3B0C086A02A0
 class EQ_TO_HASH : public RULE {
  public:
-  //##ModelId=3B0C086A02B4
   EQ_TO_HASH();
-  //##ModelId=3B0C086A02B5
   int promise(OP *op_arg, int ContextID);
-  //##ModelId=3B0C086A02C8
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // EQ_TO_HASH
 
 /*
@@ -428,9 +405,9 @@ class EQ_TO_LOOPS_INDEX : public RULE {
   //##ModelId=3B0C086A0342
   EQ_TO_LOOPS_INDEX();
   //##ModelId=3B0C086A034B
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086A0355
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 };  // EQ_TO_LOOPS_INDEX
 
 /*
@@ -446,7 +423,7 @@ class EQJOIN_COMMUTE : public RULE {
   //##ModelId=3B0C086A03D7
   ~EQJOIN_COMMUTE(){};
   //##ModelId=3B0C086A03D8
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // EQJOIN_COMMUTE
 
 /*
@@ -462,9 +439,9 @@ class EQJOIN_LTOR : public RULE {
   //##ModelId=3B0C086B00A4
   ~EQJOIN_LTOR(){};
   //##ModelId=3B0C086B00AD
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086B00B7
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
   //##ModelId=3B0C086B00C3
   int promise(OP *op_arg, int ContextID) { return ASSOC_PROMISE; };
 
@@ -483,9 +460,9 @@ class EQJOIN_RTOL : public RULE {
   //##ModelId=3B0C086B0175
   ~EQJOIN_RTOL(){};
   //##ModelId=3B0C086B0176
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086B0181
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 };  // EQJOIN_RTOL
 
 /*
@@ -501,9 +478,9 @@ class EXCHANGE : public RULE {
   //##ModelId=3B0C086B0248
   ~EXCHANGE(){};
   //##ModelId=3B0C086B0249
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086B025C
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 
 };  // EXCHANGE
 
@@ -516,7 +493,7 @@ class P_TO_PP : public RULE {
   //##ModelId=3B0C086B02DE
   P_TO_PP();
   //##ModelId=3B0C086B02DF
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // P_TO_PP
 
 /*
@@ -528,7 +505,7 @@ class SELECT_TO_FILTER : public RULE {
   //##ModelId=3B0C086B0361
   SELECT_TO_FILTER();
   //##ModelId=3B0C086B036A
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // SELECT_TO_FILTER
 
 //##ModelId=3B0C086C002C
@@ -543,7 +520,7 @@ class SORT_RULE : public RULE {
   int promise(OP *op_arg, int ContextID);
 
   //##ModelId=3B0C086C004C
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // SORT_RULE
 
 //##ModelId=3B0C086C00D7
@@ -554,7 +531,7 @@ class RM_TO_HASH_DUPLICATES : public RULE {
   //##ModelId=3B0C086C00EC
   ~RM_TO_HASH_DUPLICATES(){};
   //##ModelId=3B0C086C00F5
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // RM_TO_HASH_DUPLICATES
 
 //##ModelId=3B0C086C0177
@@ -565,7 +542,7 @@ class AL_TO_HGL : public RULE {
   //##ModelId=3B0C086C0195
   ~AL_TO_HGL(){};
   //##ModelId=3B0C086C0196
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // AL_TO_HGL
 
 //##ModelId=3B0C086C0221
@@ -576,7 +553,7 @@ class FO_TO_PFO : public RULE {
   //##ModelId=3B0C086C023F
   ~FO_TO_PFO(){};
   //##ModelId=3B0C086C0240
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // FO_TO_PFO
 
 //##ModelId=3B0C086C02FD
@@ -587,9 +564,9 @@ class AGG_THRU_EQJOIN : public RULE {
   //##ModelId=3B0C086C0313
   ~AGG_THRU_EQJOIN(){};
   //##ModelId=3B0C086C031B
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086C0325
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 };  // AGG_THRU_EQJOIN
 
 //##ModelId=3B0C086C03E4
@@ -600,9 +577,9 @@ class EQ_TO_BIT : public RULE {
   //##ModelId=3B0C086D0011
   ~EQ_TO_BIT(){};
   //##ModelId=3B0C086D001A
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086D0024
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 };  // EQ_TO_BIT
 
 //##ModelId=3B0C086D00E2
@@ -613,9 +590,9 @@ class SELECT_TO_INDEXED_FILTER : public RULE {
   //##ModelId=3B0C086D00F7
   ~SELECT_TO_INDEXED_FILTER(){};
   //##ModelId=3B0C086D0100
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086D010A
-  bool condition(EXPR *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
 };  // SELECT_TO_INDEXED_FILTER
 
 //##ModelId=3B0C086D01AA
@@ -626,8 +603,8 @@ class PROJECT_THRU_SELECT : public RULE {
   //##ModelId=3B0C086D01B6
   ~PROJECT_THRU_SELECT(){};
   //##ModelId=3B0C086D01BE
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
-  // bool condition ( EXPR * before, M_EXPR *mexpr, int ContextID);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
+  // bool condition ( Expression * before, M_EXPR *mexpr, int ContextID);
 };  // PROJECT_THRU_SELECT
 /*
    ============================================================
@@ -643,6 +620,6 @@ class DUMMY_TO_PDUMMY : public RULE {
   //##ModelId=3B0C086D026B
   ~DUMMY_TO_PDUMMY(){};
   //##ModelId=3B0C086D0273
-  EXPR *next_substitute(EXPR *before, PHYS_PROP *ReqdProp);
+  Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 
 };  // DUMMY_TO_PDUMMY

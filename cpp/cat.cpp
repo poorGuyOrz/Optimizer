@@ -1,4 +1,3 @@
-// cat.cpp -  implementation of catalog parser        Implements classes in cat.h
 
 #include "../header/cat.h"
 
@@ -277,18 +276,18 @@ CAT::CAT(string filename) {
 
   // translate foreign key string to foreignkey
   for (int CollId = 1; CollId < CollProps.size(); CollId++) {
-    CollName = CollTable[CollId].str_;
+    CollName = CollTable[CollId];
     CollProp = CollProps[CollId];
     if (CollProp->ForeignKeyString.size() > 0) {
       for (int keyNum = 0; keyNum < CollProp->ForeignKeyString.size(); keyNum++) {
-        p = CollProp->ForeignKeyString[keyNum].str_.data();
+        p = CollProp->ForeignKeyString[keyNum].data();
         KEYS_SET *FKeys = new KEYS_SET;
         KEYS_SET *RKeys = new KEYS_SET;
         parseKeys(p, FKeys, CollName);
         p += strlen(p) + 1;
         GetKey(p, RKeys);
         CollProp->FKeyArray.push_back(new FOREIGN_KEY(FKeys, RKeys));
-        CollProp->ForeignKeyString[keyNum].ReleaseBuffer();
+        // CollProp->ForeignKeyString[keyNum].ReleaseBuffer();
       }
     }
   }
@@ -345,7 +344,6 @@ void CAT::AddColl(string CollName, COLL_PROP *CollProp) {
 // fill tables related to attributes
 // If Attribute or Collection are new, add them to AttProps, AttTable, AttNames, resp.
 // Add Attr to Attrs table, Attribute to Attnames
-//##ModelId=3B0C08780034
 void CAT::AddAttr(string CollName, string AttName, ATTR *Attr, DOM_TYPE domain) {
   // If Attribute is new, add it to AttProps.  Add AttProp to AttProps table.
   int AttId = GetAttId(CollName, AttName);

@@ -26,7 +26,7 @@ Module Statistics for wcol.exe
         Time   %         Time      %      Count  Function
 ---------------------------------------------------------
    65643.609  75.5    80269.360  92.3        1 SSP::optimize(void) (ssp.obj)
-   10052.410  11.6    13209.817  15.2    63206 SSP::CopyIn(class EXPR *,int &) (ssp.obj)
+   10052.410  11.6    13209.817  15.2    63206 SSP::CopyIn(class Expression *,int &) (ssp.obj)
     6275.742   7.2     6279.168   7.2      511 GROUP::`scalar deleting destructor'(unsigned int) (ssp.obj)
     2446.390   2.8     2465.634   2.8    27003 SSP::FindDup(class M_EXPR &) (ssp.obj)
     1051.866   1.2     1051.866   1.2   127494 GROUP::GetWinner(class PHYS_PROP *) (ssp.obj)

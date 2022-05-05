@@ -34,31 +34,23 @@ File scan
 =========
 Physical version of GET.  Retrieves all data from the specified file.
 */
-//##ModelId=3B0C086E013E
 class FILE_SCAN : public PHYS_OP {
  public:
-  //##ModelId=3B0C086E0149
   FILE_SCAN(int fileId);
-  //##ModelId=3B0C086E0153
   FILE_SCAN(FILE_SCAN &Op);
 
-  //##ModelId=3B0C086E015D
   inline OP *Clone() { return new FILE_SCAN(*this); };
 
-  //##ModelId=3B0C086E0166
   ~FILE_SCAN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].Delete();
   };
 
-  //##ModelId=3B0C086E0170
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
   // get the physical prop according to the order of the collection
-  //##ModelId=3B0C086E017A
   PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props = NULL);
 
-  //##ModelId=3B0C086E0184
   inline string GetName() { return ("FILE_SCAN"); };
   //##ModelId=3B0C086E018E
   inline int GetArity() { return (0); };
@@ -87,44 +79,31 @@ class FILE_SCAN : public PHYS_OP {
    ==========
    A physical version of EQJOIN.  Nested loops, not index nested loops.
 */
-//##ModelId=3B0C086E0210
 class LOOPS_JOIN : public PHYS_OP {
  public:
-  //##ModelId=3B0C086E0224
   int *lattrs;
-  //##ModelId=3B0C086E022E
   int *rattrs;
-  //##ModelId=3B0C086E0238
   int size;
 
  public:
-  //##ModelId=3B0C086E0242
   LOOPS_JOIN(int *lattrs, int *rattrs, int size);
-  //##ModelId=3B0C086E0256
   LOOPS_JOIN(LOOPS_JOIN &Op);
 
-  //##ModelId=3B0C086E0260
   inline OP *Clone() { return new LOOPS_JOIN(*this); };
 
-  //##ModelId=3B0C086E026A
   ~LOOPS_JOIN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
 
-  //##ModelId=3B0C086E026B
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
-  //##ModelId=3B0C086E0276
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
-  //##ModelId=3B0C086E0288
   inline int GetArity() { return (2); };
-  //##ModelId=3B0C086E0292
   inline string GetName() { return ("LOOPS_JOIN"); };
 
-  //##ModelId=3B0C086E029C
   string Dump();
 
 };  // LOOPS_JOIN

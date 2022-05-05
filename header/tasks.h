@@ -1,25 +1,17 @@
-/* $Id$
-TASKS.H - OPTIMIZATION USING TASKS
-
-  Columbia Optimizer Framework
-
-        A Joint Research Project of Portland State University
-        and the Oregon Graduate Institute
-        Directed by Leonard Shapiro and David Maier
-        Supported by NSF Grants IRI-9610013 and IRI-9619977
-*/
 #pragma once
 // #include "../header/ssp.h"
 // #include "rules.h"
+#include <stack>
+
 #include "../header/ssp.h"
 #include "rules.h"
-class TASKS;       // Abstract class for all task classes
-class PTASKS;      // Pending tasks - some structure which contains all tasks waiting to execute
-class O_GROUP;     // Optimize a GROUP - find the cheapest plan in the group satisfying a context
-class O_EXPR;      // Optimize an EXPR - Fire all relevant rules for this expression
-class E_GROUP;     // Explore a group - Fire all transformation rules in this group.
-class O_INPUTS;    // Optimize inputs - determine if this expression satisfies the current context
-class APPLY_RULE;  // Apply a single rule to a single M_EXPR
+class OptimizerTask;       // Abstract class for all task classes
+class OptimizerTaskStack;  // Pending tasks - some structure which contains all tasks waiting to execute
+class OptimizeGroupTask;   // Optimize a GROUP - find the cheapest plan in the group satisfying a context
+class OptimizeExprTask;    // Optimize an Expression - Fire all relevant rules for this expression
+class ExploreGroupTask;    // Explore a group - Fire all transformation rules in this group.
+class O_INPUTS;            // Optimize inputs - determine if this expression satisfies the current context
+class ApplyRuleTask;       // Apply a single rule to a single M_EXPR
 
 /* ============================================================ */
 
@@ -47,7 +39,7 @@ typedef struct AFTERS {
 
 /*
         ============================================================
-        TASKS
+        OptimizerTask
         ============================================================
         A task is an activity within the search process.  The original task
         is to optimize the entire query.  Tasks create and schedule each
@@ -57,34 +49,29 @@ typedef struct AFTERS {
         actually produce a best plan.  After the optimization terminates,
         SSP::CopyOut() is called to print the best plan.
 
-        TASK is an abstract class.  Its subclasses are specific tasks.
+        OptimizerTask is an abstract class.  Its subclasses are specific tasks.
 
 
         Tasks must destroy themselves when done!
 */
 
-class TASK {
-  friend class PTASKS;
-
- private:
-  TASK *next;  // Used by class PTASK
-
+class OptimizerTask {
  protected:
   int ContextID;     // Index to CONT::vc, the shared set of contexts
   int ParentTaskNo;  // The task which created me
 
  public:
-  TASK(int ContextID, int ParentTaskNo);
-  ~TASK(){};
+  OptimizerTask(int ContextID, int ParentTaskNo);
+  ~OptimizerTask(){};
 
   virtual string Dump() = 0;
 
   virtual void perform() = 0;  // TaskNo is current task number, which will
-};                             // TASK
+};                             // OptimizerTask
 
 /*
   ============================================================
-  PTASKS - Pending Tasks
+  OptimizerTaskStack - Pending Tasks
   ============================================================
   This collection of undone tasks is currently stored as a stack.
   Other structures are certainly appropriate, but in any case dependencies
@@ -92,24 +79,42 @@ class TASK {
   parallelize optimization.
 */
 
-class PTASKS {
+class OptimizerTaskStack {
  private:
-  TASK *first;  // anchor of PTASKS stack
+  vector<OptimizerTask *> task_stack_;
 
  public:
-  PTASKS();
-  ~PTASKS();
+  ~OptimizerTaskStack() {
+    while (!empty()) delete pop();
+  };
 
-  bool empty();
-  void push(TASK *task);
-  TASK *pop();
+  bool empty() { return task_stack_.empty(); };
+  void push(OptimizerTask *task) {
+    task_stack_.push_back(task);
+    if (COVETrace) OutputCOVE << "PushTaskList {" << task->Dump() << "}" << endl;
+  };
+  OptimizerTask *pop() {
+    auto task = task_stack_.back();
+    task_stack_.pop_back();
+    if (COVETrace) OutputCOVE << "PopTaskList {" << task->Dump() << "}" << endl;
+    return task;
+  };
 
-  string Dump();
-};  // PTASKS
+  string Dump() {
+    string os;
+    if (empty())
+      os = "Task Stack is empty!!";
+    else {
+      int count = 0;
+      for (auto &&task : task_stack_) os += "    task: " + to_string(count++) + "   " + task->Dump() + "\n";
+    }
+    return os;
+  };
+};
 
 /*
      ============================================================
-     O_GROUP - Task to Optimize a Group
+     OptimizeGroupTask - Task to Optimize a Group
      ============================================================
      This task finds the cheapest multiplan in this group, for a given
      context, and stores it (with the context) in the group's winner's circle.
@@ -139,15 +144,15 @@ class PTASKS {
 
 */
 
-class O_GROUP : public TASK {
+class OptimizeGroupTask : public OptimizerTask {
  private:
   int GrpID;       // Which group to optimize
   bool Last;       // if this task is the last task for this group
   Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
                    // else it is zero
  public:
-  O_GROUP(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr);
-  ~O_GROUP() {
+  OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr);
+  ~OptimizeGroupTask() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].Delete();
     if (EpsBound) delete EpsBound;
   };
@@ -158,16 +163,16 @@ class O_GROUP : public TASK {
 
   string Dump();
 
-};  // O_GROUP
+};  // OptimizeGroupTask
 
 /*
 
      ============================================================
-     E_GROUP - Task to Explore the Group
+     ExploreGroupTask - Task to Explore the Group
      ============================================================
      Some rules require that their inputs contain particular (target) operators.  For
      example, the associativity rule requires that one input contain a join.  The
-     E_GROUP task explores a group by creating all target operators that could
+     ExploreGroupTask task explores a group by creating all target operators that could
      belong to the group, e.g., fire whatever rules are necessary to create all
      joins that could belong to the group.
 
@@ -177,71 +182,57 @@ class O_GROUP : public TASK {
      More sophisticated implementations would fire only those rules which might
      generate the target operator.  But it is hard to tell what those rules
      are (note that it may require a sequence of rules to get to the target).
-     Furthermore, on a second E_GROUP task for a second target it may be
+     Furthermore, on a second ExploreGroupTask task for a second target it may be
      difficult to use the results of the first visit intelligently.
 
      Because we are using the simple implementation, we do not need an E_EXPR task.
-     Instead we will use the O_GROUP task but ensure that it fires only transformation rules.
+     Instead we will use the OptimizeGroupTask task but ensure that it fires only transformation rules.
 
      If we are lucky, groups will never need to be explored: physical rules are fired first,
      and the firing of a physical rule will cause all inputs to be optimized, therefore explored.
      This may not work if we are using pruning: we might skip physical rule firings because of
-     pruning, then need to explore.  For now we will put a flag in E_GROUP to catch when it does not work.
+     pruning, then need to explore.  For now we will put a flag in ExploreGroupTask to catch when it does not work.
  */
-//##ModelId=3B0C085D02A2
-class E_GROUP : public TASK {
+class ExploreGroupTask : public OptimizerTask {
  private:
-  //##ModelId=3B0C085D02B7
-  int GrpID;  // Group to be explored
-  //##ModelId=3B0C085D02C0
-  bool Last;  // is it the last task in this group
-  //##ModelId=3B0C085D02DF
+  int GrpID;       // Group to be explored
+  bool Last;       // is it the last task in this group
   Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
                    // else it is zero
  public:
-  //##ModelId=3B0C085D02E8
-  E_GROUP(int GrpID, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
-  //##ModelId=3B0C085D0306
-  ~E_GROUP() {
+  ExploreGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
+  ~ExploreGroupTask() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_E_GROUP].Delete();
     if (EpsBound) delete EpsBound;
   };
 
-  //##ModelId=3B0C085D0307
   void perform();
 
-  //##ModelId=3B0C085D0310
   string Dump();
-};  // E_GROUP
+};
 
 /*
    ============================================================
-   O_EXPR - Task to Optimize a multi-expression
+   OptimizeExprTask - Task to Optimize a multi-expression
    ============================================================
-   This task is needed only if we implement O_GROUP in the original way.
+   This task is needed only if we implement OptimizeGroupTask in the original way.
    This task fires all rules for the expression, in order of promise.
    when it is used for exploring, fire only transformation rules to prepare for a transform
 */
 
-//##ModelId=3B0C085D03A6
-class O_EXPR : public TASK {
+class OptimizeExprTask : public OptimizerTask {
  private:
-  //##ModelId=3B0C085D03BB
-  M_EXPR *MExpr;  // Which expression to optimize
-  //##ModelId=3B0C085D03CE
-  const bool explore;  // if this task is for exploring  Should not happen - see E_GROUP
-  //##ModelId=3B0C085D03D8
-  bool Last;  // if this task is the last task for the group
-  //##ModelId=3B0C085E000E
-  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound of this task
-                   // else it is zero
+  M_EXPR *MExpr;       // Which expression to optimize
+  const bool explore;  // if this task is for exploring  Should not happen - see ExploreGroupTask
+  bool Last;           // if this task is the last task for the group
+  Cost *EpsBound;      // if global eps pruning is on, this is the eps bound of this task
+                       // else it is zero
 
  public:
-  //##ModelId=3B0C085E0018
-  O_EXPR(M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
+  OptimizeExprTask(M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false,
+                   Cost *epsbound = nullptr);
 
-  //##ModelId=3B0C085E0036
-  ~O_EXPR() {
+  ~OptimizeExprTask() {
     if (Last) {
       GROUP *Group = Ssp->GetGroup(MExpr->GetGrpID());
       if (!explore) {
@@ -267,13 +258,11 @@ class O_EXPR : public TASK {
     if (EpsBound) delete EpsBound;
   };
 
-  //##ModelId=3B0C085E0040
   string Dump();
 
-  //##ModelId=3B0C085E0041
   void perform();
 
-};  // O_EXPR
+};  // OptimizeExprTask
 
 /*
 
@@ -294,7 +283,7 @@ class O_EXPR : public TASK {
      costed, it calculates the cost of the entire physical expression.
  */
 
-class O_INPUTS : public TASK {
+class O_INPUTS : public OptimizerTask {
  private:
   M_EXPR *MExpr;  // expression whose inputs we are optimizing
   int arity;
@@ -326,36 +315,26 @@ class O_INPUTS : public TASK {
 
 /*
    ============================================================
-   APPLY_RULE - Task to Apply a Rule to a Multi-Expression
+   ApplyRuleTask - Task to Apply a Rule to a Multi-Expression
    ============================================================
 */
 
-//##ModelId=3B0C085F0092
-class APPLY_RULE : public TASK {
+class ApplyRuleTask : public OptimizerTask {
  private:
-  //##ModelId=3B0C085F00A7
-  RULE *Rule;  // rule to apply
-  //##ModelId=3B0C085F00BB
-  M_EXPR *MExpr;  // root of expr. before rule
-  //##ModelId=3B0C085F00CE
+  RULE *Rule;          // rule to apply
+  M_EXPR *MExpr;       // root of expr. before rule
   const bool explore;  // if this task is for exploring
-  //##ModelId=3B0C085F00E2
-  bool Last;  // if this task is the last task for the group
-  //##ModelId=3B0C085F00F7
-  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
-                   // else it is zero
+  bool Last;           // if this task is the last task for the group
+  Cost *EpsBound;      // if global eps pruning is on, this is the eps bound for eps pruning
+                       // else it is zero
  public:
-  //##ModelId=3B0C085F0100
-  APPLY_RULE(RULE *rule, M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false,
-             Cost *epsbound = nullptr);
+  ApplyRuleTask(RULE *rule, M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false,
+                Cost *epsbound = nullptr);
 
-  //##ModelId=3B0C085F0132
-  ~APPLY_RULE();
+  ~ApplyRuleTask();
 
-  //##ModelId=3B0C085F0133
   void perform();
 
-  //##ModelId=3B0C085F013C
   string Dump();
 
-};  // APPLY_RULE
+};  // ApplyRuleTask

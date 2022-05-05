@@ -1,17 +1,4 @@
-/*
-supp.cpp -  implementation of supplement classes
-        $Revision: 4 $
-  Implements classes in supp.h
-
-        Columbia Optimizer Framework
-
-        A Joint Research Project of Portland State University
-           and the Oregon Graduate Institute
-        Directed by Leonard Shapiro and David Maier
-        Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-
-*/
+// supp.cpp -  implementation of supplement classes
 
 #include "../header/cat.h"
 #include "../header/defs.h"
@@ -224,7 +211,6 @@ int *KEYS_SET::CopyOut() {
 }
 
 // return the int array of size one from the keys_set
-//##ModelId=3B0C085F03D1
 int *KEYS_SET::CopyOutOne(int i) {
   int *result = new int[1];
   result[0] = KeyArray[i];
@@ -233,7 +219,6 @@ int *KEYS_SET::CopyOutOne(int i) {
 }
 
 // Transform each key from A.B to NewName.B (actually the IDs)
-//##ModelId=3B0C085F03BD
 void KEYS_SET::update(string NewName) {
   int Size = KeyArray.size();
   for (int i = 0; i < Size; i++) KeyArray[i] = GetAttId(NewName, TruncName(GetAttName(KeyArray[i])));
@@ -243,7 +228,6 @@ void KEYS_SET::update(string NewName) {
 // returns A.X temp.Format("%s");
 
 // Returns the CuCard of the attribute
-//##ModelId=3B0C0860004E
 float KEYS_SET::GetAttrCuCard(int index) {
   ATTR *attr;
   attr = Cat->GetAttr(KeyArray[index]);
@@ -251,7 +235,6 @@ float KEYS_SET::GetAttrCuCard(int index) {
 }
 
 // choose the attribute with Max CuCard
-//##ModelId=3B0C0860004D
 int KEYS_SET::ChMaxCuCard() {
   string cname1, cname2;
   float cucard1, cucard2;
@@ -628,7 +611,7 @@ int GetCollId(string CollName) {
   int Size = CollTable.size();
   int i = 0;
   for (i = 0; i < Size; i++)
-    if (CollName == CollTable[i].str_) break;
+    if (CollName == CollTable[i]) break;
 
   if (i == Size) CollTable.push_back(CollName);
 
@@ -643,7 +626,7 @@ int GetAttId(string CollName, string AttName) {
   int Size = AttTable.size();
   int i = 0;
   for (i = 0; i < Size; i++) {
-    if (Name == AttTable[i].str_) break;
+    if (Name == AttTable[i]) break;
   }
 
   if (i == Size)  // the entry not exist, new it
@@ -662,7 +645,7 @@ int GetAttId(string Name) {
   int Size = AttTable.size();
   int i = 0;
   for (int i = 0; i < Size; i++)
-    if (Name == AttTable[i].str_) break;
+    if (Name == AttTable[i]) break;
 
   if (i == Size)  // the entry not exist, new it
   {
@@ -680,7 +663,7 @@ int GetIndId(string CollName, string IndName) {
   int i = 0;
   int Size = IndTable.size();
   for (int i = 0; i < Size; i++)
-    if (Name == IndTable[i].str_) break;
+    if (Name == IndTable[i]) break;
 
   if (i == Size)  // the entry not exist, new it
     IndTable.push_back(Name);
@@ -694,7 +677,7 @@ int GetBitIndId(string CollName, string BitIndName) {
   int Size = BitIndTable.size();
   int i = 0;
   for (int i = 0; i < Size; i++)
-    if (Name == BitIndTable[i].str_) break;
+    if (Name == BitIndTable[i]) break;
 
   if (i == Size)  // the entry not exist, new it
     BitIndTable.push_back(Name);
@@ -706,13 +689,13 @@ int GetBitIndId(string CollName, string BitIndName) {
 string GetCollName(int CollId) {
   if (CollId == 0) return "";
   assert(CollId < CollTable.size());
-  return CollTable[CollId].str_;
+  return CollTable[CollId];
 }
 
 string GetAttName(int AttId) {
   if (AttId == 0) return "";
   assert(AttId < AttTable.size());
-  return AttTable[AttId].str_;
+  return AttTable[AttId];
 }
 
 // Transform A.B to B
@@ -726,13 +709,13 @@ string TruncName(string AttName) {
 string GetIndName(int IndId) {
   if (IndId == 0) return "";
   assert(IndId < IndTable.size());
-  return IndTable[IndId].str_;
+  return IndTable[IndId];
 }
 
 string GetBitIndName(int BitIndId) {
   if (BitIndId == 0) return "";
   assert(BitIndId < BitIndTable.size());
-  return BitIndTable[BitIndId].str_;
+  return BitIndTable[BitIndId];
 }
 
 DOM_TYPE atoDomain(char *p) {
@@ -942,7 +925,6 @@ vector<CONT *> CONT::vc;
 
 //=============  Cost Methods  ===================
 
-//##ModelId=3B0C086400B7
 void Cost::FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size) {
   *this = *LocalCost;
 
@@ -955,15 +937,6 @@ void Cost::FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size) {
 
 string Cost::Dump() { return to_string(Value); }
 
-string OPT_STAT::Dump() {
-  string os;
-  os += "Duplicate MExpr: " + to_string(DupMExpr) + "\n";
-  os += "Hashed Logical MExpr: " + to_string(HashedMExpr) + "\n";
-  os += "Max Overflow Buckets: " + to_string(MaxBucket) + "\n";
-  os += "FiredRules: " + to_string(FiredRule) + "\n";
-
-  return os;
-}
 
 string DumpStatistics() {
   string os;
@@ -975,12 +948,3 @@ string DumpStatistics() {
   return os;
 }
 
-// get used physical memory
-int GetUsedMemory() {
-  // MEMORYSTATUS ms;
-  // ms.dwLength = sizeof(MEMORYSTATUS);
-  // GlobalMemoryStatus(&ms);
-
-  // return (ms.dwTotalVirtual - ms.dwAvailVirtual);
-  return 0;
-}

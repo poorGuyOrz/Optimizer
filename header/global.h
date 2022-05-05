@@ -1,14 +1,3 @@
-/*
-global.h - global objects
-$Revision: 10 $
-Columbia Optimizer Framework
-
-  A Joint Research Project of Portland State University
-  and the Oregon Graduate Institute
-  Directed by Leonard Shapiro and David Maier
-  Supported by NSF Grants IRI-9610013 and IRI-9619977
-*/
-
 #include "../header/logop.h"
 #include "../header/physop.h"
 #include "../header/tasks.h"
@@ -22,16 +11,15 @@ STRING_ARRAY IndTable;     // IndId to CollId
 INT_ARRAY AttCollTable;    // AttId to CollId
 STRING_ARRAY BitIndTable;  //	BitIndex name table
 
-CString SQueryFile = "query";   // query file name
-CString BQueryFile = "bquery";  // query file for batch queries
-CString CatFile = "catalog";    // catalog file name
-CString CMFile = "cm";          // cost model file name
-CString RSFile = "ruleset";     // rule set file name
-CString AppDir;                 // directory of the application
+string SQueryFile = "query";   // query file name
+string BQueryFile = "bquery";  // query file for batch queries
+string CatFile = "catalog";    // catalog file name
+string CMFile = "cm";          // cost model file name
+string AppDir;                 // directory of the application
 
 bool FileTrace = true;       // trace to file flag
 bool PiggyBack = false;      // Retain the MEMO structure for use in the subsequent optimization
-bool COVETrace = false;      // trace to file flag
+bool COVETrace = true;       // trace to file flag
 bool WindowTrace = false;    // trace to window flag
 bool TraceFinalSSP = false;  // global trace flag
 bool TraceOPEN = false;      // global trace flag
@@ -66,7 +54,7 @@ CLASS_STAT ClassStat[] =  // class statistics object
     {
         CLASS_STAT("AGG_LIST", sizeof(AGG_LIST)),
         CLASS_STAT("AGG_OP", sizeof(AGG_OP)),
-        CLASS_STAT("APPLY_RULE", sizeof(APPLY_RULE)),
+        CLASS_STAT("ApplyRuleTask", sizeof(ApplyRuleTask)),
         CLASS_STAT("ATTR", sizeof(class ATTR)),
         CLASS_STAT("ATTR_EXP", sizeof(class ATTR_EXP)),
         CLASS_STAT("ATTR_OP", sizeof(class ATTR_OP)),
@@ -78,9 +66,9 @@ CLASS_STAT ClassStat[] =  // class statistics object
         CLASS_STAT("CONST_STR_OP", sizeof(class CONST_STR_OP)),
         CLASS_STAT("CONT", sizeof(class CONT)),
         CLASS_STAT("Cost", sizeof(class Cost)),
-        CLASS_STAT("E_GROUP", sizeof(class E_GROUP)),
+        CLASS_STAT("ExploreGroupTask", sizeof(class ExploreGroupTask)),
         CLASS_STAT("EQJOIN", sizeof(class EQJOIN)),
-        CLASS_STAT("EXPR", sizeof(class EXPR)),
+        CLASS_STAT("Expression", sizeof(class Expression)),
         CLASS_STAT("FILE_SCAN", sizeof(class FILE_SCAN)),
         CLASS_STAT("FILTER", sizeof(class FILTER)),
         CLASS_STAT("FUNC_OP", sizeof(class FUNC_OP)),
@@ -99,8 +87,8 @@ CLASS_STAT ClassStat[] =  // class statistics object
         CLASS_STAT("M_WINNER", sizeof(class M_WINNER)),
         CLASS_STAT("MERGE_JOIN", sizeof(class MERGE_JOIN)),
         CLASS_STAT("HASH_JOIN", sizeof(class HASH_JOIN)),
-        CLASS_STAT("O_EXPR", sizeof(class O_EXPR)),
-        CLASS_STAT("O_GROUP", sizeof(class O_GROUP)),
+        CLASS_STAT("OptimizeExprTask", sizeof(class OptimizeExprTask)),
+        CLASS_STAT("OptimizeGroupTask", sizeof(class OptimizeGroupTask)),
         CLASS_STAT("O_INPUTS", sizeof(class O_INPUTS)),
         CLASS_STAT("P_FUNC_OP", sizeof(class P_FUNC_OP)),
         CLASS_STAT("P_PROJECT", sizeof(class P_PROJECT)),
@@ -115,16 +103,16 @@ CLASS_STAT ClassStat[] =  // class statistics object
 
 int CLASS_NUM = slotsof(ClassStat);  // sizeof of ClassStat
 
-RULE_SET *RuleSet;      // Rule set
+RuleSet *ruleSet;       // Rule set
 CAT *Cat;               // read catalog in
-QUERY *Query;           // read query in
-CostModel *Cm;          // read cost model in
+Query *query;           // read query in
+CostModel *costModel;   // read cost model in
 SSP *Ssp;               // Create Search space
 KEYS_SET IntOrdersSet;  // set of interesting orders
 
-ofstream OutputFile;  // result file
-ofstream OutputCOVE;  // script file
-PTASKS PTasks;        // pending task
+ofstream OutputFile;        // result file
+ofstream OutputCOVE;        // script file
+OptimizerTaskStack PTasks;  // pending task
 
 // **************  include physcial mexpr in group or not *****************
 bool NO_PHYS_IN_GROUP = false;

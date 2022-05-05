@@ -82,7 +82,15 @@ class OPT_STAT {
 
   OPT_STAT() : TotalMExpr(0), DupMExpr(0), FiredRule(0), HashedMExpr(0), MaxBucket(0){};
 
-  string Dump();
+  string Dump() {
+    string os;
+    os += "Duplicate MExpr: " + to_string(DupMExpr) + "\n";
+    os += "Hashed Logical MExpr: " + to_string(HashedMExpr) + "\n";
+    os += "Max Overflow Buckets: " + to_string(MaxBucket) + "\n";
+    os += "FiredRules: " + to_string(FiredRule) + "\n";
+
+    return os;
+  };
 
 };  // class OPT_STAT
 
@@ -566,7 +574,6 @@ class LOG_COLL_PROP : public LOG_PROP {
   //##ModelId=3B0C086202E6
   string DumpCOVE();
 
-
 };  // class LOG_COLL_PROP
 
 /*
@@ -693,24 +700,19 @@ Cost value of -1 = infinite cost.  Any other negative cost
    is considered an error.
 */
 
-//##ModelId=3B0C08640085
 class Cost {
  private:
-  //##ModelId=3B0C08640099
   double Value;  // Later this may be a base class specialized
                  // to various costs: CPU, IO, etc.
  public:
-  //##ModelId=3B0C086400A3
   Cost(double Number) : Value(Number) {
     assert(Number == -1 || Number >= 0);
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].New();
   };
-  //##ModelId=3B0C086400AD
   Cost(Cost &other) : Value(other.Value) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].New();
   };
 
-  //##ModelId=3B0C086400AF
   ~Cost() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].Delete();
   };
@@ -718,10 +720,8 @@ class Cost {
   // FinalCost() makes "this" equal to the total of local and input costs.
   //  It is an error if any input is null.
   //  In a parallel environment, this may involve max.
-  //##ModelId=3B0C086400B7
   void FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size);
 
-  //##ModelId=3B0C086400C3
   inline Cost &operator+=(const Cost &other) {
     if (Value == -1 || other.Value == -1)  // -1 means Infinite
       Value = -1;
@@ -731,7 +731,6 @@ class Cost {
     return (*this);
   }
 
-  //##ModelId=3B0C086400CC
   inline Cost &operator*=(double EPS) {
     assert(EPS > 0);
 
@@ -743,7 +742,6 @@ class Cost {
     return (*this);
   }
 
-  //##ModelId=3B0C086400D6
   inline Cost &operator/=(int arity) {
     assert(arity > 0);
 
@@ -755,7 +753,6 @@ class Cost {
     return (*this);
   }
 
-  //##ModelId=3B0C086400E0
   inline Cost &operator-=(const Cost &other) {
     if (Value == -1 || other.Value == -1)  // -1 means Infinite
       Value = -1;
@@ -765,13 +762,11 @@ class Cost {
     return (*this);
   }
 
-  //##ModelId=3B0C086400EA
   inline Cost &operator=(const Cost &other) {
     this->Value = other.Value;
     return (*this);
   }
 
-  //##ModelId=3B0C086400F4
   inline bool operator>=(const Cost &other) {
     if (Value == -1) return (true);
 
@@ -781,7 +776,6 @@ class Cost {
     return (this->Value >= other.Value);
   }
 
-  //##ModelId=3B0C086400FE
   inline Cost &operator*(double EPS) {
     assert(EPS >= 0);
 
@@ -793,7 +787,6 @@ class Cost {
     return (*temp);
   }
 
-  //##ModelId=3B0C08640107
   inline Cost &operator/(int arity) {
     assert(arity > 0);
 
@@ -806,7 +799,6 @@ class Cost {
     return (*temp);
   }
 
-  //##ModelId=3B0C08640111
   inline bool operator>(const Cost &other) {
     if (Value == -1) return (true);
 
@@ -816,7 +808,6 @@ class Cost {
     return (this->Value > other.Value);
   }
 
-  //##ModelId=3B0C0864011B
   inline bool operator<(const Cost &other) {
     if (Value == -1) return (false);
 
@@ -826,9 +817,7 @@ class Cost {
     return (this->Value < other.Value);
   }
 
-  //##ModelId=3B0C08640125
   string Dump();
-
 
 };  // class Cost
 
@@ -936,9 +925,6 @@ int GetBitIndId(string CollName, string IndName);
 
 // dump the memory usage Statistics
 string DumpStatistics();
-
-// get used physical memory
-int GetUsedMemory();
 
 // convert string to Domain type
 DOM_TYPE atoDomain(char *p);

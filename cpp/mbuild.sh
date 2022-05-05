@@ -1,1 +1,1 @@
-g++ -g  supp.cpp cat.cpp group.cpp item.cpp logop.cpp  physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp mainOptimizer.cpp -std=c++17
+g++ -g  supp.cpp cat.cpp group.cpp item.cpp logop.cpp  physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp mainOptimizer.cpp -std=c++20

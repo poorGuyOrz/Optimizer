@@ -268,35 +268,27 @@ typedef enum COMP_OP_CODE {
 } COMP_OP_CODE;
 
 // Comparison Operators
-//##ModelId=3B0C08760294
 class COMP_OP : public BOOLE_OP {
  private:
-  //##ModelId=3B0C087602A9
   COMP_OP_CODE op_code;
 
  public:
-  //##ModelId=3B0C087602BC
   COMP_OP(COMP_OP_CODE op_code) : op_code(op_code) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].New();
   };
 
-  //##ModelId=3B0C087602C6
   COMP_OP(COMP_OP &Op) : op_code(Op.op_code) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].New();
   };
 
-  //##ModelId=3B0C087602D0
   OP *Clone() { return new COMP_OP(*this); };
 
-  //##ModelId=3B0C087602D1
   ~COMP_OP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].Delete();
   };
 
-  //##ModelId=3B0C087602D2
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C087602DB
   inline int GetArity() {
     if (op_code == OP_NOT)
       return (1);
@@ -304,10 +296,8 @@ class COMP_OP : public BOOLE_OP {
       return (2);
   };
 
-  //##ModelId=3B0C087602E4
   inline string GetName() { return ("COMP_OP"); };
 
-  //##ModelId=3B0C087602EE
   string Dump() {
     string os;
     switch (op_code) {

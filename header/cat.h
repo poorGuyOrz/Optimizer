@@ -1,16 +1,10 @@
-// CAT.H - Catalog.  Info about stored data.
-
 #pragma once
 
 #include "../header/stdafx.h"
 
 class CAT;
 
-/*
-============================================================
-CATALOG - class CAT
-============================================================
-*/
+// CATALOG - class CAT
 
 class CAT {
  private:                              // Each array maps an integer into the elements of the array at that integer
@@ -26,7 +20,7 @@ class CAT {
 
  public:
   CAT(string filename);  // read information into catalog from some default file
-  ~CAT();                 // free the memory of the catalog structure
+  ~CAT();                // free the memory of the catalog structure
 
   // Each of the following functions retrieves data from one of the private arrays above.
   // If the index input is not within range it returns NULL.

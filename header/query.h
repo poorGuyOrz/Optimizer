@@ -1,40 +1,20 @@
-/* query.h - Definition of query parser
-$Revision: 3 $
-Columbia Optimizer Framework
 
-  A Joint Research Project of Portland State University
-  and the Oregon Graduate Institute
-  Directed by Leonard Shapiro and David Maier
-  Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-
-*/
-
-#ifndef QUERY_H
-#define QUERY_H
-
+#pragma once
 #include "../header/item.h"
 #include "../header/logop.h"
 
-class EXPR;
-class QUERY;
+class Expression;
+class Query;
 
-/*
-============================================================
-QUERY Parser - class QUERY
-============================================================
-*/
-
-class QUERY {
+class Query {
  public:
-  // free up memory
-  ~QUERY();
+  ~Query();
 
-  // get the EXPR from the query tree representation text file
-  QUERY(string filename);
+  // get the Expression from the query tree representation text file
+  Query(string filename);
 
-  // return the EXPR pointer
-  EXPR *GetEXPR();
+  // return the Expression pointer
+  Expression *GetEXPR();
 
   string Dump();
 
@@ -42,11 +22,11 @@ class QUERY {
   string Dump_IntOrders();
 
  private:
-  EXPR *QueryExpr;  // point to the query read in
-  string ExprBuf;   // store the original query string
+  Expression *QueryExpr;  // point to the query read in
+  string ExprBuf;         // store the original query string
 
   // get an expression
-  EXPR *ParseExpr(char *&ExprStr);
+  Expression *ParseExpr(char *&ExprStr);
 
   // get one element of the expression
   char *GetOneElement(char *&Expr);
@@ -80,25 +60,27 @@ class QUERY {
 
 /*
 ============================================================
-EXPRESSIONS - class EXPR
+EXPRESSIONS - class Expression
 ============================================================
 */
 
-class EXPR  // An EXPR corresponds to a detailed solution to
+class Expression  // An Expression corresponds to a detailed solution to
 // the original query or a subquery.
-// An EXPR is modeled as an operator with arguments (class OP),
-// plus input expressions (class EXPR).
+// An Expression is modeled as an operator with arguments (class OP),
+// plus input expressions (class Expression).
 
 // EXPRs are used to calculate the initial query and the final plan,
 // and are also used in rules.
 
 {
  private:
-  OP *Op;         // Operator
-  int arity;      // Number of input expressions.
-  EXPR **Inputs;  // Input expressions
+  OP *Op;               // Operator
+  int arity;            // Number of input expressions.
+  Expression **Inputs;  // Input expressions
  public:
-  EXPR(OP *Op, EXPR *First = NULL, EXPR *Second = NULL, EXPR *Third = NULL, EXPR *Fourth = NULL) : Op(Op), arity(0) {
+  Expression(OP *Op, Expression *First = NULL, Expression *Second = NULL, Expression *Third = NULL,
+             Expression *Fourth = NULL)
+      : Op(Op), arity(0) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
 
     if (First) arity++;
@@ -107,7 +89,7 @@ class EXPR  // An EXPR corresponds to a detailed solution to
     if (Fourth) arity++;
 
     if (arity) {
-      Inputs = new EXPR *[arity];
+      Inputs = new Expression *[arity];
       if (First) Inputs[0] = First;
       if (Second) Inputs[1] = Second;
       if (Third) Inputs[2] = Third;
@@ -115,19 +97,19 @@ class EXPR  // An EXPR corresponds to a detailed solution to
     }
   };
 
-  EXPR(OP *Op, EXPR **inputs) : Op(Op), Inputs(inputs), arity(Op->GetArity()) {
+  Expression(OP *Op, Expression **inputs) : Op(Op), Inputs(inputs), arity(Op->GetArity()) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
   };
 
-  EXPR(EXPR &Expr) : Op(Expr.GetOp()->Clone()), arity(Expr.GetArity()) {
+  Expression(Expression &Expr) : Op(Expr.GetOp()->Clone()), arity(Expr.GetArity()) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
     if (arity) {
-      Inputs = new EXPR *[arity];
-      for (int i = 0; i < arity; i++) Inputs[i] = new EXPR(*(Expr.GetInput(i)));
+      Inputs = new Expression *[arity];
+      for (int i = 0; i < arity; i++) Inputs[i] = new Expression(*(Expr.GetInput(i)));
     }
   };
 
-  ~EXPR() {
+  ~Expression() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].Delete();
 
     delete Op;
@@ -140,7 +122,7 @@ class EXPR  // An EXPR corresponds to a detailed solution to
 
   inline OP *GetOp() { return Op; };
   inline int GetArity() { return arity; };
-  inline EXPR *GetInput(int i) { return Inputs[i]; };
+  inline Expression *GetInput(int i) { return Inputs[i]; };
 
   string Dump() {
     string os;
@@ -155,7 +137,4 @@ class EXPR  // An EXPR corresponds to a detailed solution to
     return os;
   };
 
-
-};  // class  EXPR
-
-#endif  // QUERY_H
+};  // class  Expression

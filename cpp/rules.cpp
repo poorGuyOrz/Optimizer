@@ -6,47 +6,20 @@
 #include "../header/tasks.h"
 
 #define NUMOFRULES 20  // Number of elements in the enum RULELABELS in rules.h
-#define LINEWIDTH 256  // buffer length of one text line
 
 // use to turn some rules on/off in the optimizer
 
 int RuleVector[NUMOFRULES];
 
-RULE_SET::RULE_SET(string filename) : RuleCount(NUMOFRULES) {
-  // read the RuleVector value from filename
-  FILE *fp;                  // file handle
-  char TextLine[LINEWIDTH];  // text line buffer
-  char *p;
+RuleSet::RuleSet() : RuleCount(NUMOFRULES) {
   int rule_count = 0;
 
-  if ((fp = fopen(filename.c_str(), "r")) == NULL) OUTPUT_ERROR("can not open file 'ruleset'");
-
-  for (;;) {
-    fgets(TextLine, LINEWIDTH, fp);
-    if (feof(fp)) break;
-
-    // skip the comment line
-    if (IsCommentOrBlankLine(TextLine)) continue;
-    p = SkipSpace(TextLine);
-
-    // if the vectors are filled before end of file, raise an error
-    if (rule_count >= NUMOFRULES) {
-      OUTPUT_ERROR("Rule Set File error!");
-    }
-
-    parseString(p);
-    RuleVector[rule_count] = atoi(p);
-
-    rule_count++;
-  }
   // if the file ends before the vectors are filled, set the rest to off
   if (rule_count < NUMOFRULES) {
-    for (; rule_count < NUMOFRULES; rule_count++) RuleVector[rule_count] = 0;
+    for (; rule_count < NUMOFRULES; rule_count++) RuleVector[rule_count] = 1;
   }
 
-  fclose(fp);
-
-  rule_set = new RULE *[RuleCount];
+  rule_set.resize(RuleCount);
 
   // file-scan implements get
   rule_set[R_GET_TO_FILE_SCAN] = new GET_TO_FILE_SCAN();
@@ -85,19 +58,13 @@ RULE_SET::RULE_SET(string filename) : RuleCount(NUMOFRULES) {
   rule_set[R_RM_TO_HASH_DUPLICATES] = new RM_TO_HASH_DUPLICATES();
 
   // hgroup_list implements agg_list
-  // agg_ops1 and agg_ops2 just hold a place
-  AGG_OP_ARRAY *agg_ops1 = new AGG_OP_ARRAY;
-  AGG_OP_ARRAY *agg_ops2 = new AGG_OP_ARRAY;
-  rule_set[R_AL_TO_HGL] = new AL_TO_HGL(agg_ops1, agg_ops2);
+  rule_set[R_AL_TO_HGL] = new AL_TO_HGL(new AGG_OP_ARRAY(), new AGG_OP_ARRAY());
 
   // p_func_op implements func_op
   rule_set[R_FO_TO_PFO] = new FO_TO_PFO();
 
   // agg_thru_eq push agg_list below eqjoin
-  // agg_ops3 and agg_ops4 just hold a place
-  AGG_OP_ARRAY *agg_ops3 = new AGG_OP_ARRAY;
-  AGG_OP_ARRAY *agg_ops4 = new AGG_OP_ARRAY;
-  rule_set[R_AGG_THRU_EQJOIN] = new AGG_THRU_EQJOIN(agg_ops3, agg_ops4);
+  rule_set[R_AGG_THRU_EQJOIN] = new AGG_THRU_EQJOIN(new AGG_OP_ARRAY(), new AGG_OP_ARRAY());
 
   // eq_to_bit EQJOIN to BIT_SEMIJOIN
   rule_set[R_EQ_TO_BIT] = new EQ_TO_BIT();
@@ -115,12 +82,11 @@ RULE_SET::RULE_SET(string filename) : RuleCount(NUMOFRULES) {
   rule_set[R_DUMMY_TO_PDUMMY] = new DUMMY_TO_PDUMMY();
 };  // rule set
 
-RULE_SET::~RULE_SET() {
-  for (int i = 0; i < RuleCount; i++) delete rule_set[i];
-  delete rule_set;
+RuleSet::~RuleSet() {
+  for (auto &&rule : rule_set) delete rule;
 }
 
-string RULE_SET::Dump() {
+string RuleSet::Dump() {
   string os;
 
   for (int i = 0; i < RuleCount; i++) {
@@ -129,25 +95,20 @@ string RULE_SET::Dump() {
   return os;
 }
 
-#ifdef _DEBUG
-#ifndef _TABLE_
-string RULE_SET::DumpStats() {
+string RuleSet::DumpStats() {
   string os;
 
   os = "Rule#\tTopMatch\t Bindings\tConditions\n";
-  for (int i = 0; i < RuleCount; i++) {
-    os += to_string(i) + "\t" + to_string(TopMatch[i]) + "\t" + to_string(Bindings[i]) + "\t" +
-          to_string(Conditions[i]) + "\t" + rule_set[i]->GetName() + "\n";
-  }
+  // for (int i = 0; i < RuleCount; i++) {
+  //   os += to_string(i) + "\t" + to_string(TopMatch[i]) + "\t" + to_string(Bindings[i]) + "\t" +
+  //         to_string(Conditions[i]) + "\t" + rule_set[i]->GetName() + "\n";
+  // }
   return os;
 }
-#endif
-#endif
 
 // ====================
 
-//##ModelId=3B0EA6DA0280
-BINDERY::BINDERY(GRP_ID group_no, EXPR *original)
+BINDERY::BINDERY(int group_no, Expression *original)
     : state(start),
       group_no(group_no),
       cur_expr(NULL),
@@ -160,8 +121,7 @@ BINDERY::BINDERY(GRP_ID group_no, EXPR *original)
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 }  // BINDERY::BINDERY
 
-//##ModelId=3B0EA6DA0262
-BINDERY::BINDERY(M_EXPR *expr, EXPR *original)
+BINDERY::BINDERY(M_EXPR *expr, Expression *original)
     : state(start),
       cur_expr(expr),
       original(original),
@@ -175,7 +135,6 @@ BINDERY::BINDERY(M_EXPR *expr, EXPR *original)
 
 }  // BINDERY::BINDERY
 
-//##ModelId=3B0EA6DA0294
 BINDERY::~BINDERY() {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].Delete();
 
@@ -186,9 +145,8 @@ BINDERY::~BINDERY() {
 
 };  // BINDERY::~BINDERY
 
-//##ModelId=3B0EA6DA02A8
-EXPR *BINDERY::extract_expr() {
-  EXPR *result;
+Expression *BINDERY::extract_expr() {
+  Expression *result;
 
   // If original pattern is NULL something weird is happening.
   assert(original);
@@ -201,29 +159,29 @@ EXPR *BINDERY::extract_expr() {
 
   // create leaf marked with group index
   if (patt_op->is_leaf()) {
-    result = new EXPR(new LEAF_OP(((LEAF_OP *)patt_op)->GetIndex(), group_no));
+    result = new Expression(new LEAF_OP(((LEAF_OP *)patt_op)->GetIndex(), group_no));
   }     // create leaf marked with group index
-  else  // general invocation of new EXPR
+  else  // general invocation of new Expression
   {
-    // Top operator in the new EXPR will be top operator in cur_expr.
+    // Top operator in the new Expression will be top operator in cur_expr.
     // Get it.  (Probably could use patt_op here.)
     OP *op_arg = cur_expr->GetOp()->Clone();
 
-    // Need the arity of the top operator to construct inputs of new EXPR
+    // Need the arity of the top operator to construct inputs of new Expression
     int arity = op_arg->GetArity();
 
-    // Inputs of new EXPR can be extracted from binderys stored in
+    // Inputs of new Expression can be extracted from binderys stored in
     // BINDERY::input.  Put these in the array subexpr.
     if (arity) {
-      EXPR **subexpr = new EXPR *[arity];
+      Expression **subexpr = new Expression *[arity];
       for (int input_no = 0; input_no < arity; input_no++) subexpr[input_no] = input[input_no]->extract_expr();
 
       // Put everything together for the result.
-      result = new EXPR(op_arg, subexpr);
+      result = new Expression(op_arg, subexpr);
     } else
-      result = new EXPR(op_arg);
+      result = new Expression(op_arg);
 
-  }  // general invocation of new EXPR
+  }  // general invocation of new Expression
 
   return result;
 }  // BINDERY::extract_expr
@@ -231,7 +189,7 @@ EXPR *BINDERY::extract_expr() {
 /*
     Function BINDERY::advance() walks the many trees embedded in the
     MEMO structure in order to find possible bindings.  It is called
-    only by APPLY_RULE::perform.  The walking is done with a finite
+    only by ApplyRuleTask::perform.  The walking is done with a finite
     state machine, as follows.
 
     State start:
@@ -275,7 +233,6 @@ EXPR *BINDERY::extract_expr() {
                 break
 
 */
-//##ModelId=3B0EA6DA029E
 bool BINDERY::advance() {
 #ifdef _REUSE_SIB
   /// XXXX Leave these comments alone - fix later
@@ -540,7 +497,6 @@ bool BINDERY::advance() {
 }  // BINDERY::advance
 
 #ifdef _REUSE_SIB
-//##ModelId=3B0EA6DA024E
 void BINDERY::test_delete(int arity) {
   int input_no;
   for (input_no = arity; --input_no >= 0;)
@@ -551,57 +507,40 @@ void BINDERY::test_delete(int arity) {
 }
 #endif
 
-/*
-Rule  Get -> File-scan
-====  === == ====-====
-*/
-//##ModelId=3B0C086A00CB
-GET_TO_FILE_SCAN::GET_TO_FILE_SCAN() : RULE("GET_TO_FILE_SCAN", 0, new EXPR(new GET(0)), new EXPR(new FILE_SCAN(0))) {
-  // set rule index
+// Rule  Get -> File-scan
+GET_TO_FILE_SCAN::GET_TO_FILE_SCAN()
+    : RULE("Get->FileScan", 0, new Expression(new GET(0)), new Expression(new FILE_SCAN(0))) {
   set_index(R_GET_TO_FILE_SCAN);
+};
 
-};  // GET_TO_FILE_SCAN::GET_TO_FILE_SCAN
-
-//##ModelId=3B0C086A00DE
-EXPR *GET_TO_FILE_SCAN::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
-
+Expression *GET_TO_FILE_SCAN::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   // create transformed expression
-  result = new EXPR(new FILE_SCAN(((GET *)before->GetOp())->GetCollection()));
+  return new Expression(new FILE_SCAN(((GET *)before->GetOp())->GetCollection()));
+};
 
-  return result;
-};  // GET_TO_FILE_SCAN::next_substitute
-
-/*
-   Rule  EQJOIN  -> LOOPS JOIN
-   ====  ======  == ====  ====
-*/
-
-//##ModelId=3B0C086A0161
+//  Rule  EQJOIN  -> LOOPS JOIN
 EQ_TO_LOOPS::EQ_TO_LOOPS()
-    : RULE("EQJOIN->LOOPS_JOIN", 2, new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1))),
-           new EXPR(new LOOPS_JOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1)))) {
-  // set rule index
+    : RULE("EQJOIN->LOOPS_JOIN", 2,
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
+           new Expression(new LOOPS_JOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
   set_index(R_EQ_TO_LOOPS);
+}
 
-}  // EQ_TO_LOOPS::EQ_TO_LOOPS
-
-//##ModelId=3B0C086A0174
-EXPR *EQ_TO_LOOPS::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *EQ_TO_LOOPS::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   EQJOIN *Op = (EQJOIN *)before->GetOp();
   int size = Op->size;
   int *lattrs = CopyArray(Op->lattrs, size);
   int *rattrs = CopyArray(Op->rattrs, size);
 
   // create transformed expression
-  EXPR *result = new EXPR(new LOOPS_JOIN(lattrs, rattrs, size), new EXPR(*(before->GetInput(0))),
-                          new EXPR(*(before->GetInput(1))));
+  Expression *result = new Expression(new LOOPS_JOIN(lattrs, rattrs, size), new Expression(*(before->GetInput(0))),
+                                      new Expression(*(before->GetInput(1))));
   return result;
 }  // EQ_TO_LOOPS::next_substitute
 #ifdef CONDPRUNE
 // Is the plan a goner because an input is group pruned?
 //##ModelId=3B0C086A017E
-bool EQ_TO_LOOPS::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_LOOPS::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   Cost inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
   inputs += *(Ssp->GetGroup(mexpr->GetInput(1))->GetLowerBd());
 
@@ -611,24 +550,16 @@ bool EQ_TO_LOOPS::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 }  // EQ_TO_LOOPS::condition
 #endif
 
-/*
-  Rule  EQJOIN  -> LOOPS INDEX JOIN
-  ====  ======  == ====  ===== ====
-*/
-
-//##ModelId=3B0C086A0342
+// Rule  EQJOIN  -> LOOPS INDEX JOIN
 EQ_TO_LOOPS_INDEX::EQ_TO_LOOPS_INDEX()
     : RULE("EQJOIN -> LOOPS_INDEX_JOIN", 1,
-           new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new GET(0))),
-           new EXPR(new LOOPS_INDEX_JOIN(0, 0, 0, 0), new EXPR(new LEAF_OP(0)))) {
-  // set rule index
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new GET(0))),
+           new Expression(new LOOPS_INDEX_JOIN(0, 0, 0, 0), new Expression(new LEAF_OP(0)))) {
   set_index(R_EQ_TO_LOOPS_INDEX);
+}
 
-}  // EQ_TO_LOOPS_INDEX::EQ_TO_LOOPS_INDEX
-
-//##ModelId=3B0C086A034B
-EXPR *EQ_TO_LOOPS_INDEX::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *EQ_TO_LOOPS_INDEX::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   EQJOIN *Op = (EQJOIN *)before->GetOp();
   int size = Op->size;
@@ -639,7 +570,8 @@ EXPR *EQ_TO_LOOPS_INDEX::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   GET *g = (GET *)before->GetInput(1)->GetOp();
 
   // create transformed expression
-  result = new EXPR(new LOOPS_INDEX_JOIN(lattrs, rattrs, size, g->GetCollection()), new EXPR(*(before->GetInput(0))));
+  result = new Expression(new LOOPS_INDEX_JOIN(lattrs, rattrs, size, g->GetCollection()),
+                          new Expression(*(before->GetInput(0))));
 
   return (result);
 }  // EQ_TO_LOOPS_INDEX::next_substitute
@@ -649,7 +581,7 @@ EXPR *EQ_TO_LOOPS_INDEX::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 // 	join)
 //	there is an index for the right join attribute -- need log-bulk-props
 //##ModelId=3B0C086A0355
-bool EQ_TO_LOOPS_INDEX::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_LOOPS_INDEX::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   // Get the GET logical operator in order to get the indexed collection
   GET *g = (GET *)before->GetInput(1)->GetOp();
   INT_ARRAY *Indices = Cat->GetIndNames(g->GetCollection());
@@ -675,8 +607,9 @@ bool EQ_TO_LOOPS_INDEX::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 
 //##ModelId=3B0C086A0214
 EQ_TO_MERGE::EQ_TO_MERGE()
-    : RULE("EQJOIN -> MERGE_JOIN", 2, new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1))),
-           new EXPR(new MERGE_JOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1)))) {
+    : RULE("EQJOIN -> MERGE_JOIN", 2,
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
+           new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
   // set rule index
   set_index(R_EQ_TO_MERGE);
 }  // EQ_TO_MERGE::EQ_TO_MERGE
@@ -690,8 +623,8 @@ int EQ_TO_MERGE::promise(OP *op_arg, int ContextID) {
 }  // EQ_TO_MERGE::promise
 
 //##ModelId=3B0C086A0228
-EXPR *EQ_TO_MERGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *EQ_TO_MERGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   EQJOIN *Op = (EQJOIN *)before->GetOp();
   int size = Op->size;
@@ -699,8 +632,8 @@ EXPR *EQ_TO_MERGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int *rattrs = CopyArray(Op->rattrs, size);
 
   // create transformed expression
-  result = new EXPR(new MERGE_JOIN(lattrs, rattrs, size), new EXPR(*(before->GetInput(0))),
-                    new EXPR(*(before->GetInput(1))));
+  result = new Expression(new MERGE_JOIN(lattrs, rattrs, size), new Expression(*(before->GetInput(0))),
+                          new Expression(*(before->GetInput(1))));
 
   return (result);
 }  // EQ_TO_MERGE::next_substitute
@@ -708,7 +641,7 @@ EXPR *EQ_TO_MERGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 #ifdef CONDPRUNE
 // Is the plan a goner because an input is group pruned?
 //##ModelId=3B0C086A0232
-bool EQ_TO_MERGE::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_MERGE::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   Cost inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
   inputs += *(Ssp->GetGroup(mexpr->GetInput(1))->GetLowerBd());
 
@@ -725,8 +658,9 @@ bool EQ_TO_MERGE::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 
 //##ModelId=3B0C086A02B4
 EQ_TO_HASH::EQ_TO_HASH()
-    : RULE("EQJOIN->HASH_JOIN", 2, new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1))),
-           new EXPR(new HASH_JOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1)))) {
+    : RULE("EQJOIN->HASH_JOIN", 2,
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
+           new Expression(new HASH_JOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
   // set rule index
   set_index(R_EQ_TO_HASH);
 }  // EQ_TO_HASH::EQ_TO_HASH
@@ -740,8 +674,8 @@ int EQ_TO_HASH::promise(OP *op_arg, int ContextID) {
 }  // EQ_TO_HASH::promise
 
 //##ModelId=3B0C086A02C8
-EXPR *EQ_TO_HASH::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *EQ_TO_HASH::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   EQJOIN *Op = (EQJOIN *)before->GetOp();
   int size = Op->size;
@@ -749,8 +683,8 @@ EXPR *EQ_TO_HASH::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int *rattrs = CopyArray(Op->rattrs, size);
 
   // create transformed expression
-  result =
-      new EXPR(new HASH_JOIN(lattrs, rattrs, size), new EXPR(*(before->GetInput(0))), new EXPR(*(before->GetInput(1))));
+  result = new Expression(new HASH_JOIN(lattrs, rattrs, size), new Expression(*(before->GetInput(0))),
+                          new Expression(*(before->GetInput(1))));
 
   return (result);
 }  // EQ_TO_HASH::next_substitute
@@ -761,8 +695,9 @@ EXPR *EQ_TO_HASH::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 */
 //##ModelId=3B0C086A03CE
 EQJOIN_COMMUTE::EQJOIN_COMMUTE()
-    : RULE("EQJOIN_COMMUTE", 2, new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1))),
-           new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(1)), new EXPR(new LEAF_OP(0)))) {
+    : RULE("EQJOIN_COMMUTE", 2,
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(1)), new Expression(new LEAF_OP(0)))) {
   // set rule mask and index
   set_index(R_EQJOIN_COMMUTE);
   set_mask(1 << R_EQJOIN_COMMUTE | 1 << R_EQJOIN_LTOR | 1 << R_EQJOIN_RTOL | 1 << R_EXCHANGE);
@@ -770,7 +705,7 @@ EQJOIN_COMMUTE::EQJOIN_COMMUTE()
 }  // EQJOIN_COMMUTE::EQJOIN_COMMUTE
 
 //##ModelId=3B0C086A03D8
-EXPR *EQJOIN_COMMUTE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *EQJOIN_COMMUTE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   // lattrs and rattrs
   EQJOIN *Op = (EQJOIN *)before->GetOp();
   int size = Op->size;
@@ -778,8 +713,8 @@ EXPR *EQJOIN_COMMUTE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int *rattrs = CopyArray(Op->rattrs, size);
 
   // create transformed expression
-  EXPR *result = new EXPR(new EQJOIN(rattrs, lattrs, size),  // reverse l and r
-                          new EXPR(*(before->GetInput(1))), new EXPR(*(before->GetInput(0))));
+  Expression *result = new Expression(new EQJOIN(rattrs, lattrs, size),  // reverse l and r
+                                      new Expression(*(before->GetInput(1))), new Expression(*(before->GetInput(0))));
 
   return result;
 }  // EQJOIN_COMMUTE::next_substitute
@@ -792,16 +727,16 @@ EXPR *EQJOIN_COMMUTE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 //##ModelId=3B0C086B00A3
 EQJOIN_LTOR::EQJOIN_LTOR()
     : RULE("EQJOIN_LTOR", 3,
-           new EXPR(new EQJOIN(0, 0, 0),
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(0)),  // A
-                             new EXPR(new LEAF_OP(1))   // B
-                             ),
-                    new EXPR(new LEAF_OP(2))  // C
-                    ),                        // original pattern
-           new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)),
-                    new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(1)),
-                             new EXPR(new LEAF_OP(2))))  // substitute
+           new Expression(new EQJOIN(0, 0, 0),
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(0)),  // A
+                                         new Expression(new LEAF_OP(1))   // B
+                                         ),
+                          new Expression(new LEAF_OP(2))  // C
+                          ),                              // original pattern
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
+                          new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(1)),
+                                         new Expression(new LEAF_OP(2))))  // substitute
       )
 
 {
@@ -812,7 +747,7 @@ EQJOIN_LTOR::EQJOIN_LTOR()
 }  // EQJOIN_LTOR::EQJOIN_LTOR
 
 //##ModelId=3B0C086B00AD
-EXPR *EQJOIN_LTOR::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   /*
    * Join numbering convention:
    *          1  2             2  1		join number
@@ -850,9 +785,9 @@ EXPR *EQJOIN_LTOR::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int nsize1 = 0;
 
   //	B's schema determines new joining conditions.  Get it.
-  EXPR *AB = before->GetInput(0);
+  Expression *AB = before->GetInput(0);
   LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
-  GRP_ID group_no = B->GetGroup();
+  int group_no = B->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
@@ -900,9 +835,10 @@ EXPR *EQJOIN_LTOR::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 #endif
 
   // create transformed expression
-  EXPR *result = new EXPR(new EQJOIN(nlattrs2, nrattrs2, nsize2), new EXPR(*(before->GetInput(0)->GetInput(0))),
-                          new EXPR(new EQJOIN(nlattrs1, nrattrs1, nsize1),
-                                   new EXPR(*(before->GetInput(0)->GetInput(1))), new EXPR(*(before->GetInput(1)))));
+  Expression *result = new Expression(
+      new EQJOIN(nlattrs2, nrattrs2, nsize2), new Expression(*(before->GetInput(0)->GetInput(0))),
+      new Expression(new EQJOIN(nlattrs1, nrattrs1, nsize1), new Expression(*(before->GetInput(0)->GetInput(1))),
+                     new Expression(*(before->GetInput(1)))));
   return result;
 
 }  // EQJOIN_LTOR::next_substitute
@@ -923,7 +859,7 @@ EXPR *EQJOIN_LTOR::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 //	a || !b
 //
 //##ModelId=3B0C086B00B7
-bool EQJOIN_LTOR::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EQJOIN_LTOR::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
 #ifdef NOCART
   PTRACE("%s\n", "NOCART is On");
   EQJOIN *Op2 = (EQJOIN *)before->GetOp();
@@ -957,9 +893,9 @@ bool EQJOIN_LTOR::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
   int nsize1 = 0;
 
   //	B's schema determines new joining conditions.  Get it.
-  EXPR *AB = before->GetInput(0);
+  Expression *AB = before->GetInput(0);
   LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
-  GRP_ID group_no = B->GetGroup();
+  int group_no = B->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
@@ -996,19 +932,19 @@ Right to Left Associativity
 //##ModelId=3B0C086B016C
 EQJOIN_RTOL::EQJOIN_RTOL()
     : RULE("EQJOIN_RTOL", 3,
-           new EXPR(new EQJOIN(0, 0, 0),
-                    new EXPR(new LEAF_OP(0)),  // A
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(1)),  // B
-                             new EXPR(new LEAF_OP(2))   // C
-                             )),                        // original pattern
-           new EXPR(new EQJOIN(0, 0, 0),
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(0)),  // A
-                             new EXPR(new LEAF_OP(1))   // B
-                             ),
-                    new EXPR(new LEAF_OP(2))  // C
-                    )                         // substitute
+           new Expression(new EQJOIN(0, 0, 0),
+                          new Expression(new LEAF_OP(0)),  // A
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(1)),  // B
+                                         new Expression(new LEAF_OP(2))   // C
+                                         )),                              // original pattern
+           new Expression(new EQJOIN(0, 0, 0),
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(0)),  // A
+                                         new Expression(new LEAF_OP(1))   // B
+                                         ),
+                          new Expression(new LEAF_OP(2))  // C
+                          )                               // substitute
       ) {
   // set rule mask and index
   set_index(R_EQJOIN_RTOL);
@@ -1016,7 +952,7 @@ EQJOIN_RTOL::EQJOIN_RTOL()
 }  // EQJOIN_RTOL::EQJOIN_RTOL
 
 //##ModelId=3B0C086B0176
-EXPR *EQJOIN_RTOL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   /*
    * Join numbering convention:
    *         2  1               1  2		1 is the first join
@@ -1054,9 +990,9 @@ EXPR *EQJOIN_RTOL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int nsize1 = 0;
 
   // Get schema for B
-  EXPR *BC = before->GetInput(1);
+  Expression *BC = before->GetInput(1);
   LEAF_OP *B = (LEAF_OP *)(BC->GetInput(0)->GetOp());
-  GRP_ID group_no = B->GetGroup();
+  int group_no = B->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
@@ -1099,10 +1035,11 @@ EXPR *EQJOIN_RTOL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 #endif
 
   // create transformed expression
-  EXPR *result = new EXPR(new EQJOIN(nlattrs2, nrattrs2, nsize2),  // args reversed
-                          new EXPR(new EQJOIN(nlattrs1, nrattrs1, nsize1), new EXPR(*(before->GetInput(0))),
-                                   new EXPR(*(before->GetInput(1)->GetInput(0)))),
-                          new EXPR(*(before->GetInput(1)->GetInput(1))));
+  Expression *result =
+      new Expression(new EQJOIN(nlattrs2, nrattrs2, nsize2),  // args reversed
+                     new Expression(new EQJOIN(nlattrs1, nrattrs1, nsize1), new Expression(*(before->GetInput(0))),
+                                    new Expression(*(before->GetInput(1)->GetInput(0)))),
+                     new Expression(*(before->GetInput(1)->GetInput(1))));
   return result;
 }  // EQJOIN_RTOL::next_substitute
 
@@ -1121,7 +1058,7 @@ EXPR *EQJOIN_RTOL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 //	a || !b
 //
 //##ModelId=3B0C086B0181
-bool EQJOIN_RTOL::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EQJOIN_RTOL::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
 #ifdef NOCART
   PTRACE("%s\n", "NOCART is On");
   EQJOIN *Op2 = (EQJOIN *)before->GetOp();
@@ -1155,9 +1092,9 @@ bool EQJOIN_RTOL::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
   int nsize1 = 0;
 
   //	B's schema determines new joining conditions.  Get it.
-  EXPR *AB = before->GetInput(0);
+  Expression *AB = before->GetInput(0);
   LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
-  GRP_ID group_no = B->GetGroup();
+  int group_no = B->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
@@ -1192,21 +1129,21 @@ bool EQJOIN_RTOL::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 //##ModelId=3B0C086B023F
 EXCHANGE::EXCHANGE()
     : RULE("EXCHANGE", 4,
-           new EXPR(new EQJOIN(0, 0, 0),
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(0)),   // A
-                             new EXPR(new LEAF_OP(1))),  // B
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(2)),    // C
-                             new EXPR(new LEAF_OP(3)))),  // D
+           new Expression(new EQJOIN(0, 0, 0),
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(0)),   // A
+                                         new Expression(new LEAF_OP(1))),  // B
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(2)),    // C
+                                         new Expression(new LEAF_OP(3)))),  // D
 
-           new EXPR(new EQJOIN(0, 0, 0),
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(0)),   // A
-                             new EXPR(new LEAF_OP(2))),  // C
-                    new EXPR(new EQJOIN(0, 0, 0),
-                             new EXPR(new LEAF_OP(1)),    // B
-                             new EXPR(new LEAF_OP(3)))))  // D
+           new Expression(new EQJOIN(0, 0, 0),
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(0)),   // A
+                                         new Expression(new LEAF_OP(2))),  // C
+                          new Expression(new EQJOIN(0, 0, 0),
+                                         new Expression(new LEAF_OP(1)),    // B
+                                         new Expression(new LEAF_OP(3)))))  // D
 {
   // set rule mask and index
   set_index(R_EXCHANGE);
@@ -1214,7 +1151,7 @@ EXCHANGE::EXCHANGE()
 }  // EXCHANGE::EXCHANGE
 
 //##ModelId=3B0C086B0249
-EXPR *EXCHANGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   /*
    * Join numbering convention:
    *   2  1  3        2  1  3
@@ -1282,15 +1219,15 @@ EXPR *EXCHANGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int nsize3 = 0;
 
   // Get schema for A
-  EXPR *AB = before->GetInput(0);
+  Expression *AB = before->GetInput(0);
   LEAF_OP *AA = (LEAF_OP *)AB->GetInput(0)->GetOp();
-  GRP_ID group_no = AA->GetGroup();
+  int group_no = AA->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
   SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
 
   // Get schema for C
-  EXPR *CD = before->GetInput(1);
+  Expression *CD = before->GetInput(1);
   LEAF_OP *CC = (LEAF_OP *)CD->GetInput(0)->GetOp();
   group_no = CC->GetGroup();
   group = Ssp->GetGroup(group_no);
@@ -1333,15 +1270,15 @@ EXPR *EXCHANGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   }
 
   // create transformed expression
-  EXPR *result = new EXPR(new EQJOIN(nlattrs1, nrattrs1, nsize1),
-                          new EXPR(new EQJOIN(nlattrs2, nrattrs2, nsize2),
-                                   new EXPR(*(before->GetInput(0)->GetInput(0))),  // A
-                                   new EXPR(*(before->GetInput(1)->GetInput(0)))   // C
-                                   ),
-                          new EXPR(new EQJOIN(nlattrs3, nrattrs3, nsize3),
-                                   new EXPR(*(before->GetInput(0)->GetInput(1))),  // B
-                                   new EXPR(*(before->GetInput(1)->GetInput(1)))   // D
-                                   ));
+  Expression *result = new Expression(new EQJOIN(nlattrs1, nrattrs1, nsize1),
+                                      new Expression(new EQJOIN(nlattrs2, nrattrs2, nsize2),
+                                                     new Expression(*(before->GetInput(0)->GetInput(0))),  // A
+                                                     new Expression(*(before->GetInput(1)->GetInput(0)))   // C
+                                                     ),
+                                      new Expression(new EQJOIN(nlattrs3, nrattrs3, nsize3),
+                                                     new Expression(*(before->GetInput(0)->GetInput(1))),  // B
+                                                     new Expression(*(before->GetInput(1)->GetInput(1)))   // D
+                                                     ));
 
   return result;
 }  // EXCHANGE::next_substitute
@@ -1362,7 +1299,7 @@ EXPR *EXCHANGE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 //	a || !b
 //
 //##ModelId=3B0C086B025C
-bool EXCHANGE::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EXCHANGE::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
 #ifdef NOCART
   /*
    * Join numbering convention:
@@ -1417,15 +1354,15 @@ bool EXCHANGE::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
   int nsize3 = 0;
 
   // Get schema for A
-  EXPR *AB = before->GetInput(0);
+  Expression *AB = before->GetInput(0);
   LEAF_OP *AA = (LEAF_OP *)AB->GetInput(0)->GetOp();
-  GRP_ID group_no = AA->GetGroup();
+  int group_no = AA->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
   SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
 
   // Get schema for C
-  EXPR *CD = before->GetInput(1);
+  Expression *CD = before->GetInput(1);
   LEAF_OP *CC = (LEAF_OP *)CD->GetInput(0)->GetOp();
   group_no = CC->GetGroup();
   group = Ssp->GetGroup(group_no);
@@ -1483,21 +1420,21 @@ bool EXCHANGE::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 //##ModelId=3B0C086B0361
 SELECT_TO_FILTER::SELECT_TO_FILTER()
     : RULE("SELECT -> FILTER", 2,
-           new EXPR(new SELECT,
-                    new EXPR(new LEAF_OP(0)),  // table
-                    new EXPR(new LEAF_OP(1))   // predicate
-                    ),
-           new EXPR(new FILTER, new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1)))) {
+           new Expression(new SELECT,
+                          new Expression(new LEAF_OP(0)),  // table
+                          new Expression(new LEAF_OP(1))   // predicate
+                          ),
+           new Expression(new FILTER, new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
   // set rule index
   set_index(R_SELECT_TO_FILTER);
 }  // SELECT_TO_FILTER::SELECT_TO_FILTER
 
 //##ModelId=3B0C086B036A
-EXPR *SELECT_TO_FILTER::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *SELECT_TO_FILTER::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   // create transformed expression
-  result = new EXPR(new FILTER, new EXPR(*(before->GetInput(0))), new EXPR(*(before->GetInput(1))));
+  result = new Expression(new FILTER, new Expression(*(before->GetInput(0))), new Expression(*(before->GetInput(1))));
 
   return (result);
 }  // SELECT_TO_FILTER::next_substitute
@@ -1509,15 +1446,15 @@ EXPR *SELECT_TO_FILTER::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 
 //##ModelId=3B0C086B02DE
 P_TO_PP::P_TO_PP()
-    : RULE("PROJECT -> P_PROJECT", 1, new EXPR(new PROJECT(0, 0), new EXPR(new LEAF_OP(0))),
-           new EXPR(new P_PROJECT(0, 0), new EXPR(new LEAF_OP(0)))) {
+    : RULE("PROJECT -> P_PROJECT", 1, new Expression(new PROJECT(0, 0), new Expression(new LEAF_OP(0))),
+           new Expression(new P_PROJECT(0, 0), new Expression(new LEAF_OP(0)))) {
   // set rule index
   set_index(R_P_TO_PP);
 }  // P_TO_PP::P_TO_PP
 
 //##ModelId=3B0C086B02DF
-EXPR *P_TO_PP::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   PROJECT *Op = (PROJECT *)before->GetOp();
   int size = Op->size;
@@ -1527,7 +1464,7 @@ EXPR *P_TO_PP::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 
   // Get input's schema
   LEAF_OP *A = (LEAF_OP *)(before->GetInput(0)->GetOp());
-  GRP_ID group_no = A->GetGroup();
+  int group_no = A->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
   SCHEMA *As_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
@@ -1540,7 +1477,7 @@ EXPR *P_TO_PP::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 #endif
 
   // create transformed expression
-  result = new EXPR(new P_PROJECT(attrs, size), new EXPR(*(before->GetInput(0))));
+  result = new Expression(new P_PROJECT(attrs, size), new Expression(*(before->GetInput(0))));
 
   return (result);
 }  // P_TO_PP::next_substitute
@@ -1552,17 +1489,17 @@ EXPR *P_TO_PP::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 
 //##ModelId=3B0C086C0037
 SORT_RULE::SORT_RULE()
-    : RULE("SORT enforcer", 1, new EXPR(new LEAF_OP(0)),
-           new EXPR(new QSORT(),  // bogus should this be oby?
-                    new EXPR(new LEAF_OP(0)))) {
+    : RULE("SORT enforcer", 1, new Expression(new LEAF_OP(0)),
+           new Expression(new QSORT(),  // bogus should this be oby?
+                          new Expression(new LEAF_OP(0)))) {
   // set rule index
   set_index(R_SORT_RULE);
 }  // SORT_RULE::SORT_RULE
 
 //##ModelId=3B0C086C004C
-EXPR *SORT_RULE::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *SORT_RULE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   // create transformed expression
-  EXPR *result = new EXPR(new QSORT(), new EXPR(*before));
+  Expression *result = new Expression(new QSORT(), new Expression(*before));
   return (result);
 }
 
@@ -1584,20 +1521,20 @@ int SORT_RULE::promise(OP *op_arg, int ContextID) {
 //##ModelId=3B0C086C00EB
 RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES()
     : RULE("RM_DUPLICATES  -> HASH_DUPLICATES", 1,
-           new EXPR(new RM_DUPLICATES(),
-                    new EXPR(new LEAF_OP(0))  // input table
-                    ),
-           new EXPR(new HASH_DUPLICATES(), new EXPR(new LEAF_OP(0)))) {
+           new Expression(new RM_DUPLICATES(),
+                          new Expression(new LEAF_OP(0))  // input table
+                          ),
+           new Expression(new HASH_DUPLICATES(), new Expression(new LEAF_OP(0)))) {
   // set rule index
   set_index(R_RM_TO_HASH_DUPLICATES);
 }  // RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES
 
 //##ModelId=3B0C086C00F5
-EXPR *RM_TO_HASH_DUPLICATES::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *RM_TO_HASH_DUPLICATES::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   // create transformed expression
-  result = new EXPR(new HASH_DUPLICATES(), new EXPR(*(before->GetInput(0))));
+  result = new Expression(new HASH_DUPLICATES(), new Expression(*(before->GetInput(0))));
 
   return (result);
 }  // RM_TO_HASH_DUPLICATES::next_substitute
@@ -1610,17 +1547,17 @@ EXPR *RM_TO_HASH_DUPLICATES::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) 
 //##ModelId=3B0C086C018C
 AL_TO_HGL::AL_TO_HGL(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
     : RULE("AGG_LIST  -> HGROUP_LIST", 1,
-           new EXPR(new AGG_LIST(0, 0, list1),
-                    new EXPR(new LEAF_OP(0))  // input table
-                    ),
-           new EXPR(new HGROUP_LIST(0, 0, list2), new EXPR(new LEAF_OP(0)))) {
+           new Expression(new AGG_LIST(0, 0, list1),
+                          new Expression(new LEAF_OP(0))  // input table
+                          ),
+           new Expression(new HGROUP_LIST(0, 0, list2), new Expression(new LEAF_OP(0)))) {
   // set rule index
   set_index(R_AL_TO_HGL);
 }  // AL_TO_HGL::AL_TO_HGL
 
 //##ModelId=3B0C086C0196
-EXPR *AL_TO_HGL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *AL_TO_HGL::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   AGG_LIST *Op = (AGG_LIST *)before->GetOp();
   int size = Op->GbySize;
@@ -1634,7 +1571,7 @@ EXPR *AL_TO_HGL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   }
 
   // create transformed expression
-  result = new EXPR(new HGROUP_LIST(attrs, size, agg_ops), new EXPR(*(before->GetInput(0))));
+  result = new Expression(new HGROUP_LIST(attrs, size, agg_ops), new Expression(*(before->GetInput(0))));
 
   return (result);
 }  // AL_TO_HGL::next_substitute
@@ -1647,24 +1584,24 @@ EXPR *AL_TO_HGL::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 //##ModelId=3B0C086C0235
 FO_TO_PFO::FO_TO_PFO()
     : RULE("FUNC_OP  -> P_FUNC_OP", 1,
-           new EXPR(new FUNC_OP("", 0, 0),
-                    new EXPR(new LEAF_OP(0))  // input table
-                    ),
-           new EXPR(new P_FUNC_OP("", 0, 0), new EXPR(new LEAF_OP(0)))) {
+           new Expression(new FUNC_OP("", 0, 0),
+                          new Expression(new LEAF_OP(0))  // input table
+                          ),
+           new Expression(new P_FUNC_OP("", 0, 0), new Expression(new LEAF_OP(0)))) {
   // set rule index
   set_index(R_FO_TO_PFO);
 }  // FO_TO_PFO::FO_TO_PFO
 
 //##ModelId=3B0C086C0240
-EXPR *FO_TO_PFO::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *FO_TO_PFO::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   FUNC_OP *Op = (FUNC_OP *)before->GetOp();
   int size = Op->AttsSize;
   int *attrs = CopyArray(Op->Atts, size);
 
   // create transformed expression
-  result = new EXPR(new P_FUNC_OP(Op->RangeVar, attrs, size), new EXPR(*(before->GetInput(0))));
+  result = new Expression(new P_FUNC_OP(Op->RangeVar, attrs, size), new Expression(*(before->GetInput(0))));
 
   return (result);
 }  // FO_TO_PFO::next_substitute
@@ -1677,17 +1614,17 @@ EXPR *FO_TO_PFO::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 //##ModelId=3B0C086C0308
 AGG_THRU_EQJOIN::AGG_THRU_EQJOIN(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
     : RULE("AGGREGATE EQJOIN -> JOIN AGGREGATE", 2,
-           new EXPR(new AGG_LIST(0, 0, list1),
-                    new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1)))),
-           new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)),
-                    new EXPR(new AGG_LIST(0, 0, list2), new EXPR(new LEAF_OP(1))))) {
+           new Expression(new AGG_LIST(0, 0, list1), new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
+                                                                    new Expression(new LEAF_OP(1)))),
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
+                          new Expression(new AGG_LIST(0, 0, list2), new Expression(new LEAF_OP(1))))) {
   // set rule index
   set_index(R_AGG_THRU_EQJOIN);
 }  // AGG_THRU_EQ::AGG_THRU_EQ
 
 //##ModelId=3B0C086C031B
-EXPR *AGG_THRU_EQJOIN::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *AGG_THRU_EQJOIN::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
   int i;
   // get GbyAtts and AggOps
   AGG_LIST *agg_op = (AGG_LIST *)before->GetOp();
@@ -1705,7 +1642,7 @@ EXPR *AGG_THRU_EQJOIN::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   int *rattrs = CopyArray(Op->rattrs, size);
   // get the schema of the right input
   LEAF_OP *r_op = (LEAF_OP *)before->GetInput(0)->GetInput(1)->GetOp();
-  GRP_ID r_gid = r_op->GetGroup();
+  int r_gid = r_op->GetGroup();
   GROUP *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
   SCHEMA *right_schema = r_prop->Schema;
@@ -1728,9 +1665,9 @@ EXPR *AGG_THRU_EQJOIN::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 
   delete[] gby_atts;
   // create transformed expression
-  result = new EXPR(
-      new EQJOIN(lattrs, rattrs, size), new EXPR(*(before->GetInput(0)->GetInput(0))),
-      new EXPR(new AGG_LIST(new_gby_atts, new_gby_size, agg_ops), new EXPR(*(before->GetInput(0)->GetInput(1)))));
+  result = new Expression(new EQJOIN(lattrs, rattrs, size), new Expression(*(before->GetInput(0)->GetInput(0))),
+                          new Expression(new AGG_LIST(new_gby_atts, new_gby_size, agg_ops),
+                                         new Expression(*(before->GetInput(0)->GetInput(1)))));
 
   return (result);
 }  // AGG_THRU_EQJOIN::next_substitute
@@ -1743,7 +1680,7 @@ EXPR *AGG_THRU_EQJOIN::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
         Conditon 3 is checked by if lattrs contains candidate_key of left input
 */
 //##ModelId=3B0C086C0325
-bool AGG_THRU_EQJOIN::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool AGG_THRU_EQJOIN::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   // get attributes used in aggregates, and groupby attributes
   AGG_LIST *agg_op = (AGG_LIST *)before->GetOp();
   int *agg_atts = agg_op->FlattenedAtts;
@@ -1756,13 +1693,13 @@ bool AGG_THRU_EQJOIN::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
   int *rattrs = Op->rattrs;
   // get the schema of the right input
   LEAF_OP *r_op = (LEAF_OP *)before->GetInput(0)->GetInput(1)->GetOp();
-  GRP_ID r_gid = r_op->GetGroup();
+  int r_gid = r_op->GetGroup();
   GROUP *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
   SCHEMA *right_schema = r_prop->Schema;
   // get candidatekey of the left input
   LEAF_OP *l_op = (LEAF_OP *)before->GetInput(0)->GetInput(0)->GetOp();
-  GRP_ID l_gid = l_op->GetGroup();
+  int l_gid = l_op->GetGroup();
   GROUP *l_group = Ssp->GetGroup(l_gid);
   LOG_COLL_PROP *l_prop = (LOG_COLL_PROP *)l_group->get_log_prop();
   KEYS_SET *l_cand_key = l_prop->CandidateKey;
@@ -1802,19 +1739,19 @@ bool AGG_THRU_EQJOIN::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 //##ModelId=3B0C086D0010
 EQ_TO_BIT::EQ_TO_BIT()
     : RULE("EQJOIN -> BIT_JOIN", 2,
-           new EXPR(new EQJOIN(0, 0, 0), new EXPR(new LEAF_OP(0)),
-                    new EXPR(new SELECT,
-                             new EXPR(new GET(0)),     // table
-                             new EXPR(new LEAF_OP(1))  // predicate
-                             )),
-           new EXPR(new BIT_JOIN(0, 0, 0, 0), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1)))) {
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
+                          new Expression(new SELECT,
+                                         new Expression(new GET(0)),     // table
+                                         new Expression(new LEAF_OP(1))  // predicate
+                                         )),
+           new Expression(new BIT_JOIN(0, 0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
   // set rule index
   set_index(R_EQ_TO_BIT);
 }  // EQ_TO_BIT::EQ_TO_BIT
 
 //##ModelId=3B0C086D001A
-EXPR *EQ_TO_BIT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *EQ_TO_BIT::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   // EQJOIN is the only input to PROJECT
   EQJOIN *EqOp = (EQJOIN *)before->GetOp();
@@ -1825,8 +1762,8 @@ EXPR *EQ_TO_BIT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   // Get is the left input to SELECT
   GET *GetOp = (GET *)before->GetInput(1)->GetInput(0)->GetOp();
 
-  result = new EXPR(new BIT_JOIN(lattrs, rattrs, size, GetOp->GetCollection()), new EXPR(*(before->GetInput(0))),
-                    new EXPR(*(before->GetInput(1)->GetInput(1))));
+  result = new Expression(new BIT_JOIN(lattrs, rattrs, size, GetOp->GetCollection()),
+                          new Expression(*(before->GetInput(0))), new Expression(*(before->GetInput(1)->GetInput(1))));
 
   return (result);
 }  // AGG_THRU_EQJOIN::next_substitute
@@ -1841,7 +1778,7 @@ EXPR *EQ_TO_BIT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
       predicate=bit_pred('collection')
  */
 //##ModelId=3B0C086D0024
-bool EQ_TO_BIT::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_BIT::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   EQJOIN *EqOp = (EQJOIN *)before->GetOp();
   int size = EqOp->size;
   int *lattrs = EqOp->lattrs;
@@ -1850,7 +1787,7 @@ bool EQ_TO_BIT::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
   // get left input to eqjoin
   //  Get schema for LEAF(0)
   LEAF_OP *LEAF0 = (LEAF_OP *)(before->GetInput(0)->GetOp());
-  GRP_ID group_no = LEAF0->GetGroup();
+  int group_no = LEAF0->GetGroup();
   GROUP *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
   KEYS_SET *l_cand_key = ((LOG_COLL_PROP *)LogProp)->CandidateKey;
@@ -1866,7 +1803,7 @@ bool EQ_TO_BIT::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
 
   // Get is the predicate of SELECT
   LEAF_OP *PredOp = (LEAF_OP *)before->GetInput(1)->GetInput(1)->GetOp();
-  GRP_ID Pred_GID = PredOp->GetGroup();
+  int Pred_GID = PredOp->GetGroup();
   GROUP *leaf_group = Ssp->GetGroup(Pred_GID);
   LOG_PROP *leaf_prop = leaf_group->get_log_prop();
   KEYS_SET pred_freevar = ((LOG_ITEM_PROP *)leaf_prop)->FreeVars;
@@ -1908,22 +1845,22 @@ Rule  SELECT  -> INDEXED_FILTER
 //##ModelId=3B0C086D00F6
 SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER()
     : RULE("SELECT -> INDEXED_FILTER", 1,
-           new EXPR(new SELECT,
-                    new EXPR(new GET(0)),     // table
-                    new EXPR(new LEAF_OP(0))  // predicate
-                    ),
-           new EXPR(new INDEXED_FILTER(0), new EXPR(new LEAF_OP(0)))) {
+           new Expression(new SELECT,
+                          new Expression(new GET(0)),     // table
+                          new Expression(new LEAF_OP(0))  // predicate
+                          ),
+           new Expression(new INDEXED_FILTER(0), new Expression(new LEAF_OP(0)))) {
   // set rule index
   set_index(R_SELECT_TO_INDEXED_FILTER);
 }  // SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER
 
 //##ModelId=3B0C086D0100
-EXPR *SELECT_TO_INDEXED_FILTER::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *SELECT_TO_INDEXED_FILTER::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
 
   // create transformed expression
-  result = new EXPR(new INDEXED_FILTER(((GET *)before->GetInput(0)->GetOp())->GetCollection()),
-                    new EXPR(*(before->GetInput(1))));
+  result = new Expression(new INDEXED_FILTER(((GET *)before->GetInput(0)->GetOp())->GetCollection()),
+                          new Expression(*(before->GetInput(1))));
   return result;
 }  // GET_TO_FILE_SCAN::next_substitute
 
@@ -1931,14 +1868,14 @@ EXPR *SELECT_TO_INDEXED_FILTER::next_substitute(EXPR *before, PHYS_PROP *ReqdPro
 //      Predicate only has one free variable
 //      Index exists for the free variable
 //##ModelId=3B0C086D010A
-bool SELECT_TO_INDEXED_FILTER::condition(EXPR *before, M_EXPR *mexpr, int ContextID) {
+bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   // get the index list of the GET collection
   int CollId = ((GET *)before->GetInput(0)->GetOp())->GetCollection();
   INT_ARRAY *Indices = Cat->GetIndNames(CollId);
 
   // get the predicate free variables
   LEAF_OP *Pred = (LEAF_OP *)(before->GetInput(1)->GetOp());
-  GRP_ID GrpNo = Pred->GetGroup();
+  int GrpNo = Pred->GetGroup();
   GROUP *PredGrp = Ssp->GetGroup(GrpNo);
   LOG_PROP *log_prop = PredGrp->get_log_prop();
   KEYS_SET FreeVar = ((LOG_ITEM_PROP *)log_prop)->FreeVars;
@@ -1960,21 +1897,21 @@ Rule  PROJ SEL -> SEL PROJ
 //##ModelId=3B0C086D01B5
 PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
     : RULE("PROJECT_THRU_SELECT", 2,
-           new EXPR(new PROJECT(0, 0),
-                    new EXPR(new SELECT,  // table
-                             new EXPR(new LEAF_OP(0)),
-                             new EXPR(new LEAF_OP(1))  // predicate
-                             )),
-           new EXPR(new PROJECT(0, 0), new EXPR(new SELECT, new EXPR(new PROJECT(0, 0), new EXPR(new LEAF_OP(0))),
-                                                new EXPR(new LEAF_OP(1))))) {
+           new Expression(new PROJECT(0, 0),
+                          new Expression(new SELECT,  // table
+                                         new Expression(new LEAF_OP(0)),
+                                         new Expression(new LEAF_OP(1))  // predicate
+                                         )),
+           new Expression(new PROJECT(0, 0),
+                          new Expression(new SELECT, new Expression(new PROJECT(0, 0), new Expression(new LEAF_OP(0))),
+                                         new Expression(new LEAF_OP(1))))) {
   // set rule index
   set_index(R_PROJECT_THRU_SELECT);
   set_mask(1 << R_PROJECT_THRU_SELECT);
 }  // PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
 
-//##ModelId=3B0C086D01BE
-EXPR *PROJECT_THRU_SELECT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
-  EXPR *result;
+Expression *PROJECT_THRU_SELECT::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
+  Expression *result;
   int *top_pattrs;
   int top_size, pattr_size;
   int *pattrs;
@@ -1985,7 +1922,7 @@ EXPR *PROJECT_THRU_SELECT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 
   // Get the select predicate free variables spfv
   LEAF_OP *Pred = (LEAF_OP *)(before->GetInput(0)->GetInput(1)->GetOp());
-  GRP_ID GrpNo = Pred->GetGroup();
+  int GrpNo = Pred->GetGroup();
   GROUP *PredGrp = Ssp->GetGroup(GrpNo);
   LOG_PROP *log_prop = PredGrp->get_log_prop();
   KEYS_SET FreeVar = ((LOG_ITEM_PROP *)log_prop)->FreeVars;
@@ -1997,14 +1934,15 @@ EXPR *PROJECT_THRU_SELECT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
   pattr_size = temp->GetSize();
 
   // create transformed expression
-  result = new EXPR(new PROJECT(CopyArray(top_pattrs, top_size), top_size),
-                    new EXPR(new SELECT,
-                             // new EXPR (before->GetInput(0)->GetOp(),	//select
-                             new EXPR(new PROJECT(pattrs, pattr_size),
-                                      new EXPR((*(before->GetInput(0)->GetInput(0))))  // LEAF(0)
-                                      ),
-                             new EXPR((*(before->GetInput(0)->GetInput(1))))  // LEAF(1)
-                             ));
+  result =
+      new Expression(new PROJECT(CopyArray(top_pattrs, top_size), top_size),
+                     new Expression(new SELECT,
+                                    // new Expression (before->GetInput(0)->GetOp(),	//select
+                                    new Expression(new PROJECT(pattrs, pattr_size),
+                                                   new Expression((*(before->GetInput(0)->GetInput(0))))  // LEAF(0)
+                                                   ),
+                                    new Expression((*(before->GetInput(0)->GetInput(1))))  // LEAF(1)
+                                    ));
   return result;
 }  // PROJECT_THRU_SELECT::next_substitute
 
@@ -2015,20 +1953,22 @@ EXPR *PROJECT_THRU_SELECT::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
 
 //##ModelId=3B0C086D026A
 DUMMY_TO_PDUMMY::DUMMY_TO_PDUMMY()
-    : RULE("DUMMY->PDUMMY", 2, new EXPR(new DUMMY(), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1))),
-           new EXPR(new PDUMMY(), new EXPR(new LEAF_OP(0)), new EXPR(new LEAF_OP(1))
+    : RULE("DUMMY->PDUMMY", 2,
+           new Expression(new DUMMY(), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
+           new Expression(new PDUMMY(), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))
 
-                        )) {
+                              )) {
   // set rule index
   set_index(R_DUMMY_TO_PDUMMY);
 
 }  // DUMMY_TO_PDUMMY::DUMMY_TO_PDUMMY
 
 //##ModelId=3B0C086D0273
-EXPR *DUMMY_TO_PDUMMY::next_substitute(EXPR *before, PHYS_PROP *ReqdProp) {
+Expression *DUMMY_TO_PDUMMY::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   DUMMY *Op = (DUMMY *)before->GetOp();
 
   // create transformed expression
-  EXPR *result = new EXPR(new PDUMMY(), new EXPR(*(before->GetInput(0))), new EXPR(*(before->GetInput(1))));
+  Expression *result =
+      new Expression(new PDUMMY(), new Expression(*(before->GetInput(0))), new Expression(*(before->GetInput(1))));
   return result;
 }  // DUMMY_TO_PDUMMY::next_substitute

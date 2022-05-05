@@ -1,17 +1,4 @@
-/*
-group.cpp -  implementation of class GROUP
-        $Revision: 12 $
-        Implements class GROUP as defined in ssp.h
-
-        Columbia Optimizer Framework
-
-        A Joint Research Project of Portland State University
-           and the Oregon Graduate Institute
-        Directed by Leonard Shapiro and David Maier
-        Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-
-*/
+// group.cpp -  implementation of class GROUP
 #include "../header/ssp.h"
 #include "../header/stdafx.h"
 
@@ -71,21 +58,17 @@ GROUP::GROUP(M_EXPR *MExpr)
   count = -1;
   if (COVETrace)  // New Group
   {
-    char buffer[10];  // Holds input group ID
-    CString temp;
+    string os;
     if (arity) {
       for (int i = 0; i < arity; i++) {
-        sprintf(buffer, "%d", MExpr->GetInput(i));
         // (void)itoa(MExpr -> GetInput(i), buffer, 10);
-        temp = temp + " " + buffer;
+        os = os + " " + to_string(MExpr->GetInput(i));
       }
     }
-    temp += " ";
+    os += " ";
 
-    CString os;
-    os.Format("addGroup { %d %p \" %s  \"%s} %s", GroupID, (MExpr), MExpr->GetOp()->Dump(), temp, LogProp->DumpCOVE());
-
-    OutputCOVE << (os) << endl;
+    OutputCOVE << "addGroup { " << GroupID << " " << MExpr << " \" " << MExpr->GetOp()->Dump() << "  \"" << os << "} "
+               << LogProp->DumpCOVE() << endl;
   }
 }
 
@@ -136,7 +119,6 @@ int GROUP::EstimateNumTables(M_EXPR *MExpr) {
   return total;
 }
 
-//##ModelId=3B0C08670089
 void GROUP::NewMExpr(M_EXPR *MExpr) {
   // link to last mexpr
   if (MExpr->GetOp()->is_logical()) {
@@ -155,28 +137,21 @@ void GROUP::NewMExpr(M_EXPR *MExpr) {
   if (count != -1) count++;
   if (COVETrace)  // New MExpr
   {
-    char buffer[10];  // Holds input group ID
-    CString temp;
+    string os;
     int arity = MExpr->GetArity();
     if (arity) {
       for (int i = 0; i < arity; i++) {
-        sprintf(buffer, "%d", MExpr->GetInput(i));
         // (void)itoa(MExpr -> GetInput(i), buffer, 10);
-        temp = temp + " " + buffer;
+        os = os + " " + to_string(MExpr->GetInput(i));
       }
     }
-    temp += " ";
+    os += " ";
 
-    CString os;
-    os.Format("addExp { %d %p \" %s  \"%s} %s",
-
-              GroupID, (MExpr), MExpr->GetOp()->Dump(), temp, LogProp->DumpCOVE());
-
-    OutputCOVE << (os) << endl;
+    OutputCOVE << "addExp { " << GroupID << " " << MExpr << " \" " << MExpr->GetOp()->Dump() << "  \"" << os << "} "
+               << LogProp->DumpCOVE() << endl;
   }
 }
 
-//##ModelId=3B0C08670044
 void GROUP::set_optimized(bool is_optimized) {
   SET_TRACE Trace(true);
 
@@ -187,7 +162,6 @@ void GROUP::set_optimized(bool is_optimized) {
   State.optimized = is_optimized;
 }
 
-//##ModelId=3B0C086700BC
 void GROUP::ShrinkSubGroup() {
   for (M_EXPR *MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
     for (int i = 0; i < MExpr->GetArity(); i++) Ssp->ShrinkGroup(MExpr->GetInput(i));
@@ -195,7 +169,6 @@ void GROUP::ShrinkSubGroup() {
 }
 
 // Delete a physical MExpr from a group, save memory
-//##ModelId=3B0C086700BD
 void GROUP::DeletePhysMExpr(M_EXPR *PhysMExpr) {
   M_EXPR *MExpr = FirstPhysMExpr;
   M_EXPR *next;

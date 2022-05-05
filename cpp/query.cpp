@@ -1,17 +1,3 @@
-/* query.cpp - implementation of query parser
-$Revision: 12 $
-Implements classes in query.h
-
-Columbia Optimizer Framework
-
-        A Joint Research Project of Portland State University
-           and the Oregon Graduate Institute
-        Directed by Leonard Shapiro and David Maier
-        Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-
-*/
-
 #include "../header/query.h"
 
 #include "../header/stdafx.h"
@@ -62,19 +48,19 @@ Columbia Optimizer Framework
     Expr = ParseExpr(ExprStr);              \
     free(OneElement);                       \
     Op = new COMP_OP(OP);                   \
-    return new EXPR(Op, Expr);              \
+    return new Expression(Op, Expr);        \
   }
 
-#define PARSE_OP2(KEYWORD_OP, OP)             \
-  if (p = strstr(OneElement, KEYWORD_OP)) {   \
-    LeftExpr = ParseExpr(ExprStr);            \
-    RightExpr = ParseExpr(ExprStr);           \
-    free(OneElement);                         \
-    Op = new COMP_OP(OP);                     \
-    return new EXPR(Op, LeftExpr, RightExpr); \
+#define PARSE_OP2(KEYWORD_OP, OP)                   \
+  if (p = strstr(OneElement, KEYWORD_OP)) {         \
+    LeftExpr = ParseExpr(ExprStr);                  \
+    RightExpr = ParseExpr(ExprStr);                 \
+    free(OneElement);                               \
+    Op = new COMP_OP(OP);                           \
+    return new Expression(Op, LeftExpr, RightExpr); \
   }
 
-QUERY::QUERY(string QueryFile) {
+Query::Query(string QueryFile) {
   FILE *fp;                  // file handle
   char TextLine[LINEWIDTH];  // text line buffer
   char Buf[MAXLENGTH];       // expression buffer
@@ -145,20 +131,18 @@ QUERY::QUERY(string QueryFile) {
 };
 
 // get the expr from parser
-//##ModelId=3B0C086D031D
-EXPR *QUERY::GetEXPR() { return QueryExpr; }
+Expression *Query::GetEXPR() { return QueryExpr; }
 
 // free up some occupied memory
-//##ModelId=3B0C086D0309
-QUERY::~QUERY() {
+Query::~Query() {
   // need to free QueryExpr
   delete QueryExpr;
 }
 
 // get an expression
-EXPR *QUERY::ParseExpr(char *&ExprStr) {
-  EXPR *LeftExpr, *RightExpr;
-  EXPR *Expr;
+Expression *Query::ParseExpr(char *&ExprStr) {
+  Expression *LeftExpr, *RightExpr;
+  Expression *Expr;
   OP *Op;
   char *p;
   char *OneElement;
@@ -186,7 +170,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 
     Op = new PROJECT(KeysSet.CopyOut(), KeysSet.GetSize());
 
-    return new EXPR(Op, Expr);
+    return new Expression(Op, Expr);
   }
 
   if (p = strstr(OneElement, KEYWORD_SELECT))  // SELECT
@@ -198,7 +182,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 
     Op = new SELECT;
 
-    return new EXPR(Op, LeftExpr, RightExpr);
+    return new Expression(Op, LeftExpr, RightExpr);
   }
 
   if (p = strstr(OneElement, KEYWORD_EQJOIN))  // EQJOIN
@@ -231,7 +215,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
     IntOrdersSet.Merge(LeftKeysSet);
     IntOrdersSet.Merge(RightKeysSet);
 
-    return new EXPR(Op, LeftExpr, RightExpr);
+    return new Expression(Op, LeftExpr, RightExpr);
   }
 
   if (p = strstr(OneElement, KEYWORD_DUMMY))  // DUMMY
@@ -245,7 +229,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 
     Op = new DUMMY();
 
-    return new EXPR(Op, LeftExpr, RightExpr);
+    return new Expression(Op, LeftExpr, RightExpr);
   }
 
   if (p = strstr(OneElement, KEYWORD_GET))  // GET
@@ -268,7 +252,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
       OUTPUT_ERROR(" GET is missing a COMMA !");
 
     free(OneElement);
-    return new EXPR(Op);
+    return new Expression(Op);
   }
 
   // Deal with item epxrs
@@ -280,7 +264,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
     Op = new ATTR_OP(GetAttId(ParseOneParameter(p)));
     free(OneElement);
 
-    return new EXPR(Op);
+    return new Expression(Op);
   }
 
   if (p = strstr(OneElement, KEYWORD_INT))  // INT
@@ -291,7 +275,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
     Op = new CONST_INT_OP(atoi(ParseOneParameter(p).c_str()));
     free(OneElement);
 
-    return new EXPR(Op);
+    return new Expression(Op);
   }
 
   if (p = strstr(OneElement, KEYWORD_STR))  // STR
@@ -302,7 +286,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
     Op = new CONST_STR_OP(ParseOneParameter(p));
     free(OneElement);
 
-    return new EXPR(Op);
+    return new Expression(Op);
   }
 
   if (p = strstr(OneElement, KEYWORD_SET))  // SET
@@ -313,7 +297,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
     Op = new CONST_SET_OP(ParseOneParameter(p));
     free(OneElement);
 
-    return new EXPR(Op);
+    return new Expression(Op);
   }
 
   if (p = strstr(OneElement, KEYWORD_RM_DUPLICATES))  // RM_DUPLICATES
@@ -324,7 +308,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 
     Op = new RM_DUPLICATES;
 
-    return new EXPR(Op, Expr);
+    return new Expression(Op, Expr);
   }
 
   if (p = strstr(OneElement, KEYWORD_AGG_LIST))  // AGG_LIST
@@ -349,7 +333,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
     int NumOps = AggOps->size();
     Op = new AGG_LIST(GbyKeysSet.CopyOut(), Size, AggOps);
 
-    return new EXPR(Op, Expr);
+    return new Expression(Op, Expr);
   }
 
   if (p = strstr(OneElement, KEYWORD_FUNC_OP))  // FUNC_OP
@@ -382,7 +366,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 
     Op = new FUNC_OP(range_var, AttrKeySet.CopyOut(), size);
 
-    return new EXPR(Op, Expr);
+    return new Expression(Op, Expr);
   }
 
   if (p = strstr(OneElement, KEYWORD_ORDER_BY))  // ORDER_BY
@@ -471,7 +455,7 @@ EXPR *QUERY::ParseExpr(char *&ExprStr) {
 }
 
 // get one element of the expression
-char *QUERY::GetOneElement(char *&Expr) {
+char *Query::GetOneElement(char *&Expr) {
   string Str;
   char *OneElement;
   int LeftNumber = 0;
@@ -519,7 +503,7 @@ char *QUERY::GetOneElement(char *&Expr) {
 
 // get an GET string
 //##ModelId=3B0C086D03A9
-string QUERY::ParseOneParameter(char *&p) {
+string Query::ParseOneParameter(char *&p) {
   string Str;
 
   p = SkipSpace(p);
@@ -537,7 +521,7 @@ string QUERY::ParseOneParameter(char *&p) {
 
 // get the project keys
 //##ModelId=3B0C086D0364
-void QUERY::ParsePJKeys(char *&p, KEYS_SET &Keys) {
+void Query::ParsePJKeys(char *&p, KEYS_SET &Keys) {
   p = SkipSpace(p);
   p++;  // skip '('
 
@@ -552,7 +536,7 @@ void QUERY::ParsePJKeys(char *&p, KEYS_SET &Keys) {
 
 // get the AGG_OP_ARRAY
 //##ModelId=3B0C086D03B3
-void QUERY::ParseAggOps(char *&p, AGG_OP_ARRAY &AggOps) {
+void Query::ParseAggOps(char *&p, AGG_OP_ARRAY &AggOps) {
   p = SkipSpace(p);
   p++;  // skip '('
 
@@ -567,7 +551,7 @@ void QUERY::ParseAggOps(char *&p, AGG_OP_ARRAY &AggOps) {
 
 // get the group by keys
 //##ModelId=3B0C086D03BE
-void QUERY::ParseGby(char *&p, KEYS_SET &Keys) {
+void Query::ParseGby(char *&p, KEYS_SET &Keys) {
   p = SkipSpace(p);
   p++;  // skip '('
 
@@ -586,7 +570,7 @@ void QUERY::ParseGby(char *&p, KEYS_SET &Keys) {
 
 // get two KEYSs
 //##ModelId=3B0C086D036F
-void QUERY::ParseKeys(char *p, KEYS_SET &Keys1, KEYS_SET &Keys2) {
+void Query::ParseKeys(char *p, KEYS_SET &Keys1, KEYS_SET &Keys2) {
   p = SkipSpace(p);
   p++;  // skip '('
 
@@ -603,7 +587,7 @@ void QUERY::ParseKeys(char *p, KEYS_SET &Keys1, KEYS_SET &Keys2) {
 
 // get one KEYS_SET
 //##ModelId=3B0C086D0383
-void QUERY::GetOneKeys(char *&p, KEYS_SET &Keys) {
+void Query::GetOneKeys(char *&p, KEYS_SET &Keys) {
   bool MoreKey = false;
 
   p = SkipSpace(p);
@@ -629,7 +613,7 @@ void QUERY::GetOneKeys(char *&p, KEYS_SET &Keys) {
 
 // get one KeySET, and add to KEYS_SET
 //##ModelId=3B0C086D0395
-void QUERY::GetKey(char *&p, KEYS_SET &Keys) {
+void Query::GetKey(char *&p, KEYS_SET &Keys) {
   string Col, Attr;
 
   p = SkipSpace(p);
@@ -650,7 +634,7 @@ void QUERY::GetKey(char *&p, KEYS_SET &Keys) {
 
 //	get one AGG_OP
 //##ModelId=3B0C086D03C9
-AGG_OP *QUERY::GetOneAggOp(char *&p) {
+AGG_OP *Query::GetOneAggOp(char *&p) {
   string range_var;
   KEYS_SET AttrKeySet;
 
@@ -669,7 +653,7 @@ AGG_OP *QUERY::GetOneAggOp(char *&p) {
 }
 
 //##ModelId=3B0C086D031E
-string QUERY::Dump() {
+string Query::Dump() {
   string os;
   int pos;
   // // format the output string, insert '\r' in front of '\n'
@@ -684,4 +668,4 @@ string QUERY::Dump() {
 }
 
 // display the interesting orders
-string QUERY::Dump_IntOrders() { return (IntOrdersSet.Dump()); }
+string Query::Dump_IntOrders() { return (IntOrdersSet.Dump()); }

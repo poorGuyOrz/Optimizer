@@ -52,7 +52,7 @@ double TouchCopyCost(LOG_COLL_PROP *LogProp) {
   Total -= Min;
   Total -= Max;
 
-  return (Total * Cm->touch_copy());
+  return (Total * costModel->touch_copy());
 };
 
 /* for cucard pruning, calculate the minimun cost of fetching cucard tuples from disc
@@ -67,8 +67,8 @@ double FetchingCost(LOG_COLL_PROP *LogProp) {
   for (int i = 0; i < LogProp->Schema->GetTableNum(); i++) {
     float CuCard = LogProp->Schema->GetTableMaxCuCard(i);
     float Width = LogProp->Schema->GetTableWidth(i);
-    Total += ceil(CuCard * Width) * (Cm->cpu_read() +  // cpu cost of reading from disk
-                                     Cm->io());        // i/o cost of reading from disk
+    Total += ceil(CuCard * Width) * (costModel->cpu_read() +  // cpu cost of reading from disk
+                                     costModel->io());        // i/o cost of reading from disk
   }
 
   return Total;
@@ -108,12 +108,11 @@ PHYS_PROP *FILE_SCAN::FindPhysProp(PHYS_PROP **input_phys_props) {
   // else return NULL;
 }
 
-//##ModelId=3B0C086E0170
 Cost *FILE_SCAN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float Card = ((LOG_COLL_PROP *)LocalLogProp)->Card;
   float Width = ((LOG_COLL_PROP *)LocalLogProp)->Schema->GetTableWidth(0);
-  Cost *Result = new Cost(ceil(Card * Width) * (Cm->cpu_read() +  // cpu cost of reading from disk
-                                                Cm->io())         // i/o cost of reading from disk
+  Cost *Result = new Cost(ceil(Card * Width) * (costModel->cpu_read() +  // cpu cost of reading from disk
+                                                costModel->io())         // i/o cost of reading from disk
   );
   return (Result);
 }
@@ -145,8 +144,8 @@ Cost *LOOPS_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp)
 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
-  Cost *result = new Cost(LeftCard * RightCard * Cm->cpu_pred()  // cpu cost of predicates
-                          + OutputCard * Cm->touch_copy()        // cpu cost of copying result
+  Cost *result = new Cost(LeftCard * RightCard * costModel->cpu_pred()  // cpu cost of predicates
+                          + OutputCard * costModel->touch_copy()        // cpu cost of copying result
                                                                  // no i/o cost
   );
 
@@ -224,8 +223,8 @@ Cost *PDUMMY::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
-  Cost *result = new Cost(LeftCard * RightCard * Cm->cpu_pred()  // cpu cost of predicates
-                          + OutputCard * Cm->touch_copy()        // cpu cost of copying result
+  Cost *result = new Cost(LeftCard * RightCard * costModel->cpu_pred()  // cpu cost of predicates
+                          + OutputCard * costModel->touch_copy()        // cpu cost of copying result
                                                                  // no i/o cost
   );
 
@@ -293,14 +292,14 @@ Cost *LOOPS_INDEX_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLo
 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
-  Cost *result = new Cost(LeftCard * Cm->index_probe()  // cpu cost of finding index
+  Cost *result = new Cost(LeftCard * costModel->index_probe()  // cpu cost of finding index
                           + OutputCard                  // number of result tuples
-                                * (2 * Cm->cpu_read()   // cpu cost of reading right index and result
-                                   + Cm->touch_copy())  // cpu cost of copying left result
-                          + MIN(LeftCard, ceil(RightCard / Cm->index_bf()))  // number of index blocks
-                                * Cm->io()                                   // i/o cost of reading right index
+                                * (2 * costModel->cpu_read()   // cpu cost of reading right index and result
+                                   + costModel->touch_copy())  // cpu cost of copying left result
+                          + MIN(LeftCard, ceil(RightCard / costModel->index_bf()))  // number of index blocks
+                                * costModel->io()                                   // i/o cost of reading right index
                           + MIN(OutputCard, ceil(RightCard * RightWidth))    // number of result blocks
-                                * Cm->io()                                   // i/o cost of reading right result
+                                * costModel->io()                                   // i/o cost of reading right result
   );
 
   return (result);
@@ -381,8 +380,8 @@ Cost *MERGE_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp)
 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
-  Cost *result = new Cost((LeftCard + RightCard) * Cm->cpu_pred()  // cpu cost of predicates
-                          + OutputCard * Cm->touch_copy()          // cpu cost of copying result
+  Cost *result = new Cost((LeftCard + RightCard) * costModel->cpu_pred()  // cpu cost of predicates
+                          + OutputCard * costModel->touch_copy()          // cpu cost of copying result
                                                                    // no i/o cost
   );
 
@@ -482,9 +481,9 @@ Cost *HASH_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) 
 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
-  Cost *result = new Cost(RightCard * Cm->hash_cost()      // cpu cost of building hash table
-                          + LeftCard * Cm->hash_probe()    // cpu cost of finding hash bucket
-                          + OutputCard * Cm->touch_copy()  // cpu cost of copying result
+  Cost *result = new Cost(RightCard * costModel->hash_cost()      // cpu cost of building hash table
+                          + LeftCard * costModel->hash_probe()    // cpu cost of finding hash bucket
+                          + OutputCard * costModel->touch_copy()  // cpu cost of copying result
   );                                                       // no i/o cost
 
   return (result);
@@ -547,8 +546,8 @@ Cost *FILTER::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
   // Need to have a cost for 0 tuples case	+ 1 ??
-  Cost *result = new Cost(InputCard * Cm->cpu_pred()       // cpu cost of predicates
-                          + OutputCard * Cm->touch_copy()  // cpu cost of copying result
+  Cost *result = new Cost(InputCard * costModel->cpu_pred()       // cpu cost of predicates
+                          + OutputCard * costModel->touch_copy()  // cpu cost of copying result
                                                            // no i/o cost
   );
 
@@ -607,7 +606,7 @@ Cost *P_PROJECT::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) 
   assert(InputCard == OutputCard);
 
   // Need to have a cost for 0 tuples case	+ 1 ??
-  Cost *result = new Cost(InputCard * Cm->touch_copy()  // cpu cost of copying result
+  Cost *result = new Cost(InputCard * costModel->touch_copy()  // cpu cost of copying result
                                                         // no i/o cost
   );
 
@@ -684,7 +683,7 @@ Cost *QSORT::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float card = MAX(1, OutputCard);
 
   Cost *result = new Cost(2 * card * log(card) / log(2.0)  // number of comparison and move
-                          * Cm->cpu_comp_move()            // cpu cost of compare and move
+                          * costModel->cpu_comp_move()            // cpu cost of compare and move
                                                            // no i/o cost
   );
 
@@ -719,9 +718,9 @@ Cost *HASH_DUPLICATES::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLog
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
   // Need to have a cost for 0 tuples case	+ 1 ??
-  Cost *result = new Cost(InputCard * Cm->hash_cost()      // cpu cost of hashing
+  Cost *result = new Cost(InputCard * costModel->hash_cost()      // cpu cost of hashing
                                                            // assume hash collisions add negligible cost
-                          + OutputCard * Cm->touch_copy()  // cpu cost of copying result
+                          + OutputCard * costModel->touch_copy()  // cpu cost of copying result
                                                            // no i/o cost
   );
 
@@ -748,9 +747,9 @@ Cost *HGROUP_LIST::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
   // Need to have a cost for 0 tuples case	+ 1 ??
-  Cost *result = new Cost(InputCard * (Cm->hash_cost()                        // cost of hashing
-                                       + Cm->cpu_apply() * (AggOps->size()))  // apply the aggregate operation
-                          + OutputCard * (Cm->touch_copy())                   // copy out the result
+  Cost *result = new Cost(InputCard * (costModel->hash_cost()                        // cost of hashing
+                                       + costModel->cpu_apply() * (AggOps->size()))  // apply the aggregate operation
+                          + OutputCard * (costModel->touch_copy())                   // copy out the result
   );
 
   return (result);
@@ -812,13 +811,12 @@ Cost *P_FUNC_OP::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
   // Need to have a cost for 0 tuples case	+ 1 ??
-  Cost *result = new Cost(InputCard * Cm->cpu_apply()      // cpu cost of applying aggregate operation
-                          + OutputCard * Cm->touch_copy()  // copy out the result
+  Cost *result = new Cost(InputCard * costModel->cpu_apply()      // cpu cost of applying aggregate operation
+                          + OutputCard * costModel->touch_copy()  // copy out the result
   );
   return (result);
 }  // P_FUNC_OP::FindLocalCost
 
-//##ModelId=3B0C08710125
 PHYS_PROP *P_FUNC_OP::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible) {
   assert(InputNo == 0);  // one input
   possible = true;
@@ -826,7 +824,6 @@ PHYS_PROP *P_FUNC_OP::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp,
   return new PHYS_PROP(*PhysProp);
 }
 
-//##ModelId=3B0C08710142
 string P_FUNC_OP::Dump() {
   string os;
   int i;
@@ -841,7 +838,6 @@ string P_FUNC_OP::Dump() {
   return os;
 }
 
-//##ModelId=3B0C087102B4
 BIT_JOIN::BIT_JOIN(int *lattrs, int *rattrs, int size, int CollId)
     : lattrs(lattrs), rattrs(rattrs), size(size), CollId(CollId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BIT_JOIN].New();
@@ -850,7 +846,6 @@ BIT_JOIN::BIT_JOIN(int *lattrs, int *rattrs, int size, int CollId)
 #endif
 }  // BIT_JOIN::BIT_JOIN
 
-//##ModelId=3B0C087102C1
 BIT_JOIN::BIT_JOIN(BIT_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size), CollId(Op.CollId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
@@ -859,14 +854,13 @@ BIT_JOIN::BIT_JOIN(BIT_JOIN &Op)
 #endif
 };
 
-//##ModelId=3B0C087102D4
 Cost *BIT_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float LeftCard = ((LOG_COLL_PROP *)InputLogProp[0])->Card;
 
   float OutputCard = ((LOG_COLL_PROP *)LocalLogProp)->Card;
 
-  Cost *result = new Cost(LeftCard * Cm->cpu_read()    // cpu cost of reading bit vector
-                          + LeftCard * Cm->cpu_pred()  // cpu cost of check bit vector
+  Cost *result = new Cost(LeftCard * costModel->cpu_read()    // cpu cost of reading bit vector
+                          + LeftCard * costModel->cpu_pred()  // cpu cost of check bit vector
                                                        // the above is overstated:
                                                        //	1. The read assumes we read 1
                                                        //	   bit at a time
@@ -874,17 +868,16 @@ Cost *BIT_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
                                                        //	   is just checking a single bit
                                                        //		+OutputCard
                                                        //// number of result tuples
-                                                       //		 * Cm->touch_copy()
+                                                       //		 * costModel->touch_copy()
                                                        //// cpu cost of projecting and
                                                        // copying result
-                          + (LeftCard / Cm->bit_bf())  // number of bit vector blocks
-                                * Cm->io()             // i/o cost of reading bit vector
+                          + (LeftCard / costModel->bit_bf())  // number of bit vector blocks
+                                * costModel->io()             // i/o cost of reading bit vector
   );
 
   return (result);
 }  // BIT_JOIN::FindLocalCost
 
-//##ModelId=3B0C087102DF
 PHYS_PROP *BIT_JOIN::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible) {
   if (InputNo == 1)  // no reqd prop for right input
   {
@@ -993,13 +986,13 @@ Cost *INDEXED_FILTER::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogP
      *      (e.g. value < 23) is FALSE
      */
     // single read index
-    index_cost = Cm->cpu_read()  // cpu cost of reading index from disk;
-                 + Cm->io();     // io cost of reading index from disk
+    index_cost = costModel->cpu_read()  // cpu cost of reading index from disk;
+                 + costModel->io();     // io cost of reading index from disk
     // read data until predicate fails
-    data_cost = ceil(OutputCard * Width) * (Cm->cpu_read()  // cpu cost of reading data from disk
-                                            + Cm->io());    // io cost of reading data from disk
+    data_cost = ceil(OutputCard * Width) * (costModel->cpu_read()  // cpu cost of reading data from disk
+                                            + costModel->io());    // io cost of reading data from disk
     // evaluate predicate until predicate fails
-    pred_cost = OutputCard * Cm->cpu_pred();
+    pred_cost = OutputCard * costModel->cpu_pred();
   } else {
     /*
      * Not clustered
@@ -1018,9 +1011,9 @@ Cost *INDEXED_FILTER::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogP
      *      Read each block of file, retrieve resulting tuples
      */
     // read as many index blocks as necessary
-    index_cost = ceil(OutputCard / Cm->index_bf()) * (Cm->cpu_read() + Cm->io());
+    index_cost = ceil(OutputCard / costModel->index_bf()) * (costModel->cpu_read() + costModel->io());
     // read all data blocks or read data for every index entry found
-    data_cost = MIN(ceil(InputCard * Width), OutputCard) * (Cm->cpu_read() + Cm->io());
+    data_cost = MIN(ceil(InputCard * Width), OutputCard) * (costModel->cpu_read() + costModel->io());
   }
 
   Cost *Result = new Cost(index_cost + data_cost + pred_cost);

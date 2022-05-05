@@ -13,11 +13,11 @@ int main(int argc, char const *argv[]) {
   ForGlobalEpsPruning = false;
   OptStat = new OPT_STAT;
 
-  Cm = new CostModel("../case/cost");
-  cout << Cm->Dump() << endl;
+  costModel = new CostModel("../case/cost");
+  cout << costModel->Dump() << endl;
 
-  RuleSet = new RULE_SET("../case/ruleset");
-  cout << RuleSet->Dump() << endl;
+  ruleSet = new RuleSet();
+  cout << ruleSet->Dump() << endl;
 
   Cost *HeuristicCost = new Cost(0);
   cout << HeuristicCost->Dump() << endl;
@@ -25,13 +25,13 @@ int main(int argc, char const *argv[]) {
   Cat = new CAT("../case/catalog");
   cout << Cat->Dump() << endl;
 
-  Query = new QUERY("../case/query");
-  cout << Query->Dump() << endl;
+  query = new Query("../case/query");
+  cout << query->Dump() << endl;
 
   Ssp = new SSP;
   Ssp->Init();
   cout << "ssp::::::" << Ssp->Dump() << endl;
-  delete Query;
+  delete query;
 
   std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
   auto timet = chrono::system_clock::to_time_t(now);
