@@ -25,6 +25,8 @@ bool TraceFinalSSP = false;  // global trace flag
 bool TraceOPEN = false;      // global trace flag
 bool TraceSSP = false;       // global trace flag
 
+int printnx = 0;
+
 bool Pruning = true;           // pruning flag
 bool CuCardPruning = true;     // cucard pruning flag
 bool GlobepsPruning = false;   // global epsilon pruning flag
@@ -73,7 +75,7 @@ CLASS_STAT ClassStat[] =  // class statistics object
         CLASS_STAT("FILTER", sizeof(class FILTER)),
         CLASS_STAT("FUNC_OP", sizeof(class FUNC_OP)),
         CLASS_STAT("GET", sizeof(class GET)),
-        CLASS_STAT("GROUP", sizeof(class GROUP)),
+        CLASS_STAT("Group", sizeof(class Group)),
         CLASS_STAT("HASH_DUPLICATES", sizeof(class HASH_DUPLICATES)),
         CLASS_STAT("HGROUP_LIST", sizeof(class HGROUP_LIST)),
         CLASS_STAT("INDEXED_FILTER", sizeof(class INDEXED_FILTER)),
@@ -83,7 +85,7 @@ CLASS_STAT ClassStat[] =  // class statistics object
         CLASS_STAT("LOG_ITEM_PROP", sizeof(class LOG_ITEM_PROP)),
         CLASS_STAT("LOOPS_INDEX_JOIN", sizeof(class LOOPS_INDEX_JOIN)),
         CLASS_STAT("LOOPS_JOIN", sizeof(class LOOPS_JOIN)),
-        CLASS_STAT("M_EXPR", sizeof(class M_EXPR)),
+        CLASS_STAT("MExression", sizeof(class MExression)),
         CLASS_STAT("M_WINNER", sizeof(class M_WINNER)),
         CLASS_STAT("MERGE_JOIN", sizeof(class MERGE_JOIN)),
         CLASS_STAT("HASH_JOIN", sizeof(class HASH_JOIN)),

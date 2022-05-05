@@ -208,14 +208,12 @@ LEAF OPERATORS - USED IN RULES - class LEAF_OP
 ============================================================
 */
 
-//##ModelId=3B0C08720374
 class LEAF_OP : public OP
 // Used in rules only.  Placeholder for a Group
 {
  private:
-  //##ModelId=3B0C08720393
   int Group;  // Identifies the group bound to this leaf, after binding.
-                 //  == -1 until binding
+              //  == -1 until binding
   //##ModelId=3B0C087203A7
   int Index;  // Used to distinguish this leaf in a rule
 
@@ -244,40 +242,31 @@ class LEAF_OP : public OP
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].Delete();
   };
 
-  //##ModelId=3B0C087203D9
   inline int GetArity() { return (0); };
-  //##ModelId=3B0C087203E2
   inline string GetName() { return ("LEAF_OP"); };
-  //##ModelId=3B0C08730004
   inline int GetGroup() { return (Group); };
-  //##ModelId=3B0C08730005
   inline int GetIndex() { return (Index); };
 
-  //##ModelId=3B0C0873000E
   inline bool is_leaf() { return true; };
 
   string Dump() { return GetName() + "<" + to_string(Index) + "," + to_string(Group) + ">"; };
 
   // add assert to the following functions,
   // make sure these methods of LEAF_OP never called
-  //##ModelId=3B0C08730022
   inline int GetNameId() {
     assert(false);
     return 0;
   };
-  //##ModelId=3B0C0873002C
   ub4 hash() {
     assert(false);
     return 0;
   };
 
-  //##ModelId=3B0C0873002D
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
     return NULL;
   };
 
-  //##ModelId=3B0C08730037
   LOG_PROP *FindLogProp(LOG_PROP **input) {
     assert(false);
     return NULL;

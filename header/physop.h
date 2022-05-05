@@ -144,47 +144,33 @@ class PDUMMY : public PHYS_OP {
    =======================
 */
 
-//##ModelId=3B0C086E03DD
 class LOOPS_INDEX_JOIN : public PHYS_OP {
  public:
-  //##ModelId=3B0C086F0009
   int *lattrs;  // left attr's that are the same
-  //##ModelId=3B0C086F0013
   int *rattrs;  // right attr's that are the same
-  //##ModelId=3B0C086F001D
-  int size;  // the number of the attrs
-  //##ModelId=3B0C086F0027
-  int CollId;  // collection id accessed thru index
+  int size;     // the number of the attrs
+  int CollId;   // collection id accessed thru index
 
  public:
-  //##ModelId=3B0C086F0031
   LOOPS_INDEX_JOIN(int *lattrs, int *rattrs, int size, int CollId);
-  //##ModelId=3B0C086F0045
   LOOPS_INDEX_JOIN(LOOPS_INDEX_JOIN &Op);
 
-  //##ModelId=3B0C086F004F
   inline OP *Clone() { return new LOOPS_INDEX_JOIN(*this); };
 
-  //##ModelId=3B0C086F0050
   ~LOOPS_INDEX_JOIN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
 
-  //##ModelId=3B0C086F0059
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
-  //##ModelId=3B0C086F0064
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
-  //##ModelId=3B0C086F0077
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C086F0078
   inline string GetName() { return ("LOOPS_INDEX_JOIN"); };
 
-  //##ModelId=3B0C086F0081
   string Dump();
 };  // LOOPS_INDEX_JOIN
 

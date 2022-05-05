@@ -1,8 +1,8 @@
-// group.cpp -  implementation of class GROUP
+// group.cpp -  implementation of class Group
 #include "../header/ssp.h"
 #include "../header/stdafx.h"
 
-GROUP::GROUP(M_EXPR *MExpr)
+Group::Group(MExression *MExpr)
     : GroupID(MExpr->GetGrpID()), FirstLogMExpr(MExpr), LastLogMExpr(MExpr), FirstPhysMExpr(NULL), LastPhysMExpr(NULL) {
   if (!ForGlobalEpsPruning) ClassStat[C_GROUP].New();
 
@@ -15,10 +15,10 @@ GROUP::GROUP(M_EXPR *MExpr)
     LogProp = (MExpr->GetOp())->FindLogProp(InputProp);
   } else {
     InputProp = new LOG_PROP *[arity];
-    GROUP *Group;
+    Group *group;
     for (int i = 0; i < arity; i++) {
-      Group = Ssp->GetGroup(MExpr->GetInput(i));
-      InputProp[i] = Group->LogProp;
+      group = Ssp->GetGroup(MExpr->GetInput(i));
+      InputProp[i] = group->LogProp;
     }
 
     LogProp = ((MExpr->GetOp())->FindLogProp(InputProp));
@@ -73,14 +73,14 @@ GROUP::GROUP(M_EXPR *MExpr)
 }
 
 // free up memory
-GROUP::~GROUP() {
+Group::~Group() {
   if (!ForGlobalEpsPruning) ClassStat[C_GROUP].Delete();
 
   delete LogProp;
   delete LowerBd;
 
-  M_EXPR *mexpr = FirstLogMExpr;
-  M_EXPR *next = mexpr;
+  MExression *mexpr = FirstLogMExpr;
+  MExression *next = mexpr;
   while (next != NULL) {
     next = mexpr->GetNextMExpr();
     delete mexpr;
@@ -102,16 +102,16 @@ GROUP::~GROUP() {
 
 // estimate the number of tables in EQJOIN
 //##ModelId=3B0C086701FC
-int GROUP::EstimateNumTables(M_EXPR *MExpr) {
+int Group::EstimateNumTables(MExression *MExpr) {
   int table_num;
   int total = 0;
-  GROUP *Group;
+  Group *group;
   int arity = MExpr->GetArity();
   // if the input is EQJOIN, continue to count all the input
   for (int i = 0; i < arity; i++) {
-    Group = Ssp->GetGroup(MExpr->GetInput(i));
-    if (Group->GetFirstLogMExpr()->GetOp()->GetName() == ("EQJOIN")) {
-      table_num = Group->EstimateNumTables(Group->GetFirstLogMExpr());
+    group = Ssp->GetGroup(MExpr->GetInput(i));
+    if (group->GetFirstLogMExpr()->GetOp()->GetName() == ("EQJOIN")) {
+      table_num = group->EstimateNumTables(group->GetFirstLogMExpr());
     } else
       table_num = 1;
     total += table_num;
@@ -119,7 +119,7 @@ int GROUP::EstimateNumTables(M_EXPR *MExpr) {
   return total;
 }
 
-void GROUP::NewMExpr(M_EXPR *MExpr) {
+void Group::NewMExpr(MExression *MExpr) {
   // link to last mexpr
   if (MExpr->GetOp()->is_logical()) {
     LastLogMExpr->SetNextMExpr(MExpr);
@@ -152,7 +152,7 @@ void GROUP::NewMExpr(M_EXPR *MExpr) {
   }
 }
 
-void GROUP::set_optimized(bool is_optimized) {
+void Group::set_optimized(bool is_optimized) {
   SET_TRACE Trace(true);
 
   if (is_optimized) {
@@ -162,16 +162,16 @@ void GROUP::set_optimized(bool is_optimized) {
   State.optimized = is_optimized;
 }
 
-void GROUP::ShrinkSubGroup() {
-  for (M_EXPR *MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
+void Group::ShrinkSubGroup() {
+  for (MExression *MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
     for (int i = 0; i < MExpr->GetArity(); i++) Ssp->ShrinkGroup(MExpr->GetInput(i));
   }
 }
 
 // Delete a physical MExpr from a group, save memory
-void GROUP::DeletePhysMExpr(M_EXPR *PhysMExpr) {
-  M_EXPR *MExpr = FirstPhysMExpr;
-  M_EXPR *next;
+void Group::DeletePhysMExpr(MExression *PhysMExpr) {
+  MExression *MExpr = FirstPhysMExpr;
+  MExression *next;
   if (MExpr == PhysMExpr) {
     FirstPhysMExpr = MExpr->GetNextMExpr();
     // if the MExpr to be deleted is the only one in the group,
@@ -196,10 +196,10 @@ void GROUP::DeletePhysMExpr(M_EXPR *PhysMExpr) {
   }
 }
 
-string GROUP::Dump() {
+string Group::Dump() {
   string os;
   int Size = 0;
-  M_EXPR *MExpr;
+  MExression *MExpr;
 
   os = "Group: " + to_string(GroupID) + "\n";
 
@@ -250,9 +250,9 @@ string GROUP::Dump() {
   return os;
 }
 
-void GROUP::FastDump() {
+void Group::FastDump() {
   int Size = 0;
-  M_EXPR *MExpr;
+  MExression *MExpr;
 
   OutputFile << "----- Group " << GroupID << " : -----" << endl;
 

@@ -58,12 +58,6 @@ class Query {
   AGG_OP *GetOneAggOp(char *&p);
 };
 
-/*
-============================================================
-EXPRESSIONS - class Expression
-============================================================
-*/
-
 class Expression  // An Expression corresponds to a detailed solution to
 // the original query or a subquery.
 // An Expression is modeled as an operator with arguments (class OP),
@@ -77,9 +71,10 @@ class Expression  // An Expression corresponds to a detailed solution to
   OP *Op;               // Operator
   int arity;            // Number of input expressions.
   Expression **Inputs;  // Input expressions
+
  public:
-  Expression(OP *Op, Expression *First = NULL, Expression *Second = NULL, Expression *Third = NULL,
-             Expression *Fourth = NULL)
+  Expression(OP *Op, Expression *First = nullptr, Expression *Second = nullptr, Expression *Third = nullptr,
+             Expression *Fourth = nullptr)
       : Op(Op), arity(0) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
 
@@ -113,7 +108,6 @@ class Expression  // An Expression corresponds to a detailed solution to
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].Delete();
 
     delete Op;
-    Op = NULL;
     if (arity) {
       for (int i = 0; i < arity; i++) delete Inputs[i];
       delete[] Inputs;
@@ -126,15 +120,18 @@ class Expression  // An Expression corresponds to a detailed solution to
 
   string Dump() {
     string os;
-    os += "\n\t(";
+    os += "(";
     os += (*Op).Dump();
     int i;
     for (i = 0; i < arity; i++) {
-      os += ",";
+      os += ",\n";
+      ++printnx;
+      for (size_t j = 0; j < printnx; j++) os += "    ";
       os += Inputs[i]->Dump();
+      --printnx;
     }
     os += ")";
     return os;
   };
 
-};  // class  Expression
+};

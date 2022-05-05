@@ -3,13 +3,13 @@
 #pragma once
 #include "../header/query.h"
 
-#define NEW_GRPID -1  // used by SSP::CopyIn and M_EXPR::M_EXPR
+#define NEW_GRPID -1  // used by SSP::CopyIn and MExression::MExression
 // means need to create a new group
 #define NEW_GRPID_NOWIN -2  // use by SSP::CopyIn.  Means NEW_GRPID, and this is a
 // subgroup of DUMMY so don't init nontrivial winners
 class SSP;
-class GROUP;
-class M_EXPR;
+class Group;
+class MExression;
 class WINNER;
 class M_WINNER;
 
@@ -25,23 +25,23 @@ A Search Space typically consists of a collection of possible solutions
 to the problem and its subproblems. Dynamic Programming and
 Memoization are two approaches to using a Search Space to solve a problem.
 Both Dynamic Programming and Memoization partition the possible solutions
-by logical equivalence. We will call each partition a GROUP.  Thus a GROUP
+by logical equivalence. We will call each partition a Group.  Thus a Group
 contains a collection of logically equivalent expressions.
 
 In our setting of query optimization, logical equivalence is query equivalence.
-Each GROUP corresponds to a temporary collection, or a subquery, in a
+Each Group corresponds to a temporary collection, or a subquery, in a
 computation of the main query.  If the main query is A join B join C, then
 there are GROUPs representing A join B, A join C, C, etc.
 
 In our approach to query optimization, each possible solution in the Search
 Space is represented compactly, by what we call a Multi-expression
-(class M_EXPR).  A solution in the search space can also be represented in
+(class MExression).  A solution in the search space can also be represented in
 more detail by an expression (class Expression).
 */
 // Search Space
 class SSP {
  public:
-  M_EXPR **HashTbl;  // To identify duplicate MExprs
+  MExression **HashTbl;  // To identify duplicate MExprs
 
   SSP();
 
@@ -59,7 +59,7 @@ class SSP {
   // merge groups.
   // GrpID is the ID of the group where Mexpr will be put.  If GrpID is
   // NEW_GRPID(-1), make a new group with that ID and return its value in GrpID.
-  M_EXPR *CopyIn(Expression *Expr, int &GrpID);
+  MExression *CopyIn(Expression *Expr, int &GrpID);
 
   // Copy out the final plan.  Recursive, each time increasing tabs by
   //  one, so the plan is indented.
@@ -72,17 +72,17 @@ class SSP {
   inline int GetRootGID() { return (RootGID); };
 
   // return the specific group
-  inline GROUP *GetGroup(int Gid) { return Groups[Gid]; };
+  inline Group *GetGroup(int Gid) { return Groups[Gid]; };
 
   // If another expression in the search space is identical to MExpr, return
-  //  it, else return NULL.
+  //  it, else return nullptr.
   //  Identical means operators and arguments, and input groups are the same.
-  M_EXPR *FindDup(M_EXPR &MExpr);
+  MExression *FindDup(MExression &MExpr);
 
   // When a duplicate is found in two groups they should be merged into
   //  the same group.  We always merge bigger group_no group to smaller one.
   int MergeGroups(int group_no1, int group_no2);
-  // int MergeGroups(GROUP & ToGroup, GROUP & FromGroup);
+  // int MergeGroups(Group & ToGroup, Group & FromGroup);
 
   void ShrinkGroup(int group_no);  // shrink the group marked completed
   void Shrink();                   // shrink the ssp
@@ -102,7 +102,7 @@ class SSP {
   int NewGrpID;      // ID of the newest group, initially -1
 
   // Collection of Groups, indexed by int
-  vector<GROUP *> Groups;
+  vector<Group *> Groups;
 
 };  // class SSP
 
@@ -110,56 +110,43 @@ class SSP {
    ============================================================
    MULTI_EXPRESSIONS - class M_EXP
    ============================================================
-   M_EXPR is a compact form of Expression which utilizes sharing.  Inputs are
-   GROUPs instead of EXPRs, so the M_EXPR embodies several EXPRs.
+   MExression is a compact form of Expression which utilizes sharing.  Inputs are
+   GROUPs instead of EXPRs, so the MExression embodies several EXPRs.
    All searching is done with M_EXPRs, so each contains lots of state.
 
 */
-class M_EXPR {
+class MExression {
  private:
-  M_EXPR *HashPtr;  // list within hash bucket
-
+  MExression *HashPtr;  // list within hash bucket
   BIT_VECTOR RuleMask;  // If 1, do not fire rule with that index
-
-  int counter;  // to keep track of how many winners point to this MEXPR
-  OP *Op;       // Operator
+  int counter;          // to keep track of how many winners point to this MEXPR
+  OP *Op;               // Operator
   int *Inputs;
   int GrpID;  // I reside in this group
 
   // link to the next mexpr in the same group
-  M_EXPR *NextMExpr;
+  MExression *NextMExpr;
 
-  /*
-  //This struct will be replaced with more efficient and flexible storage
-  //Histor of which rules have been fired on this M_EXPR
-  struct RuleHist {
-  } RuleHist;
-  */
  public:
-  /*M_EXPR(OP * Op,
-    int First = NULL, int Second = NULL,
-    int Third = NULL, int Fourth = NULL);
-  */
-  ~M_EXPR() {
+  ~MExression() {
     if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].Delete();
     if (GetArity()) {
       delete[] Inputs;
     }
 
     delete Op;
-    Op = NULL;
   };
 
-  // M_EXPR(OP * Op, int* inputs); //Used by CopyIn
+  // MExression(OP * Op, int* inputs); //Used by CopyIn
 
-  // Transform an Expression into an M_EXPR.  May involve creating new Groups.
-  //  GrpID is the ID of the group where the M_EXPR will be put.  If GrpID is
+  // Transform an Expression into an MExression.  May involve creating new Groups.
+  //  GrpID is the ID of the group where the MExression will be put.  If GrpID is
   //  NEW_GRPID(-1), make a new group with that ID.  (Same as SSP::CopyIn)
-  M_EXPR(Expression *Expr, int grpid)
+  MExression(Expression *Expr, int grpid)
       : Op(Expr->GetOp()->Clone()),
-        NextMExpr(NULL),
+        NextMExpr(nullptr),
         GrpID((grpid == NEW_GRPID) ? Ssp->GetNewGrpID() : grpid),
-        HashPtr(NULL),
+        HashPtr(nullptr),
         RuleMask(0) {
     int GID;
     Expression *input;
@@ -182,7 +169,7 @@ class M_EXPR {
             GID = NEW_GRPID_NOWIN;  // DUMMY subgroups have only trivial winners
           else
             GID = NEW_GRPID;
-          M_EXPR *MExpr = Ssp->CopyIn(input, GID);
+          MExression *MExpr = Ssp->CopyIn(input, GID);
         }
 
         Inputs[i] = GID;
@@ -190,7 +177,7 @@ class M_EXPR {
     }  // if(arity)
   };
 
-  M_EXPR(M_EXPR &other)
+  MExression(MExression &other)
       : GrpID(other.GrpID),
         HashPtr(other.HashPtr),
         NextMExpr(other.NextMExpr),
@@ -217,11 +204,11 @@ class M_EXPR {
   inline int GetGrpID() { return (GrpID); };
   inline int GetArity() { return (Op->GetArity()); };
 
-  inline M_EXPR *GetNextHash() { return HashPtr; };
-  inline void SetNextHash(M_EXPR *mexpr) { HashPtr = mexpr; };
+  inline MExression *GetNextHash() { return HashPtr; };
+  inline void SetNextHash(MExression *mexpr) { HashPtr = mexpr; };
 
-  inline void SetNextMExpr(M_EXPR *MExpr) { NextMExpr = MExpr; };
-  inline M_EXPR *GetNextMExpr() { return NextMExpr; };
+  inline void SetNextMExpr(MExression *MExpr) { NextMExpr = MExpr; };
+  inline MExression *GetNextMExpr() { return NextMExpr; };
 
   // We just fired this rule, so update dont_fire bit vector
   inline void fire_rule(int rule_no) { bit_on(RuleMask, rule_no); };
@@ -253,30 +240,30 @@ class M_EXPR {
     return os;
   };
 
-};  // class M_EXPR
+};  // class MExression
 
 /*
 
 ============================================================
-class GROUP
+class Group
 ============================================================
 The main problem, and its subproblems, consist of
-a search to find the cheapest MultiExpression in a GROUP,
+a search to find the cheapest MultiExpression in a Group,
 satisfying some context.
 
-A GROUP includes a collection of logically equivalent M_EXPR's.
-The GROUP also contains logical properties shared by all M_EXPR's
+A Group includes a collection of logically equivalent MExression's.
+The Group also contains logical properties shared by all MExression's
 in the group.
 
-A GROUP also contains a winner's circle consisting of winners from
-previous searches of the GROUP.  Note that each search may of the
-GROUP may have different contexts and thus different winners.
+A Group also contains a winner's circle consisting of winners from
+previous searches of the Group.  Note that each search may of the
+Group may have different contexts and thus different winners.
 
-A GROUP can also be thought of as a temporary collection, or
+A Group can also be thought of as a temporary collection, or
 subquery, in a computation of the main query.
 
 We assume the following three conditions are equivalent:
-(1) There is a winner (maybe with null *plan) for some property, with done==true
+(1) There is a winner (maybe with nullptr *plan) for some property, with done==true
 (2) The group contains all possible logical and physical expressions except for
      enforcers
 (3) The bit "optimized" is turned on.
@@ -288,36 +275,29 @@ And any of these imply:
 The truth of the above assumptions depend on whether we fire all
 applicable rules when the property is ANY. */
 
-//##ModelId=3B0C0866009C
 struct BIT_STATE {
-  //##ModelId=3B0C086600B1
   unsigned changed : 1;  // has the group got changed or just created?
   // Used for tracing
-  //##ModelId=3B0C086600C5
-  unsigned exploring : 1;  // is the group being explored?
-  //##ModelId=3B0C086600D9
-  unsigned explored : 1;  // Has the group been explored?
-  //##ModelId=3B0C086600F7
+  unsigned exploring : 1;   // is the group being explored?
+  unsigned explored : 1;    // Has the group been explored?
   unsigned optimizing : 1;  // is the group being optimized?
-  //##ModelId=3B0C0866010B
-  unsigned optimized : 1;  // has the group been optimized (completed) ?
-  //##ModelId=3B0C08660129
+  unsigned optimized : 1;   // has the group been optimized (completed) ?
   unsigned others : 1;
 };
 
-class GROUP {
+class Group {
  public:
-  GROUP(M_EXPR *MExpr);  // Create a new Group containing just this MExpression
-  ~GROUP();
+  Group(MExression *MExpr);  // Create a new Group containing just this MExpression
+  ~Group();
 
   string Dump();
   void FastDump();
 
   // Find first and last (in some sense) MExpression in this Group
-  inline M_EXPR *GetFirstLogMExpr() { return FirstLogMExpr; };
-  inline M_EXPR *GetFirstPhysMExpr() { return FirstPhysMExpr; };
-  inline void SetLastLogMExpr(M_EXPR *last) { LastLogMExpr = last; };
-  inline void SetLastPhysMExpr(M_EXPR *last) { LastPhysMExpr = last; };
+  inline MExression *GetFirstLogMExpr() { return FirstLogMExpr; };
+  inline MExression *GetFirstPhysMExpr() { return FirstPhysMExpr; };
+  inline void SetLastLogMExpr(MExression *last) { LastLogMExpr = last; };
+  inline void SetLastPhysMExpr(MExression *last) { LastPhysMExpr = last; };
 
   // Manipulate states
   inline void init_state() { State.changed = State.explored = State.exploring = State.optimized = false; }
@@ -338,13 +318,13 @@ class GROUP {
   inline int GetGroupID() { return (GroupID); };
 
   // Add a new MExpr to the group
-  void NewMExpr(M_EXPR *MExpr);
+  void NewMExpr(MExression *MExpr);
 
   /*search_circle returns the state of the winner's circle for this
   context and group - it does no rule firing.  Thus it is cheap to execute.
     search_circle returns in four possible states:
   (1) There is no possibility of satisfying C
-  (2) There is a non-null winner which satisfies C
+  (2) There is a non-nullptr winner which satisfies C
   (3) More search is needed, and there has been no search
       for this property before
   (4) More search is needed, and there has been a search for
@@ -372,16 +352,16 @@ class GROUP {
 #endif
 
   // Manipulate Winner's circle
-  // Return winner for this property, null if there is none
+  // Return winner for this property, nullptr if there is none
   WINNER *GetWinner(PHYS_PROP *PhysProp);
   // If there is a winner for ReqdProp, error.
   // Create a new winner for the property ReqdProp, with these parameters.
   // Used when beginning the first search for ReqdProp.
-  void NewWinner(PHYS_PROP *ReqdProp, M_EXPR *MExpr, Cost *TotalCost, bool done);
+  void NewWinner(PHYS_PROP *ReqdProp, MExression *MExpr, Cost *TotalCost, bool done);
 
   void ShrinkSubGroup();
 
-  void DeletePhysMExpr(M_EXPR *PhysMExpr);  // delete a physical mexpr from a group
+  void DeletePhysMExpr(MExression *PhysMExpr);  // delete a physical mexpr from a group
 
   bool CheckWinnerDone();  // check if there is at least one winner done in this group
 
@@ -393,14 +373,14 @@ class GROUP {
  private:
   int GroupID;  // ID of this group
 
-  M_EXPR *FirstLogMExpr;   // first log M_EXPR in  the GROUP
-  M_EXPR *LastLogMExpr;    // last log M_EXPR in  the GROUP
-  M_EXPR *FirstPhysMExpr;  // first phys M_EXPR in  the GROUP
-  M_EXPR *LastPhysMExpr;   // last phys M_EXPR in  the GROUP
+  MExression *FirstLogMExpr;   // first log MExression in  the Group
+  MExression *LastLogMExpr;    // last log MExression in  the Group
+  MExression *FirstPhysMExpr;  // first phys MExression in  the Group
+  MExression *LastPhysMExpr;   // last phys MExression in  the Group
 
   struct BIT_STATE State;  //  the state of the group
 
-  LOG_PROP *LogProp;  // Logical properties of this GROUP
+  LOG_PROP *LogProp;  // Logical properties of this Group
   Cost *LowerBd;      // lower bound of cost of fetching cucard tuples from disc
 
   // Winner's circle
@@ -412,13 +392,13 @@ class GROUP {
 
   int count;
 
-  int EstimateNumTables(M_EXPR *MExpr);
+  int EstimateNumTables(MExression *MExpr);
 
 #ifdef FIRSTPLAN
   static bool firstplan;
 #endif
 
-};  // class GROUP
+};  // class Group
 
 /*
 ============================================================
@@ -426,22 +406,22 @@ WINNER
 ============================================================
 The key idea of dynamic programming/memoization is to save the results
 of searches for future use.  A WINNER is such a result.  In general a WINNER
-contains the M_EXPR which won a search plus the context (CONT) used in the search.
+contains the MExression which won a search plus the context (CONT) used in the search.
 Done = False, in a winner, means this winner is under construction; its search is
 not complete.
 
 Each group has a set of winners derived from previous searches of that group.
 This set of winners is called a memo in the classic literature; here we call
-it a winner's circle (cf. the GROUP class).
+it a winner's circle (cf. the Group class).
 
 A winner can represent these cases, if Done is true:
-(1) If MPlan is not null:
+(1) If MPlan is not nullptr:
         *MPlan is the cheapest possible plan in this group with PhysProp.
         *MPlan has cost *Cost.  This derives from a successful search.
-(2) If MPlan is null, and Cost is not null:
+(2) If MPlan is nullptr, and Cost is not nullptr:
         All possible plans in this group with PhysProp cost more than *Cost.
         This derives from a search which fails because of cost.
-(3) If MPlan is null, and Cost is null:
+(3) If MPlan is nullptr, and Cost is nullptr:
         There can be no plan in this group with PhysProp
         (Should never happen if we have enforcers)
         (also should not happen because winners are initialized with context's costs)
@@ -454,7 +434,7 @@ the cheapest plan yet found, and its cost, are stored in a winner.
 class WINNER {
  private:
   //##ModelId=3B0C08670365
-  M_EXPR *MPlan;
+  MExression *MPlan;
   //##ModelId=3B0C08670379
   PHYS_PROP *PhysProp;  // PhysProp and Cost typically represent the context of
   //##ModelId=3B0C08670397
@@ -464,7 +444,7 @@ class WINNER {
   bool Done;  // Is this a real winner; is the current search complete?
  public:
   //##ModelId=3B0C086703BE
-  WINNER(M_EXPR *, PHYS_PROP *, Cost *, bool done = false);
+  WINNER(MExression *, PHYS_PROP *, Cost *, bool done = false);
   //##ModelId=3B0C086703DD
   ~WINNER() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].Delete();
@@ -473,7 +453,7 @@ class WINNER {
   };
 
   //##ModelId=3B0C086703DE
-  inline M_EXPR *GetMPlan() { return (MPlan); };
+  inline MExression *GetMPlan() { return (MPlan); };
   //##ModelId=3B0C086703E7
   inline PHYS_PROP *GetPhysProp() { return (PhysProp); };
   //##ModelId=3B0C086703E8
@@ -506,7 +486,7 @@ class M_WINNER {
 
  private:
   int wide;  // size of each element
-  M_EXPR **BPlan;
+  MExression **BPlan;
   PHYS_PROP **PhysProp;
   Cost **Bound;
 
@@ -517,7 +497,7 @@ class M_WINNER {
     delete[] BPlan;
     for (int i = 0; i < wide; i++) {
       delete PhysProp[i];
-      if (Bound[i] != NULL) delete Bound[i];
+      if (Bound[i] != nullptr) delete Bound[i];
     }
     delete[] PhysProp;
     delete[] Bound;
@@ -526,16 +506,16 @@ class M_WINNER {
   inline int GetWide() { return wide; };
 
   // Return the requested MEXPR indexed by an integer
-  inline M_EXPR *GetBPlan(int i) { return (BPlan[i]); };
+  inline MExression *GetBPlan(int i) { return (BPlan[i]); };
 
   // Return the MEXPR indexed by the physical property
-  inline M_EXPR *GetBPlan(PHYS_PROP *PhysProp) {
+  inline MExression *GetBPlan(PHYS_PROP *PhysProp) {
     for (int i = 0; i < wide; i++) {
       if (*GetPhysProp(i) == *PhysProp) {
         return (BPlan[i]);
       }
     }
-    return (NULL);
+    return (nullptr);
   };
 
   inline void SetPhysProp(int i, PHYS_PROP *Prop) { PhysProp[i] = Prop; }
@@ -557,14 +537,14 @@ class M_WINNER {
   inline void SetUpperBound(Cost *NewUB, PHYS_PROP *Prop) {
     for (int i = 0; i < wide; i++) {
       if (*GetPhysProp(i) == *Prop) {
-        if (Bound[i] != NULL) delete Bound[i];
+        if (Bound[i] != nullptr) delete Bound[i];
         Bound[i] = NewUB;
       }
     }
   };
 
   // Update the MEXPR
-  inline void SetBPlan(M_EXPR *Winner, int i) { BPlan[i] = Winner; };
+  inline void SetBPlan(MExression *Winner, int i) { BPlan[i] = Winner; };
 
   // print the multiwinners
   string Dump() {
@@ -574,10 +554,10 @@ class M_WINNER {
       os += ",  ";
       os += Bound[i]->Dump();
       os += ",  ";
-      if (BPlan[i] != NULL)
+      if (BPlan[i] != nullptr)
         os += BPlan[i]->Dump();
       else
-        os += "NULL";
+        os += "nullptr";
       os += "\n";
     }
     return os;

@@ -125,8 +125,6 @@ Query::Query(string QueryFile) {
   char *ExprStr = Buf;
   QueryExpr = ParseExpr(ExprStr);
 
-  cout << "initial query tree: " << QueryExpr->Dump() << endl;
-
   fclose(fp);
 };
 
@@ -586,7 +584,6 @@ void Query::ParseKeys(char *p, KEYS_SET &Keys1, KEYS_SET &Keys2) {
 }
 
 // get one KEYS_SET
-//##ModelId=3B0C086D0383
 void Query::GetOneKeys(char *&p, KEYS_SET &Keys) {
   bool MoreKey = false;
 
@@ -633,7 +630,6 @@ void Query::GetKey(char *&p, KEYS_SET &Keys) {
 }
 
 //	get one AGG_OP
-//##ModelId=3B0C086D03C9
 AGG_OP *Query::GetOneAggOp(char *&p) {
   string range_var;
   KEYS_SET AttrKeySet;
@@ -652,20 +648,7 @@ AGG_OP *Query::GetOneAggOp(char *&p) {
   return (new AGG_OP(range_var, AttrKeySet.CopyOut(), size));
 }
 
-//##ModelId=3B0C086D031E
-string Query::Dump() {
-  string os;
-  int pos;
-  // // format the output string, insert '\r' in front of '\n'
-  // while ((pos = ExprBuf.find('\n')) != string::npos) {
-  //   os += ExprBuf.substr(0, pos);
-  //   os += "\n";
-  //   ExprBuf = ExprBuf.Mid(pos + 1);
-  // }
-  os += QueryExpr->Dump();
-
-  return os;
-}
+string Query::Dump() { return QueryExpr->Dump(); }
 
 // display the interesting orders
 string Query::Dump_IntOrders() { return (IntOrdersSet.Dump()); }

@@ -26,11 +26,13 @@ int main(int argc, char const *argv[]) {
   cout << Cat->Dump() << endl;
 
   query = new Query("../case/query");
-  cout << query->Dump() << endl;
+  cout << endl << query->Dump() << endl;
 
   Ssp = new SSP;
   Ssp->Init();
-  cout << "ssp::::::" << Ssp->Dump() << endl;
+  Ssp->FastDump();
+
+  cout << "ssp-->" << endl << Ssp->DumpHashTable() << endl;
   delete query;
 
   std::chrono::system_clock::time_point now = std::chrono::system_clock::now();

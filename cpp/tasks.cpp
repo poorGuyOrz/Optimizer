@@ -54,7 +54,7 @@ OptimizeGroupTask::OptimizeGroupTask(int grpID, int ContextID, int parentTaskNo,
 /*
 OptimizeGroupTask::perform
 {
-    see search_circle in declaration of class GROUP, for notation
+    see search_circle in declaration of class Group, for notation
 
     Call search_circle
     If cases (1) or (2),
@@ -96,14 +96,14 @@ void OptimizeGroupTask::perform() {
 #endif
   PTRACE("Last flag is " << Last);
 
-  GROUP *Group = Ssp->GetGroup(GrpID);
-  M_EXPR *FirstLogMExpr = Group->GetFirstLogMExpr();
+  Group *group = Ssp->GetGroup(GrpID);
+  MExression *FirstLogMExpr = group->GetFirstLogMExpr();
 
   if (FirstLogMExpr->GetOp()->is_const()) {
     PTRACE("Group " << GrpID << " is const group");
 #ifndef IRPROP
-    M_EXPR *WPlan = new M_EXPR(*FirstLogMExpr);
-    Group->NewWinner(new PHYS_PROP(any), WPlan, new Cost(0), true);
+    MExression *WPlan = new MExression(*FirstLogMExpr);
+    group->NewWinner(new PHYS_PROP(any), WPlan, new Cost(0), true);
 #endif
     return;
   }
@@ -113,7 +113,7 @@ void OptimizeGroupTask::perform() {
 #ifdef IRPROP
 
   PHYS_PROP *LocalReqdProp = M_WINNER::mc[GrpID]->GetPhysProp(ContextID);  // What prop is required of
-  SCReturn = Group->search_circle(GrpID, LocalReqdProp, moreSearch);
+  SCReturn = group->search_circle(GrpID, LocalReqdProp, moreSearch);
   if (!moreSearch) {
     // group is completely optimized
     PTRACE("%s", "Winner's circle is prepared so terminate this task");
@@ -122,7 +122,7 @@ void OptimizeGroupTask::perform() {
   } else  // group is not optimized at all
   {
     // Get the first logical mexpr in the group
-    M_EXPR *LogMExpr = Group->GetFirstLogMExpr();
+    MExression *LogMExpr = group->GetFirstLogMExpr();
 
     // push the enforcer rule before pushing the first logical MEXPR
     PTRACE("%s", "Push ApplyRuleTask on enforcer rule");
@@ -139,7 +139,7 @@ void OptimizeGroupTask::perform() {
   PHYS_PROP *LocalReqdProp = LocalCont->GetPhysProp();  // What prop is required
   Cost *LocalCost = LocalCont->GetUpperBd();
 
-  SCReturn = Group->search_circle(LocalCont, moreSearch);
+  SCReturn = group->search_circle(LocalCont, moreSearch);
 
   // If case (2) or (1), terminate this task
   if (!moreSearch) {
@@ -148,13 +148,13 @@ void OptimizeGroupTask::perform() {
     return;
   }
 
-  PTRACE("Group is " << (Group->is_optimized() ? "" : "not") << " optimized");
-  if (!Group->is_optimized()) {
+  PTRACE("Group is " << (group->is_optimized() ? "" : "not") << " optimized");
+  if (!group->is_optimized()) {
     assert(moreSearch && !SCReturn);  // assert (this is case 3)
     // if (property is ANY)
     if (LocalReqdProp->GetOrder() == any) {
       PTRACE("add winner with null plan, push OptimizeExprTask on 1st logical expression");
-      Group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
+      group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
       if (GlobepsPruning) {
         Cost *eps_bound = new Cost(*EpsBound);
         PTasks.push(new OptimizeExprTask(FirstLogMExpr, false, ContextID, TaskNo, true, eps_bound));
@@ -182,12 +182,12 @@ void OptimizeGroupTask::perform() {
     // if (property is ANY)
     // assert (this is case 4)
     // push O_INPUTS on all physical mexprs
-    vector<M_EXPR *> PhysMExprs;
+    vector<MExression *> PhysMExprs;
     int count = 0;
     if (LocalReqdProp->GetOrder() == any) {
       PTRACE("push O_INPUTS on all physical mexprs");
       assert(moreSearch && SCReturn);
-      for (M_EXPR *PhysMExpr = Group->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
+      for (MExression *PhysMExpr = group->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
         PhysMExprs.push_back(PhysMExpr);
         count++;
       }
@@ -214,7 +214,7 @@ void OptimizeGroupTask::perform() {
       assert(LocalReqdProp->GetOrder() == sorted);  // temporary
       // Push O_INPUTS on all physical mexprs with current context, last one is last task
       PTRACE("Push O_INPUTS on all physical mexprs");
-      for (M_EXPR *PhysMExpr = Group->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
+      for (MExression *PhysMExpr = group->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
         PhysMExprs.push_back(PhysMExpr);
         count++;
       }
@@ -255,7 +255,7 @@ void OptimizeGroupTask::perform() {
       // add a winner to the circle, with null plan.
       //(i.e., initialize the winner's circle for this property.)
       PTRACE("Init winner's circle for this property");
-      if (moreSearch && !SCReturn) Group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
+      if (moreSearch && !SCReturn) group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
     }
   }
 #endif
@@ -286,27 +286,27 @@ void ExploreGroupTask::perform() {
   PTRACE("ExploreGroupTask " << GrpID << " performing");
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
 
-  GROUP *Group = Ssp->GetGroup(GrpID);
+  Group *group = Ssp->GetGroup(GrpID);
 
-  if (Group->is_optimized())  // See discussion in ExploreGroupTask class declaration
+  if (group->is_optimized())  // See discussion in ExploreGroupTask class declaration
   {
     delete this;
     return;
-  } else if (Group->is_explored()) {
+  } else if (group->is_explored()) {
     delete this;
     return;
   }
 
-  if (Group->is_exploring())
+  if (group->is_exploring())
     assert(false);
   else {
     // the group will be explored, let other tasks don't do it again
-    Group->set_exploring(true);
+    group->set_exploring(true);
 
     // mark the group not explored since we will begin exploration
-    Group->set_explored(false);
+    group->set_explored(false);
 
-    M_EXPR *LogMExpr = Group->GetFirstLogMExpr();
+    MExression *LogMExpr = group->GetFirstLogMExpr();
 
     // only need to E_EXPR the first log expr,
     // because it will generate all logical exprs by applying appropriate rules
@@ -332,7 +332,7 @@ string ExploreGroupTask::Dump() {
 
 // ************  OptimizeExprTask ******************
 
-OptimizeExprTask::OptimizeExprTask(M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last,
+OptimizeExprTask::OptimizeExprTask(MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last,
                                    Cost *bound)
     : OptimizerTask(ContextID, parent_task_no), MExpr(mexpr), explore(explore), Last(last), EpsBound(bound) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_EXPR].New();
@@ -454,7 +454,7 @@ string OptimizeExprTask::Dump() {
 
 /*********** O_INPUTS FUNCTIONS ***************/
 
-O_INPUTS::O_INPUTS(M_EXPR *MExpr, int ContextID, int ParentTaskNo, bool last, Cost *bound, int ContNo)
+O_INPUTS::O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last, Cost *bound, int ContNo)
     : MExpr(MExpr),
       OptimizerTask(ContextID, ParentTaskNo),
       InputNo(-1),
@@ -608,7 +608,7 @@ void O_INPUTS::perform() {
 
   OP *Op = MExpr->GetOp();  // the op of the expr
   assert(Op->is_physical());
-  GROUP *LocalGroup = Ssp->GetGroup(MExpr->GetGrpID());  // Group of the MExpr
+  Group *LocalGroup = Ssp->GetGroup(MExpr->GetGrpID());  // Group of the MExpr
 
 #ifdef IRPROP
   PHYS_PROP *LocalReqdProp = M_WINNER::mc[GrpNo]->GetPhysProp(ContextID);
@@ -631,7 +631,7 @@ void O_INPUTS::perform() {
 
   // Declare locals
   int IGNo;  // Input Group Number
-  GROUP *IG;
+  Group *IG;
   int input;      // index over input groups
   bool possible;  // is it possible to satisfy the required property?
                   //	Cost * CostSoFar = new Cost(0);
@@ -647,7 +647,7 @@ void O_INPUTS::perform() {
   if (InputNo == -1) {
     // init inputLogProp
     for (input = 0; input < arity; input++) {
-      GROUP *InputGroup = Ssp->GetGroup(MExpr->GetInput(input));  // Group of current input
+      Group *InputGroup = Ssp->GetGroup(MExpr->GetInput(input));  // Group of current input
       InputLogProp[input] = InputGroup->get_log_prop();
     }
 
@@ -1065,10 +1065,10 @@ void O_INPUTS::perform() {
       (CostSoFar >= *(M_WINNER::mc[GrpNo]->GetUpperBd(LocalReqdProp)))) {
     goto TerminateThisTask;
   } else {
-    GROUP *Group = Ssp->GetGroup(GrpNo);
+    Group *group = Ssp->GetGroup(GrpNo);
     Cost *WinCost = new Cost(CostSoFar);
 
-    M_EXPR *OldWinner = M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp);
+    MExression *OldWinner = M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp);
 
     if (OldWinner != NULL) {
       // decrement the counter of old winner and if it becomes 0, delete it
@@ -1076,7 +1076,7 @@ void O_INPUTS::perform() {
 
       if (OldWinner->GetCounter() == 0) {
         PTRACE("Deleted Physical MExpr %s  !!!\n", OldWinner->Dump());
-        Group->DeletePhysMExpr(OldWinner);
+        group->DeletePhysMExpr(OldWinner);
       }
     }
 
@@ -1089,15 +1089,15 @@ void O_INPUTS::perform() {
 
     if (Last)
       // this's the last task for the group, so mark the group with completed optimizing
-      Group->set_optimized(true);
+      group->set_optimized(true);
 
     // set the flag, so that the changed search space is output onto the trace
-    Group->set_changed(true);
+    group->set_changed(true);
 
     // if the new winner is not good for any of the contexts, delete it
     if ((ContNo == 0) && (MExpr->GetCounter() == 0)) {
       PTRACE("New winner %s is not cheaper than old winner, so deleted !!!", MExpr->Dump());
-      Group->DeletePhysMExpr(MExpr);
+      group->DeletePhysMExpr(MExpr);
     }
 
     delete this;
@@ -1136,7 +1136,7 @@ TerminateThisTask:
     LocalWinner->SetDone(true);
 #ifdef _DEBUG
     string os;
-    M_EXPR *TempME = LocalWinner->GetMPlan();
+    MExression *TempME = LocalWinner->GetMPlan();
     os.Format("Terminate: replaced winner with %s, %s, %s\n", LocalReqdProp->Dump(), TempME ? TempME->Dump() : " NULL ",
               LocalWinner->GetCost()->Dump());
     PTRACE("%s", os);
@@ -1181,7 +1181,7 @@ string O_INPUTS::Dump() {
 }  // Dump
 
 //  ***************  ApplyRuleTask  *****************
-ApplyRuleTask::ApplyRuleTask(RULE *rule, M_EXPR *mexpr, bool explore, int ContextID, int parent_task_no, bool last,
+ApplyRuleTask::ApplyRuleTask(RULE *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last,
                              Cost *bound)
     : OptimizerTask(ContextID, parent_task_no),
       Rule(rule),
@@ -1194,13 +1194,13 @@ ApplyRuleTask::ApplyRuleTask(RULE *rule, M_EXPR *mexpr, bool explore, int Contex
 
 ApplyRuleTask::~ApplyRuleTask() {
   if (Last) {
-    GROUP *Group = Ssp->GetGroup(MExpr->GetGrpID());
+    Group *group = Ssp->GetGroup(MExpr->GetGrpID());
     if (!explore) {
 #ifndef IRPROP
       CONT *LocalCont = CONT::vc[ContextID];
       // What prop is required of
       PHYS_PROP *LocalReqdProp = LocalCont->GetPhysProp();
-      WINNER *Winner = Group->GetWinner(LocalReqdProp);
+      WINNER *Winner = group->GetWinner(LocalReqdProp);
 
       if (Winner) assert(!Winner->GetDone());
 
@@ -1262,7 +1262,7 @@ void ApplyRuleTask::perform() {
   BINDERY *bindery;    // Expression bindery. Used to bind MExpr to rule's original pattern
   Expression *before;  // see below
   Expression *after;   // see below
-  M_EXPR *NewMExpr;    // see below
+  MExression *NewMExpr;    // see below
 
   // Guide to closely related variables
 
@@ -1311,7 +1311,7 @@ void ApplyRuleTask::perform() {
 
     assert(after != NULL);
 
-    PTRACE("substitute expr is : " << after->Dump());
+    PTRACE("substitute expr is : " << endl << after->Dump());
 
     // include substitute in MEMO, find duplicates, etc.
     int group_no = MExpr->GetGrpID();
@@ -1320,7 +1320,7 @@ void ApplyRuleTask::perform() {
       if (after->GetOp()->is_logical())
         NewMExpr = Ssp->CopyIn(after, group_no);
       else
-        NewMExpr = new M_EXPR(after, group_no);
+        NewMExpr = new MExression(after, group_no);
     } else  // include physical mexpr into group
       NewMExpr = Ssp->CopyIn(after, group_no);
 
@@ -1439,7 +1439,7 @@ void ApplyRuleTask::perform() {
 
     assert(after != NULL);
 
-    PTRACE("substitute expr is : %s", after->Dump());
+    PTRACE("substitute expr is : "<<  endl << after->Dump());
 
     // include substitute in MEMO, find duplicates, etc.
     int group_no = MExpr->GetGrpID();
@@ -1448,7 +1448,7 @@ void ApplyRuleTask::perform() {
       if (after->GetOp()->is_logical())
         NewMExpr = Ssp->CopyIn(after, group_no);
       else
-        NewMExpr = new M_EXPR(after, group_no);
+        NewMExpr = new MExression(after, group_no);
     } else  // include physcial mexpr into group
       NewMExpr = Ssp->CopyIn(after, group_no);
 
@@ -1482,7 +1482,7 @@ void ApplyRuleTask::perform() {
       int input;
       for (input = 0; input < arity; input++) {
         int IGNo;  // Input Group Number
-        GROUP *IG;
+        Group *IG;
         IGNo = NewMExpr->GetInput(input);
         IG = Ssp->GetGroup(IGNo);  // Group of current input
         InputCost[input] = IG->GetLowerBd();

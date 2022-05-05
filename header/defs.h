@@ -126,17 +126,15 @@ typedef enum DOM_TYPE { string_t, int_t, real_t, unknown } DOM_TYPE;
   }
 
 // Print n tabs, then the character string.  No newlines except as in string.
-#define OUTPUTN(n, str)               \
-  {                                   \
-    if (!ForGlobalEpsPruning) {       \
-      string OutputString;            \
-      OutputString = "    ";          \
-      for (int i = 0; i < n; i++) {   \
-        OutputString += OutputString; \
-      }                               \
-      OutputString += str;            \
-      OutputFile << (OutputString);   \
-    }                                 \
+#define OUTPUTN(n, str)                                         \
+  {                                                             \
+    if (!ForGlobalEpsPruning) {                                 \
+      string OutputString;                                      \
+      OutputString = "    ";                                    \
+      for (int i = 0; i < n; i++) OutputString += OutputString; \
+      OutputString += str;                                      \
+      OutputFile << (OutputString);                             \
+    }                                                           \
   }
 
 // trace without line and file info.  No newlines except in format input.
@@ -175,7 +173,7 @@ class SET_TRACE;
 class RuleSet;
 class CostModel;
 class KEYS_SET;
-class M_EXPR;
+class MExression;
 
 extern OPT_STAT *OptStat;       // stat. info. of Optimizer
 extern CLASS_STAT ClassStat[];  // stat. info of all classes
@@ -216,6 +214,8 @@ extern int TaskNo;        // Number of the current task.
 extern int Memo_M_Exprs;  // How Many M_EXPRs in the MEMO Structure?
 
 extern double GLOBAL_EPS;  // global epsilon value
+
+extern int printnx;
 
 extern Query *query;
 extern OptimizerTaskStack PTasks;

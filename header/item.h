@@ -73,16 +73,13 @@ class ATTR_EXP : public ITEM_OP {
   ATTR *AttNew;
 
  public:
-  //##ModelId=3B0C08750379
   ATTR_EXP(string range_var, int *atts, int size);
 
-  //##ModelId=3B0C0875038D
   ATTR_EXP(ATTR_EXP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize) {
     AttNew = new ATTR(*Op.AttNew);
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_EXP].New();
   };
 
-  //##ModelId=3B0C08750397
   OP *Clone() { return new ATTR_EXP(*this); };
 
   //##ModelId=3B0C08750398

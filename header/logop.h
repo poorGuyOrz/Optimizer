@@ -322,7 +322,7 @@ class RM_DUPLICATES : public LOG_OP {
         For example,
                 SELECT SUM(LE*(1-LD)) AS revenue
                 FROM LineItem
-                GROUP BY LD, LS
+                Group BY LD, LS
         becomes the operator
                 AGG_LIST with parameters
                         AggOps = <LE, LD> and GbyAtts <LE, LD>

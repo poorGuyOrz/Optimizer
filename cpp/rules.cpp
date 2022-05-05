@@ -121,7 +121,7 @@ BINDERY::BINDERY(int group_no, Expression *original)
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 }  // BINDERY::BINDERY
 
-BINDERY::BINDERY(M_EXPR *expr, Expression *original)
+BINDERY::BINDERY(MExression *expr, Expression *original)
     : state(start),
       cur_expr(expr),
       original(original),
@@ -540,7 +540,7 @@ Expression *EQ_TO_LOOPS::next_substitute(Expression *before, PHYS_PROP *ReqdProp
 #ifdef CONDPRUNE
 // Is the plan a goner because an input is group pruned?
 //##ModelId=3B0C086A017E
-bool EQ_TO_LOOPS::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_LOOPS::condition(Expression *before, MExression *mexpr, int ContextID) {
   Cost inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
   inputs += *(Ssp->GetGroup(mexpr->GetInput(1))->GetLowerBd());
 
@@ -581,7 +581,7 @@ Expression *EQ_TO_LOOPS_INDEX::next_substitute(Expression *before, PHYS_PROP *Re
 // 	join)
 //	there is an index for the right join attribute -- need log-bulk-props
 //##ModelId=3B0C086A0355
-bool EQ_TO_LOOPS_INDEX::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_LOOPS_INDEX::condition(Expression *before, MExression *mexpr, int ContextID) {
   // Get the GET logical operator in order to get the indexed collection
   GET *g = (GET *)before->GetInput(1)->GetOp();
   INT_ARRAY *Indices = Cat->GetIndNames(g->GetCollection());
@@ -641,7 +641,7 @@ Expression *EQ_TO_MERGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp
 #ifdef CONDPRUNE
 // Is the plan a goner because an input is group pruned?
 //##ModelId=3B0C086A0232
-bool EQ_TO_MERGE::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_MERGE::condition(Expression *before, MExression *mexpr, int ContextID) {
   Cost inputs = *(Ssp->GetGroup(mexpr->GetInput(0))->GetLowerBd());
   inputs += *(Ssp->GetGroup(mexpr->GetInput(1))->GetLowerBd());
 
@@ -788,7 +788,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   Expression *AB = before->GetInput(0);
   LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
   // See where second join predicates of antecedent go
@@ -859,7 +859,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
 //	a || !b
 //
 //##ModelId=3B0C086B00B7
-bool EQJOIN_LTOR::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EQJOIN_LTOR::condition(Expression *before, MExression *mexpr, int ContextID) {
 #ifdef NOCART
   PTRACE("%s\n", "NOCART is On");
   EQJOIN *Op2 = (EQJOIN *)before->GetOp();
@@ -896,7 +896,7 @@ bool EQJOIN_LTOR::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   Expression *AB = before->GetInput(0);
   LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
   // See where second join predicates of antecedent go
@@ -993,7 +993,7 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   Expression *BC = before->GetInput(1);
   LEAF_OP *B = (LEAF_OP *)(BC->GetInput(0)->GetOp());
   int group_no = B->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
 
@@ -1058,7 +1058,7 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
 //	a || !b
 //
 //##ModelId=3B0C086B0181
-bool EQJOIN_RTOL::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EQJOIN_RTOL::condition(Expression *before, MExression *mexpr, int ContextID) {
 #ifdef NOCART
   PTRACE("%s\n", "NOCART is On");
   EQJOIN *Op2 = (EQJOIN *)before->GetOp();
@@ -1095,7 +1095,7 @@ bool EQJOIN_RTOL::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   Expression *AB = before->GetInput(0);
   LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
   // See where second join predicates of antecedent go
@@ -1126,7 +1126,6 @@ bool EQJOIN_RTOL::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
         Cesar's EXCHANGE rule: (AxB)x(CxD) -> (AxC)x(BxD)
           ====  ============= =
 */
-//##ModelId=3B0C086B023F
 EXCHANGE::EXCHANGE()
     : RULE("EXCHANGE", 4,
            new Expression(new EQJOIN(0, 0, 0),
@@ -1222,7 +1221,7 @@ Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *AB = before->GetInput(0);
   LEAF_OP *AA = (LEAF_OP *)AB->GetInput(0)->GetOp();
   int group_no = AA->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
   SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
 
@@ -1299,7 +1298,7 @@ Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
 //	a || !b
 //
 //##ModelId=3B0C086B025C
-bool EXCHANGE::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
 #ifdef NOCART
   /*
    * Join numbering convention:
@@ -1357,7 +1356,7 @@ bool EXCHANGE::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   Expression *AB = before->GetInput(0);
   LEAF_OP *AA = (LEAF_OP *)AB->GetInput(0)->GetOp();
   int group_no = AA->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
   SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
 
@@ -1465,7 +1464,7 @@ Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   // Get input's schema
   LEAF_OP *A = (LEAF_OP *)(before->GetInput(0)->GetOp());
   int group_no = A->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
   SCHEMA *As_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
 
@@ -1643,7 +1642,7 @@ Expression *AGG_THRU_EQJOIN::next_substitute(Expression *before, PHYS_PROP *Reqd
   // get the schema of the right input
   LEAF_OP *r_op = (LEAF_OP *)before->GetInput(0)->GetInput(1)->GetOp();
   int r_gid = r_op->GetGroup();
-  GROUP *r_group = Ssp->GetGroup(r_gid);
+  Group *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
   SCHEMA *right_schema = r_prop->Schema;
 
@@ -1680,7 +1679,7 @@ Expression *AGG_THRU_EQJOIN::next_substitute(Expression *before, PHYS_PROP *Reqd
         Conditon 3 is checked by if lattrs contains candidate_key of left input
 */
 //##ModelId=3B0C086C0325
-bool AGG_THRU_EQJOIN::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool AGG_THRU_EQJOIN::condition(Expression *before, MExression *mexpr, int ContextID) {
   // get attributes used in aggregates, and groupby attributes
   AGG_LIST *agg_op = (AGG_LIST *)before->GetOp();
   int *agg_atts = agg_op->FlattenedAtts;
@@ -1694,13 +1693,13 @@ bool AGG_THRU_EQJOIN::condition(Expression *before, M_EXPR *mexpr, int ContextID
   // get the schema of the right input
   LEAF_OP *r_op = (LEAF_OP *)before->GetInput(0)->GetInput(1)->GetOp();
   int r_gid = r_op->GetGroup();
-  GROUP *r_group = Ssp->GetGroup(r_gid);
+  Group *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
   SCHEMA *right_schema = r_prop->Schema;
   // get candidatekey of the left input
   LEAF_OP *l_op = (LEAF_OP *)before->GetInput(0)->GetInput(0)->GetOp();
   int l_gid = l_op->GetGroup();
-  GROUP *l_group = Ssp->GetGroup(l_gid);
+  Group *l_group = Ssp->GetGroup(l_gid);
   LOG_COLL_PROP *l_prop = (LOG_COLL_PROP *)l_group->get_log_prop();
   KEYS_SET *l_cand_key = l_prop->CandidateKey;
 
@@ -1778,7 +1777,7 @@ Expression *EQ_TO_BIT::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
       predicate=bit_pred('collection')
  */
 //##ModelId=3B0C086D0024
-bool EQ_TO_BIT::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool EQ_TO_BIT::condition(Expression *before, MExression *mexpr, int ContextID) {
   EQJOIN *EqOp = (EQJOIN *)before->GetOp();
   int size = EqOp->size;
   int *lattrs = EqOp->lattrs;
@@ -1788,7 +1787,7 @@ bool EQ_TO_BIT::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   //  Get schema for LEAF(0)
   LEAF_OP *LEAF0 = (LEAF_OP *)(before->GetInput(0)->GetOp());
   int group_no = LEAF0->GetGroup();
-  GROUP *group = Ssp->GetGroup(group_no);
+  Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
   KEYS_SET *l_cand_key = ((LOG_COLL_PROP *)LogProp)->CandidateKey;
 
@@ -1804,7 +1803,7 @@ bool EQ_TO_BIT::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
   // Get is the predicate of SELECT
   LEAF_OP *PredOp = (LEAF_OP *)before->GetInput(1)->GetInput(1)->GetOp();
   int Pred_GID = PredOp->GetGroup();
-  GROUP *leaf_group = Ssp->GetGroup(Pred_GID);
+  Group *leaf_group = Ssp->GetGroup(Pred_GID);
   LOG_PROP *leaf_prop = leaf_group->get_log_prop();
   KEYS_SET pred_freevar = ((LOG_ITEM_PROP *)leaf_prop)->FreeVars;
 
@@ -1868,7 +1867,7 @@ Expression *SELECT_TO_INDEXED_FILTER::next_substitute(Expression *before, PHYS_P
 //      Predicate only has one free variable
 //      Index exists for the free variable
 //##ModelId=3B0C086D010A
-bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, M_EXPR *mexpr, int ContextID) {
+bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, MExression *mexpr, int ContextID) {
   // get the index list of the GET collection
   int CollId = ((GET *)before->GetInput(0)->GetOp())->GetCollection();
   INT_ARRAY *Indices = Cat->GetIndNames(CollId);
@@ -1876,7 +1875,7 @@ bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, M_EXPR *mexpr, int 
   // get the predicate free variables
   LEAF_OP *Pred = (LEAF_OP *)(before->GetInput(1)->GetOp());
   int GrpNo = Pred->GetGroup();
-  GROUP *PredGrp = Ssp->GetGroup(GrpNo);
+  Group *PredGrp = Ssp->GetGroup(GrpNo);
   LOG_PROP *log_prop = PredGrp->get_log_prop();
   KEYS_SET FreeVar = ((LOG_ITEM_PROP *)log_prop)->FreeVars;
 
@@ -1923,7 +1922,7 @@ Expression *PROJECT_THRU_SELECT::next_substitute(Expression *before, PHYS_PROP *
   // Get the select predicate free variables spfv
   LEAF_OP *Pred = (LEAF_OP *)(before->GetInput(0)->GetInput(1)->GetOp());
   int GrpNo = Pred->GetGroup();
-  GROUP *PredGrp = Ssp->GetGroup(GrpNo);
+  Group *PredGrp = Ssp->GetGroup(GrpNo);
   LOG_PROP *log_prop = PredGrp->get_log_prop();
   KEYS_SET FreeVar = ((LOG_ITEM_PROP *)log_prop)->FreeVars;
 

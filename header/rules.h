@@ -147,7 +147,7 @@ class BINDERY {
  private:
   Expression *original;  // bind with this original pattern
 
-  M_EXPR *cur_expr;  // bind the original pattern to this multi-expression
+  MExression *cur_expr;  // bind the original pattern to this multi-expression
 
   bool one_expr;  // Is this an expression bindery?
 
@@ -171,7 +171,7 @@ class BINDERY {
 
  public:
   // Create an Expression bindery
-  BINDERY(M_EXPR *expr, Expression *original);
+  BINDERY(MExression *expr, Expression *original);
 
   // Create a Group bindery
   BINDERY(int group_no, Expression *original);
@@ -311,7 +311,7 @@ class RULE {
   // context for the search?  mexpr is the multi-expression bound to
   // before, probably mexpr is not needed.
   // Default value is TRUE, i.e., rule applies
-  virtual bool condition(Expression *before, M_EXPR *mexpr, int ContextID) { return true; };
+  virtual bool condition(Expression *before, MExression *mexpr, int ContextID) { return true; };
 
   // Given an expression which is a binding (before), this
   //  returns the next substitute form (after) of the rule.
@@ -362,7 +362,7 @@ class EQ_TO_LOOPS : public RULE {
   ~EQ_TO_LOOPS(){};
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 #ifdef CONDPRUNE
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 #endif
 
 };  // EQ_TO_LOOPS
@@ -378,7 +378,7 @@ class EQ_TO_MERGE : public RULE {
   int promise(OP *op_arg, int ContextID);
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 #ifdef CONDPRUNE
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 #endif
 };  // EQ_TO_MERGE
 
@@ -407,7 +407,7 @@ class EQ_TO_LOOPS_INDEX : public RULE {
   //##ModelId=3B0C086A034B
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086A0355
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // EQ_TO_LOOPS_INDEX
 
 /*
@@ -441,7 +441,7 @@ class EQJOIN_LTOR : public RULE {
   //##ModelId=3B0C086B00AD
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086B00B7
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
   //##ModelId=3B0C086B00C3
   int promise(OP *op_arg, int ContextID) { return ASSOC_PROMISE; };
 
@@ -462,7 +462,7 @@ class EQJOIN_RTOL : public RULE {
   //##ModelId=3B0C086B0176
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086B0181
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // EQJOIN_RTOL
 
 /*
@@ -480,7 +480,7 @@ class EXCHANGE : public RULE {
   //##ModelId=3B0C086B0249
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086B025C
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 
 };  // EXCHANGE
 
@@ -566,7 +566,7 @@ class AGG_THRU_EQJOIN : public RULE {
   //##ModelId=3B0C086C031B
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086C0325
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // AGG_THRU_EQJOIN
 
 //##ModelId=3B0C086C03E4
@@ -579,7 +579,7 @@ class EQ_TO_BIT : public RULE {
   //##ModelId=3B0C086D001A
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086D0024
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // EQ_TO_BIT
 
 //##ModelId=3B0C086D00E2
@@ -592,7 +592,7 @@ class SELECT_TO_INDEXED_FILTER : public RULE {
   //##ModelId=3B0C086D0100
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   //##ModelId=3B0C086D010A
-  bool condition(Expression *before, M_EXPR *mexpr, int ContextID);
+  bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // SELECT_TO_INDEXED_FILTER
 
 //##ModelId=3B0C086D01AA
@@ -604,7 +604,7 @@ class PROJECT_THRU_SELECT : public RULE {
   ~PROJECT_THRU_SELECT(){};
   //##ModelId=3B0C086D01BE
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-  // bool condition ( Expression * before, M_EXPR *mexpr, int ContextID);
+  // bool condition ( Expression * before, MExression *mexpr, int ContextID);
 };  // PROJECT_THRU_SELECT
 /*
    ============================================================
