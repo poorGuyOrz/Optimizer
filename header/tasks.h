@@ -59,7 +59,7 @@ class OptimizerTask {
   int ParentTaskNo;  // The task which created me
 
  public:
-  OptimizerTask(int ContextID, int ParentTaskNo);
+  OptimizerTask(int ContextID, int ParentTaskNo) : ContextID(ContextID) { ParentTaskNo = ParentTaskNo; };
   ~OptimizerTask(){};
 
   virtual string Dump() = 0;
@@ -149,7 +149,16 @@ class OptimizeGroupTask : public OptimizerTask {
   Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
                    // else it is zero
  public:
-  OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr);
+  OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr)
+      : OptimizerTask(ContextID, parent_task_no), GrpID(GrpID), Last(last), EpsBound(epsbound) {
+    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].New();
+
+      // if INFBOUND flag is on, set the bound to be INF
+#ifdef INFBOUND
+    Cost *INFCost = new Cost(-1);
+    CONT::vc[ContextID]->SetUpperBound(*INFCost);
+#endif
+  };
   ~OptimizeGroupTask() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].Delete();
     if (EpsBound) delete EpsBound;

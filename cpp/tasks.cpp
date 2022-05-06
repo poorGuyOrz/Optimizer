@@ -37,19 +37,6 @@ int compare_afters(void const *x, void const *y) {
   return result;
 }  // compare_afters
 
-OptimizerTask::OptimizerTask(int ContextID, int parentTaskNo) : ContextID(ContextID) { ParentTaskNo = parentTaskNo; };
-
-OptimizeGroupTask::OptimizeGroupTask(int grpID, int ContextID, int parentTaskNo, bool last, Cost *bound)
-    : OptimizerTask(ContextID, parentTaskNo), GrpID(grpID), Last(last), EpsBound(bound) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].New();
-
-    // if INFBOUND flag is on, set the bound to be INF
-#ifdef INFBOUND
-  Cost *INFCost = new Cost(-1);
-  CONT::vc[ContextID]->SetUpperBound(*INFCost);
-#endif
-
-};  // OptimizeGroupTask::OptimizeGroupTask
 
 /*
 OptimizeGroupTask::perform

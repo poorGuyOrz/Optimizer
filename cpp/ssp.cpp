@@ -714,7 +714,7 @@ void SearchSpace::optimize() {
     Cost *eps_bound = new Cost(GlobalEpsBound);
     PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true, eps_bound));
   } else
-    PTasks.push(new OptimizeGroupTask(RootGID, 0, 0));
+    PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true, nullptr));
 
   while (!PTasks.empty()) {
     TaskNo++;

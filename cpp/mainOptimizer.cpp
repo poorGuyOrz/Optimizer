@@ -3,8 +3,6 @@
 #include "../header/cm.h"
 #include "../header/global.h"
 #include "../header/physop.h"
-#include "../header/stdafx.h"
-#include "../header/tasks.h"
 
 int main(int argc, char const *argv[]) {
   OutputFile.open("../colout.txt");
@@ -16,10 +14,8 @@ int main(int argc, char const *argv[]) {
   costModel = new CostModel("../case/cost");
 
   ruleSet = new RuleSet();
-  cout << ruleSet->Dump() << endl;
 
   Cost *HeuristicCost = new Cost(0);
-  cout << HeuristicCost->Dump() << endl;
 
   Cat = new CAT("../case/catalog");
   cout << Cat->Dump() << endl;
