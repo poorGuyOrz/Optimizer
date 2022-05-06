@@ -1,19 +1,4 @@
-/*
-PHYSOP.H - physical Operators
-$Revision: 6 $
-Columbia Optimizer Framework
-
-  A Joint Research Project of Portland State University
-  and the Oregon Graduate Institute
-  Directed by Leonard Shapiro and David Maier
-  Supported by NSF Grants IRI-9610013 and IRI-9619977
-*/
-
-// physical operators
-
-#ifndef PHYSOP_H
-#define PHYSOP_H
-
+#pragma once
 #include "op.h"
 
 class FILE_SCAN;
@@ -29,11 +14,7 @@ class HGROUP_LIST;
 class P_FUNC_OP;
 class BIT_JOIN;
 
-/*
-File scan
-=========
-Physical version of GET.  Retrieves all data from the specified file.
-*/
+// Physical version of GET.  Retrieves all data from the specified file.
 class FILE_SCAN : public PhysicalOperator {
  public:
   FILE_SCAN(int fileId);
@@ -45,40 +26,28 @@ class FILE_SCAN : public PhysicalOperator {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].Delete();
   };
 
-  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
-                      LOG_PROP **InputLogProp);  // uses primarily cardinalities
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
-  // get the physical prop according to the order of the collection
-  PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props = NULL);
+  PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props = nullptr);
 
   inline string GetName() { return ("FILE_SCAN"); };
-  //##ModelId=3B0C086E018E
   inline int GetArity() { return (0); };
-  //##ModelId=3B0C086E018F
   inline int GetFileId() { return FileId; };
 
   string Dump() { return GetName() + "(" + GetCollName(FileId) + ")"; };
 
   // File_scan does not have any InputReqProp
-  //##ModelId=3B0C086E01A2
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible) {
-    assert(false);  // make sure ops should define this method except 0 arity op
-    return NULL;
+    assert(false);
+    return nullptr;
   };
 
  private:
-  //##ModelId=3B0C086E01AE
   int FileId;
-  //##ModelId=3B0C086E01C0
   string RangeVar;
+};
 
-};  // FILE_SCAN
-
-/*
-   Loops Join
-   ==========
-   A physical version of EQJOIN.  Nested loops, not index nested loops.
-*/
+//  A physical version of EQJOIN.  Nested loops, not index nested loops.
 class LOOPS_JOIN : public PhysicalOperator {
  public:
   int *lattrs;
@@ -97,47 +66,33 @@ class LOOPS_JOIN : public PhysicalOperator {
     delete[] rattrs;
   };
 
-  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
-                      LOG_PROP **InputLogProp);  // uses primarily cardinalities
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
   inline int GetArity() { return (2); };
   inline string GetName() { return ("LOOPS_JOIN"); };
 
   string Dump();
-
-};  // LOOPS_JOIN
+};
 
 // Physical Dummy Operator.  Just to give the dummy operator a physical counterpart.
-
-//##ModelId=3B0C086E0314
 class PDUMMY : public PhysicalOperator {
  public:
-  //##ModelId=3B0C086E031F
   PDUMMY();
-  //##ModelId=3B0C086E0328
   PDUMMY(PDUMMY &Op);
 
-  //##ModelId=3B0C086E0333
   inline Operator *Clone() { return new PDUMMY(*this); };
 
-  //##ModelId=3B0C086E033C
   ~PDUMMY(){};
 
-  //##ModelId=3B0C086E0346
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
-  //##ModelId=3B0C086E0350
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
-  //##ModelId=3B0C086E035C
   inline int GetArity() { return (2); };
-  //##ModelId=3B0C086E0364
   inline string GetName() { return ("PDUMMY"); };
 
-  //##ModelId=3B0C086E036E
   string Dump();
-
-};  // PDUMMY
+};
 
 /*
    Nested loops index join
@@ -446,7 +401,6 @@ class HGROUP_LIST : public PhysicalOperator {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HGROUP_LIST].New();
   };
 
-  //##ModelId=3B0C08700390
   inline Operator *Clone() { return new HGROUP_LIST(*this); };
 
   //##ModelId=3B0C08700399
@@ -577,43 +531,29 @@ class BIT_JOIN : public PhysicalOperator {
    ======
 */
 
-//##ModelId=3B0C0872002B
 class INDEXED_FILTER : public PhysicalOperator {
  public:
-  //##ModelId=3B0C08720036
   INDEXED_FILTER(const int fileId);
-  //##ModelId=3B0C0872003F
   INDEXED_FILTER(INDEXED_FILTER &Op);
-  //##ModelId=3B0C08720049
   ~INDEXED_FILTER() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].Delete();
   };
 
-  //##ModelId=3B0C0872004A
   inline Operator *Clone() { return new INDEXED_FILTER(*this); };
 
-  //##ModelId=3B0C08720053
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
-  //##ModelId=3B0C0872005D
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
-  //##ModelId=3B0C08720068
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C08720071
   inline string GetName() { return ("INDEXED_FILTER"); };
-  //##ModelId=3B0C08720072
   inline int GetFileId() { return FileId; };
 
   string Dump() { return GetName() + "(" + GetCollName(FileId) + ")"; };
 
  private:
-  //##ModelId=3B0C0872007C
   int FileId;
-  //##ModelId=3B0C0872008F
   string RangeVar;
 
 };  // INDEXED_FILTER
-
-#endif  // PHYSOP_H

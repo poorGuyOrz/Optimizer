@@ -179,7 +179,6 @@ bool KEYS_SET::AddKey(string CollName, string KeyName) {
   return true;
 }
 
-//##ModelId=3B0C085F03A9
 bool KEYS_SET::AddKey(int AttId) {
   // check duplicate element in vector
   for (int i = 0; i < KeyArray.size(); i++)
@@ -191,7 +190,6 @@ bool KEYS_SET::AddKey(int AttId) {
   return true;
 }
 
-//##ModelId=3B0C085F03B3
 bool KEYS_SET::ContainKey(int AttId) {
   // check if the attid is in the vector
   for (int i = 0; i < KeyArray.size(); i++)
@@ -201,7 +199,6 @@ bool KEYS_SET::ContainKey(int AttId) {
 }
 
 // return the int array from the keys_set
-//##ModelId=3B0C085F03C7
 int *KEYS_SET::CopyOut() {
   int size = GetSize();
   int *result = new int[size];
@@ -798,19 +795,16 @@ void parseString(char *p) {
 }
 
 //=============  PHYS_PROP Methods  ===================
-//##ModelId=3B0C0863023C
 PHYS_PROP::PHYS_PROP(KEYS_SET *Keys, ORDER Order) : Keys(Keys), Order(Order) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New();
 };
 
 // a constructor for ANY property
-//##ModelId=3B0C08630250
 PHYS_PROP::PHYS_PROP(ORDER Order) : Keys(NULL), Order(Order) {
   assert(Order == any);
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New();
 }
 
-//##ModelId=3B0C0863025A
 PHYS_PROP::PHYS_PROP(PHYS_PROP &other)
     : Keys(other.Order == any ? NULL : new KEYS_SET(*(other.Keys))), Order(other.Order) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New();
@@ -820,7 +814,6 @@ PHYS_PROP::PHYS_PROP(PHYS_PROP &other)
   }
 }
 
-//##ModelId=3B0C08630279
 void PHYS_PROP::Merge(PHYS_PROP &other) {
   assert(Order == other.Order);  // only idential orders can be merge
 
@@ -830,7 +823,6 @@ void PHYS_PROP::Merge(PHYS_PROP &other) {
   }
 }
 
-//##ModelId=3B0C0863028D
 bool PHYS_PROP::operator==(PHYS_PROP &other) {
   // Note that operator== is defined properly for enums,
   // by default
@@ -930,7 +922,6 @@ void Cost::FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size) {
 
 string Cost::Dump() { return to_string(Value); }
 
-
 string DumpStatistics() {
   string os;
   string temp;
@@ -940,4 +931,3 @@ string DumpStatistics() {
 
   return os;
 }
-

@@ -1,17 +1,15 @@
 #pragma once
-// #include "../header/ssp.h"
-// #include "rules.h"
 #include <stack>
 
-#include "../header/ssp.h"
+// #include "../header/ssp.h"
 #include "rules.h"
-class OptimizerTask;       // Abstract class for all task classes
-class OptimizerTaskStack;  // Pending tasks - some structure which contains all tasks waiting to execute
-class OptimizeGroupTask;   // Optimize a Group - find the cheapest plan in the group satisfying a context
-class OptimizeExprTask;    // Optimize an Expression - Fire all relevant rules for this expression
-class ExploreGroupTask;    // Explore a group - Fire all transformation rules in this group.
-class O_INPUTS;            // Optimize inputs - determine if this expression satisfies the current context
-class ApplyRuleTask;       // Apply a single rule to a single MExression
+// class OptimizerTask;       // Abstract class for all task classes
+// class OptimizerTaskStack;  // Pending tasks - some structure which contains all tasks waiting to execute
+// class OptimizeGroupTask;   // Optimize a Group - find the cheapest plan in the group satisfying a context
+// class OptimizeExprTask;    // Optimize an Expression - Fire all relevant rules for this expression
+// class ExploreGroupTask;    // Explore a group - Fire all transformation rules in this group.
+// class O_INPUTS;            // Optimize inputs - determine if this expression satisfies the current context
+// class ApplyRuleTask;       // Apply a single rule to a single MExression
 
 /* ============================================================ */
 

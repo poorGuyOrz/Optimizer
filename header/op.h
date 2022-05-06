@@ -45,10 +45,11 @@ class Operator {
   virtual bool is_leaf() { return false; };
   virtual bool is_item() { return false; };
 
-  // attr_op, const_int_op, const_set_op, const_str_op are special
-  // case in O_INPUT::perform()
+  // attr_op, const_int_op, const_set_op, const_str_op are special case in O_INPUT::perform()
   virtual bool is_const() { return false; };
 
+  // 计算表达式的代价
+  // 逻辑表达式没有代价，物理表达式才计算代价
   virtual Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) = 0;
 };
 
@@ -76,16 +77,9 @@ class LogicalOperator : public Operator {
   // make sure these methods of LogicalOperator never called(log_op does not get cost)
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
-    return NULL;
+    return nullptr;
   };
-
-};  // class LogicalOperator
-
-/*
-    ============================================================
-    PHYSICAL OPERATOR - class PhysicalOperator
-    ============================================================
-*/
+};
 
 // Physical Operator
 class PhysicalOperator : public Operator {
@@ -93,12 +87,11 @@ class PhysicalOperator : public Operator {
   PhysicalOperator(){};
   virtual ~PhysicalOperator(){};
 
-  // FindPhysProp() establishes the physical properties of an
-  // algorithm's output.
+  // FindPhysProp() establishes the physical properties of an algorithm's output.
   //  right now, only implemented by operators with 0 arity. no input_phys_props
-  virtual PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props = NULL) {
+  virtual PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props = nullptr) {
     assert(false);
-    return NULL;
+    return nullptr;
   };
 
   // FindLocalCost() finds the local cost of the operator,
@@ -118,9 +111,8 @@ virtual int opt_combs() */
   // If we require the physical property Prop of this operator, what
   // property from input number InputNo will guarantee it?
   // A false return value for possible means there is no value which will work.
-  // If possible is true, a NULL return says any property is OK.
+  // If possible is true, a nullptr return says any property is OK.
   // Should never be called for arity 0 operators
-  //##ModelId=3B0C0872022B
   virtual PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible) = 0;
 
   inline bool is_physical() { return true; };
@@ -128,7 +120,7 @@ virtual int opt_combs() */
   // make sure these methods of PhysicalOperator never called(log_prop is not passed by phys_op)
   LOG_PROP *FindLogProp(LOG_PROP **input) {
     assert(false);
-    return NULL;
+    return nullptr;
   };
   inline int GetNameId() {
     assert(false);
@@ -222,12 +214,12 @@ class LeafOperator : public Operator {
 
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
-    return NULL;
+    return nullptr;
   };
 
   LOG_PROP *FindLogProp(LOG_PROP **input) {
     assert(false);
-    return NULL;
+    return nullptr;
   };
 
 };  // class LeafOperator
