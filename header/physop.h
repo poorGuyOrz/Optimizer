@@ -34,12 +34,12 @@ File scan
 =========
 Physical version of GET.  Retrieves all data from the specified file.
 */
-class FILE_SCAN : public PHYS_OP {
+class FILE_SCAN : public PhysicalOperator {
  public:
   FILE_SCAN(int fileId);
   FILE_SCAN(FILE_SCAN &Op);
 
-  inline OP *Clone() { return new FILE_SCAN(*this); };
+  inline Operator *Clone() { return new FILE_SCAN(*this); };
 
   ~FILE_SCAN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].Delete();
@@ -79,7 +79,7 @@ class FILE_SCAN : public PHYS_OP {
    ==========
    A physical version of EQJOIN.  Nested loops, not index nested loops.
 */
-class LOOPS_JOIN : public PHYS_OP {
+class LOOPS_JOIN : public PhysicalOperator {
  public:
   int *lattrs;
   int *rattrs;
@@ -89,7 +89,7 @@ class LOOPS_JOIN : public PHYS_OP {
   LOOPS_JOIN(int *lattrs, int *rattrs, int size);
   LOOPS_JOIN(LOOPS_JOIN &Op);
 
-  inline OP *Clone() { return new LOOPS_JOIN(*this); };
+  inline Operator *Clone() { return new LOOPS_JOIN(*this); };
 
   ~LOOPS_JOIN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].Delete();
@@ -111,7 +111,7 @@ class LOOPS_JOIN : public PHYS_OP {
 // Physical Dummy Operator.  Just to give the dummy operator a physical counterpart.
 
 //##ModelId=3B0C086E0314
-class PDUMMY : public PHYS_OP {
+class PDUMMY : public PhysicalOperator {
  public:
   //##ModelId=3B0C086E031F
   PDUMMY();
@@ -119,7 +119,7 @@ class PDUMMY : public PHYS_OP {
   PDUMMY(PDUMMY &Op);
 
   //##ModelId=3B0C086E0333
-  inline OP *Clone() { return new PDUMMY(*this); };
+  inline Operator *Clone() { return new PDUMMY(*this); };
 
   //##ModelId=3B0C086E033C
   ~PDUMMY(){};
@@ -144,7 +144,7 @@ class PDUMMY : public PHYS_OP {
    =======================
 */
 
-class LOOPS_INDEX_JOIN : public PHYS_OP {
+class LOOPS_INDEX_JOIN : public PhysicalOperator {
  public:
   int *lattrs;  // left attr's that are the same
   int *rattrs;  // right attr's that are the same
@@ -155,7 +155,7 @@ class LOOPS_INDEX_JOIN : public PHYS_OP {
   LOOPS_INDEX_JOIN(int *lattrs, int *rattrs, int size, int CollId);
   LOOPS_INDEX_JOIN(LOOPS_INDEX_JOIN &Op);
 
-  inline OP *Clone() { return new LOOPS_INDEX_JOIN(*this); };
+  inline Operator *Clone() { return new LOOPS_INDEX_JOIN(*this); };
 
   ~LOOPS_INDEX_JOIN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].Delete();
@@ -181,7 +181,7 @@ class LOOPS_INDEX_JOIN : public PHYS_OP {
 */
 
 //##ModelId=3B0C086F010D
-class MERGE_JOIN : public PHYS_OP {
+class MERGE_JOIN : public PhysicalOperator {
  public:
   //##ModelId=3B0C086F0118
   int *lattrs;  // left attr's that are the same
@@ -198,7 +198,7 @@ class MERGE_JOIN : public PHYS_OP {
   MERGE_JOIN(MERGE_JOIN &Op);
 
   //##ModelId=3B0C086F0154
-  inline OP *Clone() { return new MERGE_JOIN(*this); };
+  inline Operator *Clone() { return new MERGE_JOIN(*this); };
 
   //##ModelId=3B0C086F015D
   ~MERGE_JOIN() {
@@ -226,7 +226,7 @@ class MERGE_JOIN : public PHYS_OP {
 
 // Does not require its inputs to be hashed
 //##ModelId=3B0C086F0225
-class HASH_JOIN : public PHYS_OP {
+class HASH_JOIN : public PhysicalOperator {
  public:
   int *lattrs, *rattrs;  // left, right attr's to be joined
   //##ModelId=3B0C086F0230
@@ -238,7 +238,7 @@ class HASH_JOIN : public PHYS_OP {
   HASH_JOIN(HASH_JOIN &Op);
 
   //##ModelId=3B0C086F024F
-  inline OP *Clone() { return new HASH_JOIN(*this); };
+  inline Operator *Clone() { return new HASH_JOIN(*this); };
 
   //##ModelId=3B0C086F0257
   ~HASH_JOIN() {
@@ -263,7 +263,7 @@ class HASH_JOIN : public PHYS_OP {
 
 };  // HASH_JOIN
 //##ModelId=3B0C086F0320
-class P_PROJECT : public PHYS_OP {
+class P_PROJECT : public PhysicalOperator {
  public:
   //##ModelId=3B0C086F0334
   int *attrs;  // attr's to project on
@@ -277,7 +277,7 @@ class P_PROJECT : public PHYS_OP {
   P_PROJECT(P_PROJECT &Op);
 
   //##ModelId=3B0C086F035C
-  inline OP *Clone() { return new P_PROJECT(*this); };
+  inline Operator *Clone() { return new P_PROJECT(*this); };
 
   //##ModelId=3B0C086F0366
   ~P_PROJECT() {
@@ -308,7 +308,7 @@ class P_PROJECT : public PHYS_OP {
 */
 
 //##ModelId=3B0C08700028
-class FILTER : public PHYS_OP {
+class FILTER : public PhysicalOperator {
  public:
   //##ModelId=3B0C08700033
   FILTER() {
@@ -324,7 +324,7 @@ class FILTER : public PHYS_OP {
   };
 
   //##ModelId=3B0C08700046
-  inline OP *Clone() { return new FILTER(*this); };
+  inline Operator *Clone() { return new FILTER(*this); };
 
   //##ModelId=3B0C08700050
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
@@ -349,7 +349,7 @@ class FILTER : public PHYS_OP {
 */
 
 //##ModelId=3B0C08700122
-class QSORT : public PHYS_OP {
+class QSORT : public PhysicalOperator {
  public:
   //##ModelId=3B0C08700136
   QSORT();
@@ -358,7 +358,7 @@ class QSORT : public PHYS_OP {
   QSORT(QSORT &Op);
 
   //##ModelId=3B0C08700142
-  inline OP *Clone() { return new QSORT(*this); };
+  inline Operator *Clone() { return new QSORT(*this); };
 
   //##ModelId=3B0C0870014B
   ~QSORT() {
@@ -382,7 +382,7 @@ class QSORT : public PHYS_OP {
 };  // QSORT
 
 //##ModelId=3B0C08700213
-class HASH_DUPLICATES : public PHYS_OP {
+class HASH_DUPLICATES : public PhysicalOperator {
  public:
   //##ModelId=3B0C08700227
   HASH_DUPLICATES() {
@@ -394,7 +394,7 @@ class HASH_DUPLICATES : public PHYS_OP {
   };
 
   //##ModelId=3B0C08700231
-  inline OP *Clone() { return new HASH_DUPLICATES(*this); };
+  inline Operator *Clone() { return new HASH_DUPLICATES(*this); };
 
   //##ModelId=3B0C08700232
   ~HASH_DUPLICATES() {
@@ -420,7 +420,7 @@ class HASH_DUPLICATES : public PHYS_OP {
 
 // Hash-based AGG_LIST
 //##ModelId=3B0C0870033F
-class HGROUP_LIST : public PHYS_OP {
+class HGROUP_LIST : public PhysicalOperator {
  public:
   //##ModelId=3B0C08700354
   AGG_OP_ARRAY *AggOps;
@@ -447,7 +447,7 @@ class HGROUP_LIST : public PHYS_OP {
   };
 
   //##ModelId=3B0C08700390
-  inline OP *Clone() { return new HGROUP_LIST(*this); };
+  inline Operator *Clone() { return new HGROUP_LIST(*this); };
 
   //##ModelId=3B0C08700399
   ~HGROUP_LIST() {
@@ -476,7 +476,7 @@ class HGROUP_LIST : public PHYS_OP {
 };  // HASH_DUPLICATES
 
 //##ModelId=3B0C087100CA
-class P_FUNC_OP : public PHYS_OP {
+class P_FUNC_OP : public PhysicalOperator {
  public:
   //##ModelId=3B0C087100DE
   string RangeVar;
@@ -496,7 +496,7 @@ class P_FUNC_OP : public PHYS_OP {
   };
 
   //##ModelId=3B0C08710111
-  inline OP *Clone() { return new P_FUNC_OP(*this); };
+  inline Operator *Clone() { return new P_FUNC_OP(*this); };
 
   //##ModelId=3B0C0871011A
   ~P_FUNC_OP() {
@@ -526,7 +526,7 @@ class P_FUNC_OP : public PHYS_OP {
    =======================
 */
 
-class BIT_JOIN : public PHYS_OP {
+class BIT_JOIN : public PhysicalOperator {
  public:
   //##ModelId=3B0C0871028C
   int *lattrs;  // left attr's that are the same
@@ -544,7 +544,7 @@ class BIT_JOIN : public PHYS_OP {
   BIT_JOIN(BIT_JOIN &Op);
 
   //##ModelId=3B0C087102C9
-  inline OP *Clone() { return new BIT_JOIN(*this); };
+  inline Operator *Clone() { return new BIT_JOIN(*this); };
 
   //##ModelId=3B0C087102D3
   ~BIT_JOIN() {
@@ -578,7 +578,7 @@ class BIT_JOIN : public PHYS_OP {
 */
 
 //##ModelId=3B0C0872002B
-class INDEXED_FILTER : public PHYS_OP {
+class INDEXED_FILTER : public PhysicalOperator {
  public:
   //##ModelId=3B0C08720036
   INDEXED_FILTER(const int fileId);
@@ -590,7 +590,7 @@ class INDEXED_FILTER : public PHYS_OP {
   };
 
   //##ModelId=3B0C0872004A
-  inline OP *Clone() { return new INDEXED_FILTER(*this); };
+  inline Operator *Clone() { return new INDEXED_FILTER(*this); };
 
   //##ModelId=3B0C08720053
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group

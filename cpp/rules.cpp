@@ -151,7 +151,7 @@ Expression *BINDERY::extract_expr() {
   // If original pattern is NULL something weird is happening.
   assert(original);
 
-  OP *patt_op = original->GetOp();
+  Operator *patt_op = original->GetOp();
 
   // Ensure that there has been a binding, so there is an
   // expression to extract.
@@ -159,13 +159,13 @@ Expression *BINDERY::extract_expr() {
 
   // create leaf marked with group index
   if (patt_op->is_leaf()) {
-    result = new Expression(new LEAF_OP(((LEAF_OP *)patt_op)->GetIndex(), group_no));
+    result = new Expression(new LeafOperator(((LeafOperator *)patt_op)->GetIndex(), group_no));
   }     // create leaf marked with group index
   else  // general invocation of new Expression
   {
     // Top operator in the new Expression will be top operator in cur_expr.
     // Get it.  (Probably could use patt_op here.)
-    OP *op_arg = cur_expr->GetOp()->Clone();
+    Operator *op_arg = cur_expr->GetOp()->Clone();
 
     // Need the arity of the top operator to construct inputs of new Expression
     int arity = op_arg->GetArity();
@@ -236,7 +236,7 @@ Expression *BINDERY::extract_expr() {
 bool BINDERY::advance() {
 #ifdef _REUSE_SIB
   /// XXXX Leave these comments alone - fix later
-  OP *patt_op = original->GetOp();
+  Operator *patt_op = original->GetOp();
   // If the original pattern is a leaf, we will get one binding,
   //   to the entire group, then we will be done
   if (patt_op->is_leaf()) {
@@ -261,7 +261,7 @@ bool BINDERY::advance() {
   // loop until either failure or success
   for (;;) {
     // cache some function results
-    OP *op_arg = cur_expr->GetOp();
+    Operator *op_arg = cur_expr->GetOp();
     int arity = op_arg->GetArity();
     int input_no;
 
@@ -363,7 +363,7 @@ bool BINDERY::advance() {
 
   assert(false);  // should never terminate this loop
 #else
-  OP *patt_op = original->GetOp();
+  Operator *patt_op = original->GetOp();
   // If the original pattern is a leaf, we will get one binding,
   //   to the entire group, then we will be done
   if (patt_op->is_leaf()) {
@@ -390,7 +390,7 @@ bool BINDERY::advance() {
     // PTRACE ("advancing the cur_expr: %s", cur_expr->Dump() );
 
     // cache some function results
-    OP *op_arg = cur_expr->GetOp();
+    Operator *op_arg = cur_expr->GetOp();
     int arity = op_arg->GetArity();
     int input_no;
 
@@ -521,8 +521,8 @@ Expression *GET_TO_FILE_SCAN::next_substitute(Expression *before, PHYS_PROP *Req
 //  Rule  EQJOIN  -> LOOPS JOIN
 EQ_TO_LOOPS::EQ_TO_LOOPS()
     : RULE("EQJOIN->LOOPS_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
-           new Expression(new LOOPS_JOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+           new Expression(new LOOPS_JOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
   set_index(R_EQ_TO_LOOPS);
 }
 
@@ -553,8 +553,8 @@ bool EQ_TO_LOOPS::condition(Expression *before, MExression *mexpr, int ContextID
 // Rule  EQJOIN  -> LOOPS INDEX JOIN
 EQ_TO_LOOPS_INDEX::EQ_TO_LOOPS_INDEX()
     : RULE("EQJOIN -> LOOPS_INDEX_JOIN", 1,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new GET(0))),
-           new Expression(new LOOPS_INDEX_JOIN(0, 0, 0, 0), new Expression(new LEAF_OP(0)))) {
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new GET(0))),
+           new Expression(new LOOPS_INDEX_JOIN(0, 0, 0, 0), new Expression(new LeafOperator(0)))) {
   set_index(R_EQ_TO_LOOPS_INDEX);
 }
 
@@ -608,14 +608,14 @@ bool EQ_TO_LOOPS_INDEX::condition(Expression *before, MExression *mexpr, int Con
 //##ModelId=3B0C086A0214
 EQ_TO_MERGE::EQ_TO_MERGE()
     : RULE("EQJOIN -> MERGE_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
-           new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+           new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_EQ_TO_MERGE);
 }  // EQ_TO_MERGE::EQ_TO_MERGE
 
 //##ModelId=3B0C086A0215
-int EQ_TO_MERGE::promise(OP *op_arg, int ContextID) {
+int EQ_TO_MERGE::promise(Operator *op_arg, int ContextID) {
   // if the merge-join attributes set is empty, don't fire this rule
   int result = (((EQJOIN *)op_arg)->size == 0) ? 0 : MERGE_PROMISE;
 
@@ -659,14 +659,14 @@ bool EQ_TO_MERGE::condition(Expression *before, MExression *mexpr, int ContextID
 //##ModelId=3B0C086A02B4
 EQ_TO_HASH::EQ_TO_HASH()
     : RULE("EQJOIN->HASH_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
-           new Expression(new HASH_JOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+           new Expression(new HASH_JOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_EQ_TO_HASH);
 }  // EQ_TO_HASH::EQ_TO_HASH
 
 //##ModelId=3B0C086A02B5
-int EQ_TO_HASH::promise(OP *op_arg, int ContextID) {
+int EQ_TO_HASH::promise(Operator *op_arg, int ContextID) {
   // if the hash-join attributes set is empty, don't fire this rule
   int result = (((EQJOIN *)op_arg)->size == 0) ? 0 : HASH_PROMISE;
 
@@ -696,8 +696,8 @@ Expression *EQ_TO_HASH::next_substitute(Expression *before, PHYS_PROP *ReqdProp)
 //##ModelId=3B0C086A03CE
 EQJOIN_COMMUTE::EQJOIN_COMMUTE()
     : RULE("EQJOIN_COMMUTE", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(1)), new Expression(new LEAF_OP(0)))) {
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(1)), new Expression(new LeafOperator(0)))) {
   // set rule mask and index
   set_index(R_EQJOIN_COMMUTE);
   set_mask(1 << R_EQJOIN_COMMUTE | 1 << R_EQJOIN_LTOR | 1 << R_EQJOIN_RTOL | 1 << R_EXCHANGE);
@@ -729,14 +729,14 @@ EQJOIN_LTOR::EQJOIN_LTOR()
     : RULE("EQJOIN_LTOR", 3,
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(0)),  // A
-                                         new Expression(new LEAF_OP(1))   // B
+                                         new Expression(new LeafOperator(0)),  // A
+                                         new Expression(new LeafOperator(1))   // B
                                          ),
-                          new Expression(new LEAF_OP(2))  // C
+                          new Expression(new LeafOperator(2))  // C
                           ),                              // original pattern
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
-                          new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(1)),
-                                         new Expression(new LEAF_OP(2))))  // substitute
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(1)),
+                                         new Expression(new LeafOperator(2))))  // substitute
       )
 
 {
@@ -786,7 +786,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
 
   //	B's schema determines new joining conditions.  Get it.
   Expression *AB = before->GetInput(0);
-  LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
+  LeafOperator *B = (LeafOperator *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
@@ -810,7 +810,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   // Check that each join is legal
 
   // Get C's schema
-  LEAF_OP *C = (LEAF_OP *)(before->GetInput(1)->GetOp());
+  LeafOperator *C = (LeafOperator *)(before->GetInput(1)->GetOp());
   group_no = C->GetGroup();
   group = Ssp->GetGroup(group_no);
   SCHEMA *Cs_schema = ((LOG_COLL_PROP *)group->get_log_prop())->Schema;
@@ -822,7 +822,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   }
 
   //  Get A's schema
-  LEAF_OP *A = (LEAF_OP *)(AB->GetInput(0)->GetOp());
+  LeafOperator *A = (LeafOperator *)(AB->GetInput(0)->GetOp());
   group_no = A->GetGroup();
   group = Ssp->GetGroup(group_no);
   ;
@@ -894,7 +894,7 @@ bool EQJOIN_LTOR::condition(Expression *before, MExression *mexpr, int ContextID
 
   //	B's schema determines new joining conditions.  Get it.
   Expression *AB = before->GetInput(0);
-  LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
+  LeafOperator *B = (LeafOperator *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
@@ -933,17 +933,17 @@ Right to Left Associativity
 EQJOIN_RTOL::EQJOIN_RTOL()
     : RULE("EQJOIN_RTOL", 3,
            new Expression(new EQJOIN(0, 0, 0),
-                          new Expression(new LEAF_OP(0)),  // A
+                          new Expression(new LeafOperator(0)),  // A
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(1)),  // B
-                                         new Expression(new LEAF_OP(2))   // C
+                                         new Expression(new LeafOperator(1)),  // B
+                                         new Expression(new LeafOperator(2))   // C
                                          )),                              // original pattern
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(0)),  // A
-                                         new Expression(new LEAF_OP(1))   // B
+                                         new Expression(new LeafOperator(0)),  // A
+                                         new Expression(new LeafOperator(1))   // B
                                          ),
-                          new Expression(new LEAF_OP(2))  // C
+                          new Expression(new LeafOperator(2))  // C
                           )                               // substitute
       ) {
   // set rule mask and index
@@ -991,7 +991,7 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
 
   // Get schema for B
   Expression *BC = before->GetInput(1);
-  LEAF_OP *B = (LEAF_OP *)(BC->GetInput(0)->GetOp());
+  LeafOperator *B = (LeafOperator *)(BC->GetInput(0)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
@@ -1021,7 +1021,7 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   }
 
   // Get C's schema
-  LEAF_OP *C = (LEAF_OP *)(BC->GetInput(1)->GetOp());
+  LeafOperator *C = (LeafOperator *)(BC->GetInput(1)->GetOp());
   group_no = C->GetGroup();
   group = Ssp->GetGroup(group_no);
   LogProp = group->get_log_prop();
@@ -1093,7 +1093,7 @@ bool EQJOIN_RTOL::condition(Expression *before, MExression *mexpr, int ContextID
 
   //	B's schema determines new joining conditions.  Get it.
   Expression *AB = before->GetInput(0);
-  LEAF_OP *B = (LEAF_OP *)(AB->GetInput(1)->GetOp());
+  LeafOperator *B = (LeafOperator *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
@@ -1130,19 +1130,19 @@ EXCHANGE::EXCHANGE()
     : RULE("EXCHANGE", 4,
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(0)),   // A
-                                         new Expression(new LEAF_OP(1))),  // B
+                                         new Expression(new LeafOperator(0)),   // A
+                                         new Expression(new LeafOperator(1))),  // B
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(2)),    // C
-                                         new Expression(new LEAF_OP(3)))),  // D
+                                         new Expression(new LeafOperator(2)),    // C
+                                         new Expression(new LeafOperator(3)))),  // D
 
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(0)),   // A
-                                         new Expression(new LEAF_OP(2))),  // C
+                                         new Expression(new LeafOperator(0)),   // A
+                                         new Expression(new LeafOperator(2))),  // C
                           new Expression(new EQJOIN(0, 0, 0),
-                                         new Expression(new LEAF_OP(1)),    // B
-                                         new Expression(new LEAF_OP(3)))))  // D
+                                         new Expression(new LeafOperator(1)),    // B
+                                         new Expression(new LeafOperator(3)))))  // D
 {
   // set rule mask and index
   set_index(R_EXCHANGE);
@@ -1219,7 +1219,7 @@ Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
 
   // Get schema for A
   Expression *AB = before->GetInput(0);
-  LEAF_OP *AA = (LEAF_OP *)AB->GetInput(0)->GetOp();
+  LeafOperator *AA = (LeafOperator *)AB->GetInput(0)->GetOp();
   int group_no = AA->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
@@ -1227,7 +1227,7 @@ Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
 
   // Get schema for C
   Expression *CD = before->GetInput(1);
-  LEAF_OP *CC = (LEAF_OP *)CD->GetInput(0)->GetOp();
+  LeafOperator *CC = (LeafOperator *)CD->GetInput(0)->GetOp();
   group_no = CC->GetGroup();
   group = Ssp->GetGroup(group_no);
   log_prop = group->get_log_prop();
@@ -1354,7 +1354,7 @@ bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
 
   // Get schema for A
   Expression *AB = before->GetInput(0);
-  LEAF_OP *AA = (LEAF_OP *)AB->GetInput(0)->GetOp();
+  LeafOperator *AA = (LeafOperator *)AB->GetInput(0)->GetOp();
   int group_no = AA->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
@@ -1362,7 +1362,7 @@ bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
 
   // Get schema for C
   Expression *CD = before->GetInput(1);
-  LEAF_OP *CC = (LEAF_OP *)CD->GetInput(0)->GetOp();
+  LeafOperator *CC = (LeafOperator *)CD->GetInput(0)->GetOp();
   group_no = CC->GetGroup();
   group = Ssp->GetGroup(group_no);
   log_prop = group->get_log_prop();
@@ -1420,10 +1420,10 @@ bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
 SELECT_TO_FILTER::SELECT_TO_FILTER()
     : RULE("SELECT -> FILTER", 2,
            new Expression(new SELECT,
-                          new Expression(new LEAF_OP(0)),  // table
-                          new Expression(new LEAF_OP(1))   // predicate
+                          new Expression(new LeafOperator(0)),  // table
+                          new Expression(new LeafOperator(1))   // predicate
                           ),
-           new Expression(new FILTER, new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
+           new Expression(new FILTER, new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_SELECT_TO_FILTER);
 }  // SELECT_TO_FILTER::SELECT_TO_FILTER
@@ -1445,8 +1445,8 @@ Expression *SELECT_TO_FILTER::next_substitute(Expression *before, PHYS_PROP *Req
 
 //##ModelId=3B0C086B02DE
 P_TO_PP::P_TO_PP()
-    : RULE("PROJECT -> P_PROJECT", 1, new Expression(new PROJECT(0, 0), new Expression(new LEAF_OP(0))),
-           new Expression(new P_PROJECT(0, 0), new Expression(new LEAF_OP(0)))) {
+    : RULE("PROJECT -> P_PROJECT", 1, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
+           new Expression(new P_PROJECT(0, 0), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_P_TO_PP);
 }  // P_TO_PP::P_TO_PP
@@ -1462,7 +1462,7 @@ Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
 #ifdef _DEBUG
 
   // Get input's schema
-  LEAF_OP *A = (LEAF_OP *)(before->GetInput(0)->GetOp());
+  LeafOperator *A = (LeafOperator *)(before->GetInput(0)->GetOp());
   int group_no = A->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
@@ -1488,9 +1488,9 @@ Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
 
 //##ModelId=3B0C086C0037
 SORT_RULE::SORT_RULE()
-    : RULE("SORT enforcer", 1, new Expression(new LEAF_OP(0)),
+    : RULE("SORT enforcer", 1, new Expression(new LeafOperator(0)),
            new Expression(new QSORT(),  // bogus should this be oby?
-                          new Expression(new LEAF_OP(0)))) {
+                          new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_SORT_RULE);
 }  // SORT_RULE::SORT_RULE
@@ -1503,7 +1503,7 @@ Expression *SORT_RULE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
 }
 
 //##ModelId=3B0C086C0041
-int SORT_RULE::promise(OP *op_arg, int ContextID) {
+int SORT_RULE::promise(Operator *op_arg, int ContextID) {
   CONT *Cont = CONT::vc[ContextID];
   PHYS_PROP *ReqdProp = Cont->GetPhysProp();  // What prop is required of
 
@@ -1521,9 +1521,9 @@ int SORT_RULE::promise(OP *op_arg, int ContextID) {
 RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES()
     : RULE("RM_DUPLICATES  -> HASH_DUPLICATES", 1,
            new Expression(new RM_DUPLICATES(),
-                          new Expression(new LEAF_OP(0))  // input table
+                          new Expression(new LeafOperator(0))  // input table
                           ),
-           new Expression(new HASH_DUPLICATES(), new Expression(new LEAF_OP(0)))) {
+           new Expression(new HASH_DUPLICATES(), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_RM_TO_HASH_DUPLICATES);
 }  // RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES
@@ -1547,9 +1547,9 @@ Expression *RM_TO_HASH_DUPLICATES::next_substitute(Expression *before, PHYS_PROP
 AL_TO_HGL::AL_TO_HGL(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
     : RULE("AGG_LIST  -> HGROUP_LIST", 1,
            new Expression(new AGG_LIST(0, 0, list1),
-                          new Expression(new LEAF_OP(0))  // input table
+                          new Expression(new LeafOperator(0))  // input table
                           ),
-           new Expression(new HGROUP_LIST(0, 0, list2), new Expression(new LEAF_OP(0)))) {
+           new Expression(new HGROUP_LIST(0, 0, list2), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_AL_TO_HGL);
 }  // AL_TO_HGL::AL_TO_HGL
@@ -1584,9 +1584,9 @@ Expression *AL_TO_HGL::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
 FO_TO_PFO::FO_TO_PFO()
     : RULE("FUNC_OP  -> P_FUNC_OP", 1,
            new Expression(new FUNC_OP("", 0, 0),
-                          new Expression(new LEAF_OP(0))  // input table
+                          new Expression(new LeafOperator(0))  // input table
                           ),
-           new Expression(new P_FUNC_OP("", 0, 0), new Expression(new LEAF_OP(0)))) {
+           new Expression(new P_FUNC_OP("", 0, 0), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_FO_TO_PFO);
 }  // FO_TO_PFO::FO_TO_PFO
@@ -1613,10 +1613,10 @@ Expression *FO_TO_PFO::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
 //##ModelId=3B0C086C0308
 AGG_THRU_EQJOIN::AGG_THRU_EQJOIN(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
     : RULE("AGGREGATE EQJOIN -> JOIN AGGREGATE", 2,
-           new Expression(new AGG_LIST(0, 0, list1), new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
-                                                                    new Expression(new LEAF_OP(1)))),
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
-                          new Expression(new AGG_LIST(0, 0, list2), new Expression(new LEAF_OP(1))))) {
+           new Expression(new AGG_LIST(0, 0, list1), new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                                                                    new Expression(new LeafOperator(1)))),
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                          new Expression(new AGG_LIST(0, 0, list2), new Expression(new LeafOperator(1))))) {
   // set rule index
   set_index(R_AGG_THRU_EQJOIN);
 }  // AGG_THRU_EQ::AGG_THRU_EQ
@@ -1640,7 +1640,7 @@ Expression *AGG_THRU_EQJOIN::next_substitute(Expression *before, PHYS_PROP *Reqd
   int *lattrs = CopyArray(Op->lattrs, size);
   int *rattrs = CopyArray(Op->rattrs, size);
   // get the schema of the right input
-  LEAF_OP *r_op = (LEAF_OP *)before->GetInput(0)->GetInput(1)->GetOp();
+  LeafOperator *r_op = (LeafOperator *)before->GetInput(0)->GetInput(1)->GetOp();
   int r_gid = r_op->GetGroup();
   Group *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
@@ -1691,13 +1691,13 @@ bool AGG_THRU_EQJOIN::condition(Expression *before, MExression *mexpr, int Conte
   int *lattrs = Op->lattrs;
   int *rattrs = Op->rattrs;
   // get the schema of the right input
-  LEAF_OP *r_op = (LEAF_OP *)before->GetInput(0)->GetInput(1)->GetOp();
+  LeafOperator *r_op = (LeafOperator *)before->GetInput(0)->GetInput(1)->GetOp();
   int r_gid = r_op->GetGroup();
   Group *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
   SCHEMA *right_schema = r_prop->Schema;
   // get candidatekey of the left input
-  LEAF_OP *l_op = (LEAF_OP *)before->GetInput(0)->GetInput(0)->GetOp();
+  LeafOperator *l_op = (LeafOperator *)before->GetInput(0)->GetInput(0)->GetOp();
   int l_gid = l_op->GetGroup();
   Group *l_group = Ssp->GetGroup(l_gid);
   LOG_COLL_PROP *l_prop = (LOG_COLL_PROP *)l_group->get_log_prop();
@@ -1738,12 +1738,12 @@ bool AGG_THRU_EQJOIN::condition(Expression *before, MExression *mexpr, int Conte
 //##ModelId=3B0C086D0010
 EQ_TO_BIT::EQ_TO_BIT()
     : RULE("EQJOIN -> BIT_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LEAF_OP(0)),
+           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                           new Expression(new SELECT,
                                          new Expression(new GET(0)),     // table
-                                         new Expression(new LEAF_OP(1))  // predicate
+                                         new Expression(new LeafOperator(1))  // predicate
                                          )),
-           new Expression(new BIT_JOIN(0, 0, 0, 0), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1)))) {
+           new Expression(new BIT_JOIN(0, 0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_EQ_TO_BIT);
 }  // EQ_TO_BIT::EQ_TO_BIT
@@ -1785,7 +1785,7 @@ bool EQ_TO_BIT::condition(Expression *before, MExression *mexpr, int ContextID) 
 
   // get left input to eqjoin
   //  Get schema for LEAF(0)
-  LEAF_OP *LEAF0 = (LEAF_OP *)(before->GetInput(0)->GetOp());
+  LeafOperator *LEAF0 = (LeafOperator *)(before->GetInput(0)->GetOp());
   int group_no = LEAF0->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
@@ -1801,7 +1801,7 @@ bool EQ_TO_BIT::condition(Expression *before, MExression *mexpr, int ContextID) 
   INT_ARRAY *BitIndices = Cat->GetBitIndNames(CollId);
 
   // Get is the predicate of SELECT
-  LEAF_OP *PredOp = (LEAF_OP *)before->GetInput(1)->GetInput(1)->GetOp();
+  LeafOperator *PredOp = (LeafOperator *)before->GetInput(1)->GetInput(1)->GetOp();
   int Pred_GID = PredOp->GetGroup();
   Group *leaf_group = Ssp->GetGroup(Pred_GID);
   LOG_PROP *leaf_prop = leaf_group->get_log_prop();
@@ -1846,9 +1846,9 @@ SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER()
     : RULE("SELECT -> INDEXED_FILTER", 1,
            new Expression(new SELECT,
                           new Expression(new GET(0)),     // table
-                          new Expression(new LEAF_OP(0))  // predicate
+                          new Expression(new LeafOperator(0))  // predicate
                           ),
-           new Expression(new INDEXED_FILTER(0), new Expression(new LEAF_OP(0)))) {
+           new Expression(new INDEXED_FILTER(0), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_SELECT_TO_INDEXED_FILTER);
 }  // SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER
@@ -1873,7 +1873,7 @@ bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, MExression *mexpr, 
   INT_ARRAY *Indices = Cat->GetIndNames(CollId);
 
   // get the predicate free variables
-  LEAF_OP *Pred = (LEAF_OP *)(before->GetInput(1)->GetOp());
+  LeafOperator *Pred = (LeafOperator *)(before->GetInput(1)->GetOp());
   int GrpNo = Pred->GetGroup();
   Group *PredGrp = Ssp->GetGroup(GrpNo);
   LOG_PROP *log_prop = PredGrp->get_log_prop();
@@ -1898,12 +1898,12 @@ PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
     : RULE("PROJECT_THRU_SELECT", 2,
            new Expression(new PROJECT(0, 0),
                           new Expression(new SELECT,  // table
-                                         new Expression(new LEAF_OP(0)),
-                                         new Expression(new LEAF_OP(1))  // predicate
+                                         new Expression(new LeafOperator(0)),
+                                         new Expression(new LeafOperator(1))  // predicate
                                          )),
            new Expression(new PROJECT(0, 0),
-                          new Expression(new SELECT, new Expression(new PROJECT(0, 0), new Expression(new LEAF_OP(0))),
-                                         new Expression(new LEAF_OP(1))))) {
+                          new Expression(new SELECT, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
+                                         new Expression(new LeafOperator(1))))) {
   // set rule index
   set_index(R_PROJECT_THRU_SELECT);
   set_mask(1 << R_PROJECT_THRU_SELECT);
@@ -1920,7 +1920,7 @@ Expression *PROJECT_THRU_SELECT::next_substitute(Expression *before, PHYS_PROP *
   top_size = ((PROJECT *)before->GetOp())->size;
 
   // Get the select predicate free variables spfv
-  LEAF_OP *Pred = (LEAF_OP *)(before->GetInput(0)->GetInput(1)->GetOp());
+  LeafOperator *Pred = (LeafOperator *)(before->GetInput(0)->GetInput(1)->GetOp());
   int GrpNo = Pred->GetGroup();
   Group *PredGrp = Ssp->GetGroup(GrpNo);
   LOG_PROP *log_prop = PredGrp->get_log_prop();
@@ -1953,8 +1953,8 @@ Expression *PROJECT_THRU_SELECT::next_substitute(Expression *before, PHYS_PROP *
 //##ModelId=3B0C086D026A
 DUMMY_TO_PDUMMY::DUMMY_TO_PDUMMY()
     : RULE("DUMMY->PDUMMY", 2,
-           new Expression(new DUMMY(), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))),
-           new Expression(new PDUMMY(), new Expression(new LEAF_OP(0)), new Expression(new LEAF_OP(1))
+           new Expression(new DUMMY(), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+           new Expression(new PDUMMY(), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))
 
                               )) {
   // set rule index

@@ -254,7 +254,7 @@ void Group::FastDump() {
   int Size = 0;
   MExression *MExpr;
 
-  OutputFile << "----- Group " << GroupID << " : -----" << endl;
+  OutputFile << "Group:" << GroupID  << endl;
 
   for (MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
     OutputFile << MExpr->Dump() << " ; ";

@@ -1,35 +1,28 @@
-// OP.H - Base Classes for Operators
+// Operator.H - Base Classes for Operators
 
 #pragma once
 #include "../header/stdafx.h"
 
-class OP;  // All operators - Abstract
+class Operator;  // All operators - Abstract
 
-// The next three classes are Abstract - cannot be instantiated
-class LOG_OP;   // Logical Operators on Collections
-class PHYS_OP;  // Physical Operators on Collections
-class ITEM_OP;  // Item Operators on objects, used for predicates
+class LogicalOperator;   // Logical Operators on Collections
+class PhysicalOperator;  // Physical Operators on Collections
+class ItemOperator;      // Item Operators on objects, used for predicates
 
-class LEAF_OP;  // Leaf operators - place holder for a group, in a pattern.
-// Patterns are used in rules.
+class LeafOperator;  // Leaf operators - place holder for a group, in a pattern. Patterns are used in rules.
 
-/*
-============================================================
-OPERATORS AND ARGUMENTS - class OP
-============================================================
-*/
 // Abstract Class.  Operator and its arguments.
 // Arguments could be attributes to project on, etc.
-class OP {
+class Operator {
  public:
   string name;  // Name of this operator
 
-  OP(){};
+  Operator(){};
 
   // add assert to the following virtual functions, make sure the subclasses define them
-  virtual OP *Clone() = 0;
+  virtual Operator *Clone() = 0;
 
-  virtual ~OP(){};
+  virtual ~Operator(){};
 
   virtual string Dump() = 0;
   virtual LOG_PROP *FindLogProp(LOG_PROP **input) = 0;
@@ -41,7 +34,7 @@ class OP {
   virtual int GetNameId() = 0;
   virtual int GetArity() = 0;
 
-  virtual bool operator==(OP *other) { return (GetNameId() == other->GetNameId()); };
+  virtual bool operator==(Operator *other) { return (GetNameId() == other->GetNameId()); };
 
   // Used to compute the hash value of an mexpr.  Used only for logical operators,
   // so we make it abort everywhere else.
@@ -57,27 +50,21 @@ class OP {
   virtual bool is_const() { return false; };
 
   virtual Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) = 0;
-};  // class OP
+};
 
-/*
-   ============================================================
-   LOGICAL OPERATORS - class LOG_OP
-   ============================================================
-*/
-
-class LOG_OP : public OP  // Logical Operator Abstract Class
-{
+// Logical Operator Abstract Class
+class LogicalOperator : public Operator {
  public:
-  LOG_OP(){};
-  virtual ~LOG_OP(){};
+  LogicalOperator(){};
+  virtual ~LogicalOperator(){};
 
   // OpMatch (other) is true if this and other are the same operator,
   // independent of arguments.
   // OpMatch is used in preconditions for applying rules.
-  // This should be moved to the OP class if we ever apply rules to
+  // This should be moved to the Operator class if we ever apply rules to
   // other than logical operators.
   // If someone writes a rule which uses member data, it could be made virtual
-  inline bool OpMatch(LOG_OP *other) { return (GetNameId() == other->GetNameId()); };
+  inline bool OpMatch(LogicalOperator *other) { return (GetNameId() == other->GetNameId()); };
 
   inline bool is_logical() { return true; };
 
@@ -86,26 +73,25 @@ class LOG_OP : public OP  // Logical Operator Abstract Class
   // only on the name of the operator.
 
   // add assert to the following functions,
-  // make sure these methods of LOG_OP never called(log_op does not get cost)
+  // make sure these methods of LogicalOperator never called(log_op does not get cost)
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
     assert(false);
     return NULL;
   };
 
-};  // class LOG_OP
+};  // class LogicalOperator
 
 /*
     ============================================================
-    PHYSICAL OPERATOR - class PHYS_OP
+    PHYSICAL OPERATOR - class PhysicalOperator
     ============================================================
 */
 
-class PHYS_OP : public OP  // Physical Operator
-
-{
+// Physical Operator
+class PhysicalOperator : public Operator {
  public:
-  PHYS_OP(){};
-  virtual ~PHYS_OP(){};
+  PhysicalOperator(){};
+  virtual ~PhysicalOperator(){};
 
   // FindPhysProp() establishes the physical properties of an
   // algorithm's output.
@@ -137,113 +123,85 @@ virtual int opt_combs() */
   //##ModelId=3B0C0872022B
   virtual PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible) = 0;
 
-  //##ModelId=3B0C0872023E
   inline bool is_physical() { return true; };
   // add assert to the following functions,
-  // make sure these methods of PHYS_OP never called(log_prop is not passed by phys_op)
-  //##ModelId=3B0C0872023F
+  // make sure these methods of PhysicalOperator never called(log_prop is not passed by phys_op)
   LOG_PROP *FindLogProp(LOG_PROP **input) {
     assert(false);
     return NULL;
   };
-  //##ModelId=3B0C08720249
   inline int GetNameId() {
     assert(false);
     return 0;
   };
-  //##ModelId=3B0C08720252
   ub4 hash() {
     assert(false);
     return 0;
   };
-};  // class PHYS_OP
+};  // class PhysicalOperator
 
 /*
     ============================================================
-        ITEM OPERATORS - ACT ON INDIVIDUAL OBJECTS - USED IN PREDICATES - class ITEM_OP
+        ITEM OPERATORS - ACT ON INDIVIDUAL OBJECTS - USED IN PREDICATES - class ItemOperator
     ============================================================
 */
 
-//##ModelId=3B0C0872028E
-class ITEM_OP : public OP  // Item Operator - both logical and physical
+// Item Operator - both logical and physical
 // Can we do multiple inheritance?  That would be ideal.
-{
+class ItemOperator : public Operator {
  public:
-  //##ModelId=3B0C08720299
-  ITEM_OP(){};
-  //##ModelId=3B0C087202A2
-  ~ITEM_OP(){};
+  ItemOperator(){};
+  ~ItemOperator(){};
 
   // For now we assume no expensive predicates
-  //##ModelId=3B0C087202A3
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) { return (new Cost(0)); };
 
-  //##ModelId=3B0C087202AE
   LOG_PROP *FindLogProp(LOG_PROP **input) {
     KEYS_SET empty_arr;
     return (new LOG_ITEM_PROP(-1, -1, -1, 0, empty_arr));
   }
 
-  //##ModelId=3B0C087202B7
   inline bool is_item() { return true; };
 
   // add assert to the following functions,
-  // make sure these methods of ITEM_OP never called
-  //##ModelId=3B0C087202C0
+  // make sure these methods of ItemOperator never called
   inline int GetNameId() {
     assert(false);
     return 0;
   };
-  //##ModelId=3B0C087202C1
   ub4 hash() {
     assert(false);
     return 0;
   };
 
-};  // class ITEM_OP
+};  // class ItemOperator
 
-/*
-============================================================
-LEAF OPERATORS - USED IN RULES - class LEAF_OP
-============================================================
-*/
-
-class LEAF_OP : public OP
 // Used in rules only.  Placeholder for a Group
-{
+class LeafOperator : public Operator {
  private:
   int Group;  // Identifies the group bound to this leaf, after binding.
               //  == -1 until binding
-  //##ModelId=3B0C087203A7
   int Index;  // Used to distinguish this leaf in a rule
 
  public:
-  //##ModelId=3B0C087203BA
-  LEAF_OP(int index, int group = -1) : Index(index), Group(group) {
+  LeafOperator(int index, int group = -1) : Index(index), Group(group) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
-#ifdef _DEBUG
     name = GetName();  // for debug
-#endif
   };
 
-  //##ModelId=3B0C087203C5
-  LEAF_OP(LEAF_OP &Op) : Index(Op.Index), Group(Op.Group) {
+  LeafOperator(LeafOperator &Op) : Index(Op.Index), Group(Op.Group) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
-#ifdef _DEBUG
     name = Op.name;  // for debug
-#endif
   };
 
-  //##ModelId=3B0C087203CF
-  inline OP *Clone() { return new LEAF_OP(*this); };
+  inline Operator *Clone() { return new LeafOperator(*this); };
 
-  //##ModelId=3B0C087203D8
-  ~LEAF_OP() {
+  ~LeafOperator() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].Delete();
   };
 
   inline int GetArity() { return (0); };
-  inline string GetName() { return ("LEAF_OP"); };
+  inline string GetName() { return ("LeafOperator"); };
   inline int GetGroup() { return (Group); };
   inline int GetIndex() { return (Index); };
 
@@ -252,7 +210,7 @@ class LEAF_OP : public OP
   string Dump() { return GetName() + "<" + to_string(Index) + "," + to_string(Group) + ">"; };
 
   // add assert to the following functions,
-  // make sure these methods of LEAF_OP never called
+  // make sure these methods of LeafOperator never called
   inline int GetNameId() {
     assert(false);
     return 0;
@@ -272,7 +230,7 @@ class LEAF_OP : public OP
     return NULL;
   };
 
-};  // class LEAF_OP
+};  // class LeafOperator
 
 /*
     ============================================================

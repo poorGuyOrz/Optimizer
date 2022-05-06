@@ -1,4 +1,4 @@
-// ssp.cpp -  implementation of class SSP
+// ssp.cpp -  implementation of class SearchSpace
 
 #include "../header/stdafx.h"
 #include "../header/tasks.h"
@@ -8,13 +8,13 @@
 
 extern Cost GlobalEpsBound;
 
-SSP::SSP() : NewGrpID(-1) {
+SearchSpace::SearchSpace() : NewGrpID(-1) {
   // initialize HashTbl to contain HashTableSize elements, each initially nullptr.
   HashTbl = new MExression *[HtblSize];  // 8192
   for (ub4 i = 0; i < HtblSize; i++) HashTbl[i] = nullptr;
 }
 
-void SSP::Init() {
+void SearchSpace::Init() {
   Expression *Expr = query->GetEXPR();
 
   // create the initial search space
@@ -27,14 +27,14 @@ void SSP::Init() {
 }
 
 // free up memory
-SSP::~SSP() {
+SearchSpace::~SearchSpace() {
   for (int i = 0; i < Groups.size(); i++) delete Groups[i];
   for (int j = 0; j < M_WINNER::mc.size(); j++) delete M_WINNER::mc[j];
   M_WINNER::mc.clear();
   delete[] HashTbl;
 }
 
-string SSP::DumpHashTable() {
+string SearchSpace::DumpHashTable() {
   string os;
 
   os = "Hash Table BEGIN:\n";
@@ -49,7 +49,7 @@ string SSP::DumpHashTable() {
   return os;
 }
 
-string SSP::DumpChanged() {
+string SearchSpace::DumpChanged() {
   string os;
   Group *group;
 
@@ -66,13 +66,11 @@ string SSP::DumpChanged() {
     return ("Search Space not changed");
 }
 
-//##ModelId=3B0C086500C3
-void SSP::Shrink() {
+void SearchSpace::Shrink() {
   for (int i = InitGroupNum; i < Groups.size(); i++) ShrinkGroup(i);
 }
 
-//##ModelId=3B0C086500B9
-void SSP::ShrinkGroup(int group_no) {
+void SearchSpace::ShrinkGroup(int group_no) {
   Group *group;
   MExression *mexpr;
   MExression *p;
@@ -144,7 +142,7 @@ void SSP::ShrinkGroup(int group_no) {
   PTRACE("Deleted " << DeleteCount << " mexpr!\n");
 }
 
-string SSP::Dump() {
+string SearchSpace::Dump() {
   string os;
   Group *group;
 
@@ -159,8 +157,8 @@ string SSP::Dump() {
   return os;
 }
 
-void SSP::FastDump() {
-  OutputFile << "SSP Content: RootGID: " << RootGID << endl;
+void SearchSpace::FastDump() {
+  OutputFile << "SearchSpace Content: RootGID: " << RootGID << endl;
 
   for (int i = 0; i < Groups.size(); i++) {
     Groups[i]->FastDump();
@@ -168,8 +166,7 @@ void SSP::FastDump() {
   }
 }
 
-//##ModelId=3B0C086500A5
-MExression *SSP::FindDup(MExression &MExpr) {
+MExression *SearchSpace::FindDup(MExression &MExpr) {
   int Arity = MExpr.GetArity();
 
   ub4 hashval = MExpr.hash();
@@ -224,14 +221,13 @@ MExression *SSP::FindDup(MExression &MExpr) {
   }
 
   return (nullptr);
-}  // SSP::FindDup
+}  // SearchSpace::FindDup
 
 // merge two groups when duplicate found in these two groups
 // means they should be the same group
 // always merge bigger group_no group to smaller one.
 
-//##ModelId=3B0C086500AE
-int SSP::MergeGroups(int group_no1, int group_no2) {
+int SearchSpace::MergeGroups(int group_no1, int group_no2) {
   // MExression * mexpr;
 
   int ToGid = group_no1;
@@ -248,9 +244,9 @@ int SSP::MergeGroups(int group_no1, int group_no2) {
 #endif
 
   return ToGid;
-}  // SSP::MergeGroups
+}  // SearchSpace::MergeGroups
 
-MExression *SSP::CopyIn(Expression *Expr, int &GrpID) {
+MExression *SearchSpace::CopyIn(Expression *Expr, int &GrpID) {
   Group *group;
   bool win = true;  // will we initialize nontrivial winners in this group?
   // False if it is a subgroup of a DUMMY operator
@@ -351,9 +347,9 @@ MExression *SSP::CopyIn(Expression *Expr, int &GrpID) {
   group->set_changed(true);
 
   return MExpr;
-}  // SSP::CopyIn
+}  // SearchSpace::CopyIn
 
-void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
+void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
   // Find the winner for this Physical Property.
   // print the Winner's Operator and cost
   Group *ThisGroup = Ssp->GetGroup(GrpID);
@@ -363,7 +359,7 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 #endif
 
   MExression *WinnerMExpr;
-  OP *WinnerOp;
+  Operator *WinnerOp;
   string os;
 
   // special case : it's a const group
@@ -373,7 +369,7 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 #else
     WinnerMExpr = ThisGroup->GetFirstLogMExpr();
 #endif
-    os = WinnerMExpr->GetOp()->Dump();
+    os = WinnerMExpr->Dump();
     os += ", Cost = 0\n";
     OUTPUTN(tabs, os);
   }
@@ -401,7 +397,7 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 #endif
     WinnerOp = WinnerMExpr->GetOp();
 
-    os = WinnerOp->Dump();
+    os = WinnerMExpr->Dump();
     os += ", Cost = ";
 
     OUTPUTN(tabs, os);
@@ -422,7 +418,6 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
       delete InputProp;
     }
   }
-
   // it's a normal group
   else {
     // First extract the winning expression for this property
@@ -453,7 +448,7 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
     assert(WinnerMExpr != nullptr);
 
     WinnerOp = WinnerMExpr->GetOp();
-    os = WinnerOp->Dump();
+    os = WinnerMExpr->Dump();
     if (WinnerOp->GetName() == "QSORT") os += PhysProp->Dump();
     os += ", Cost = ";
 
@@ -468,7 +463,7 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 #else
     Cost *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
 #endif
-    os = WinnerCost->Dump() + "\n";
+    os = WinnerCost->Dump();
 
 #ifndef _TABLE_
     OUTPUT(os);
@@ -489,8 +484,8 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
     for (int i = 0; i < Arity; i++) {
       int input_groupno = WinnerMExpr->GetInput(i);
 
-      ReqProp =
-          ((PHYS_OP *)WinnerOp)->InputReqdProp(PhysProp, Ssp->GetGroup(input_groupno)->get_log_prop(), i, possible);
+      ReqProp = ((PhysicalOperator *)WinnerOp)
+                    ->InputReqdProp(PhysProp, Ssp->GetGroup(input_groupno)->get_log_prop(), i, possible);
 
       assert(possible);  // Otherwise optimization fails
 
@@ -500,10 +495,9 @@ void SSP::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
     }
 #endif
   }
-}  // SSP::CopyOut()
+}  // SearchSpace::CopyOut()
 
 #ifdef FIRSTPLAN
-//##ModelId=3B0C0867021A
 bool Group::firstplan = false;
 #endif
 
@@ -631,8 +625,7 @@ WINNER *Group::GetWinner(PHYS_PROP *PhysProp) {
 
   // No matching winner
   return (nullptr);
-
-}  // Group::GetWinner
+}
 
 void Group::NewWinner(PHYS_PROP *ReqdProp, MExression *MExpr, Cost *TotalCost, bool done) {
   if (COVETrace && MExpr)  // New Winner
@@ -703,12 +696,10 @@ Cost M_WINNER::InfCost(-1);
 int TaskNo;
 int Memo_M_Exprs;
 
-void SSP::optimize() {
+void SearchSpace::optimize() {
 #ifdef FIRSTPLAN
   Ssp->GetGroup(0)->setfirstplan(false);
 #endif
-
-  SET_TRACE Trace(true);
 
   // Create initial context, with no requested properties, infinite upper bound,
   //  zero lower bound, not yet done.  Later this may be specified by user.
@@ -717,61 +708,33 @@ void SSP::optimize() {
     // Make this the first context
     CONT::vc.push_back(InitCont);
   }
-  // assert(CONT::vc.size() == 1);
 
   // start optimization with root group, 0th context, parent task of zero.
-  // 初始化group，
   if (GlobepsPruning) {
     Cost *eps_bound = new Cost(GlobalEpsBound);
     PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true, eps_bound));
   } else
     PTasks.push(new OptimizeGroupTask(RootGID, 0, 0));
 
-  PTRACE("initial OPEN:\n " << PTasks.Dump());
-
-  // main loop of optimization
-  // while there are tasks undone, do one
   while (!PTasks.empty()) {
     TaskNo++;
-    PTRACE("Starting task " << TaskNo);
+    PTRACE("--------------------------Starting task " << TaskNo << "-----------------------------");
 
-    OptimizerTask *NextTask = PTasks.pop();
-    NextTask->perform();
+    OptimizerTask *task = PTasks.pop();
+    task->perform();
 
-    if (TraceSSP) {
-      OutputFile << "\n====== SSP after task " << TaskNo << ": " << endl;
-      OutputFile << DumpChanged() << endl;
-    } else {
-      PTRACE(DumpChanged());
-    }
+    PTRACE("------------------ SearchSpace after task " << TaskNo << ": ");
+    OutputFile << DumpChanged() << endl;
 
-    if (TraceOPEN) {
-      OutputFile << "\n====== OPEN after task " << TaskNo << ":" << endl;
-      OutputFile << PTasks.Dump() << endl;
-    } else {
-      PTRACE("OPEN after task " << TaskNo << ":\n " << PTasks.Dump() << endl);
-    }
-  }  // main optimization loop over remaining tasks in task list
+    PTRACE("------------------ OPEN after task " << TaskNo << ":");
+    OutputFile << PTasks.Dump() << endl;
+  }
 
   PTRACE("Optimizing completed: " << TaskNo << " tasks\n");
-#ifdef _TABLE_
-  OUTPUT("%s\t", GlobalEpsBound.Dump());
-  OUTPUT("%d\t", ClassStat[C_M_EXPR].Count);
-  OUTPUT("%d\t", ClassStat[C_M_EXPR].Total);
-  OUTPUT("%d\t", TaskNo);
-#else
-  if (SingleLineBatch) {
-    string os;
-    os = to_string(TaskNo) + "\t" + to_string(ClassStat[C_GROUP].Count) + "\t" + to_string(ClassStat[C_M_EXPR].Count) +
-         "\t" + to_string(ClassStat[C_M_EXPR].Total) + "\t" + to_string(OptStat->FiredRule) + "\t";
-    OUTPUT(os);
-  } else {
-    OUTPUT("TotalTask : " << TaskNo);
-    OUTPUT("TotalGroup : " << ClassStat[C_GROUP].Count);
-    OUTPUT("CurrentMExpr : " << ClassStat[C_M_EXPR].Count);
-    OUTPUT("TotalMExpr : " << ClassStat[C_M_EXPR].Total);
-    OUTPUT("TotalMExpr in MEMO: " << Memo_M_Exprs);
-    OUTPUT(OptStat->Dump());
-  }
-#endif
-}  // SSP::optimize()
+  OUTPUT("TotalTask : " << TaskNo);
+  OUTPUT("TotalGroup : " << ClassStat[C_GROUP].Count);
+  OUTPUT("CurrentMExpr : " << ClassStat[C_M_EXPR].Count);
+  OUTPUT("TotalMExpr : " << ClassStat[C_M_EXPR].Total);
+  OUTPUT("TotalMExpr in MEMO: " << Memo_M_Exprs);
+  OUTPUT(OptStat->Dump());
+}

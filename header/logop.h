@@ -43,14 +43,14 @@ from EMP as E, then EMP (actually, its ID) is the CollID and
 E is the RangeVar.
 */
 
-class GET : public LOG_OP {
+class GET : public LogicalOperator {
  public:
   // If the query includes FROM EMP e, then EMP is the collection
   // and e is the range variable.
   GET(string collection, string rangeVar);
   GET(int collId);  // Range Variable defaults to Collection here
   GET(GET &Op);
-  OP *Clone() { return new GET(*this); };
+  Operator *Clone() { return new GET(*this); };
 
   ~GET() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].Delete();
@@ -62,7 +62,7 @@ class GET : public LOG_OP {
   inline string GetName() { return ("GET"); };
   inline int GetNameId() { return GET_ID; };
   inline int GetCollection() { return CollId; };
-  inline bool operator==(OP *other) {
+  inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() && ((GET *)other)->CollId == CollId &&
             ((GET *)other)->RangeVar == RangeVar);
   };
@@ -87,7 +87,7 @@ class GET : public LOG_OP {
    we may want to reconsider this decision.
 */
 
-class EQJOIN : public LOG_OP {
+class EQJOIN : public LogicalOperator {
  public:
   // If the query includes
   //  	WHERE A.X = B.Y AND C.Z = D.W
@@ -102,7 +102,7 @@ class EQJOIN : public LOG_OP {
  public:
   EQJOIN(int *lattrs, int *rattrs, int size);
   EQJOIN(EQJOIN &Op);
-  OP *Clone() { return new EQJOIN(*this); };
+  Operator *Clone() { return new EQJOIN(*this); };
 
   ~EQJOIN() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].Delete();
@@ -115,7 +115,7 @@ class EQJOIN : public LOG_OP {
   inline int GetArity() { return (2); };  // Inputs are left and right streams
   inline string GetName() { return ("EQJOIN"); };  // Name of this operator
   inline int GetNameId() { return EQJOIN_ID; };  // Name of this operator
-  inline bool operator==(OP *other) {
+  inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((EQJOIN *)other)->lattrs, lattrs, size) &&  // arguments are equal
             EqualArray(((EQJOIN *)other)->rattrs, rattrs, size));
@@ -139,14 +139,14 @@ implementation, namely PDUMMY.
 */
 
 //##ModelId=3B0C0874001A
-class DUMMY : public LOG_OP {
+class DUMMY : public LogicalOperator {
  public:
   //##ModelId=3B0C0874002F
   DUMMY();
   //##ModelId=3B0C08740030
   DUMMY(DUMMY &Op);
   //##ModelId=3B0C08740039
-  OP *Clone() { return new DUMMY(*this); };
+  Operator *Clone() { return new DUMMY(*this); };
 
   //##ModelId=3B0C08740042
   ~DUMMY(){};
@@ -161,7 +161,7 @@ class DUMMY : public LOG_OP {
   //##ModelId=3B0C08740057
   inline int GetNameId() { return DUMMY_ID; };  // Name of this operator
   //##ModelId=3B0C08740060
-  inline bool operator==(OP *other) { return (other->GetNameId() == GetNameId()); };
+  inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); };
 
   //##ModelId=3B0C0874006B
   ub4 hash();
@@ -181,14 +181,14 @@ class DUMMY : public LOG_OP {
 */
 
 //##ModelId=3B0C087400F6
-class SELECT : public LOG_OP {
+class SELECT : public LogicalOperator {
  public:
   //##ModelId=3B0C08740101
   SELECT();
   //##ModelId=3B0C0874010A
   SELECT(SELECT &Op);
   //##ModelId=3B0C08740114
-  OP *Clone() { return new SELECT(*this); };
+  Operator *Clone() { return new SELECT(*this); };
 
   //##ModelId=3B0C08740115
   ~SELECT() {
@@ -207,7 +207,7 @@ class SELECT : public LOG_OP {
   //##ModelId=3B0C08740132
   inline int GetNameId() { return SELECT_ID; };  // Name of this operator
   //##ModelId=3B0C08740133
-  inline bool operator==(OP *other) { return (other->GetNameId() == GetNameId()); }
+  inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); }
 
   //##ModelId=3B0C0874013D
   ub4 hash();
@@ -225,7 +225,7 @@ class SELECT : public LOG_OP {
 */
 
 //##ModelId=3B0C087401DC
-class PROJECT : public LOG_OP {
+class PROJECT : public LogicalOperator {
  public:
   //##ModelId=3B0C087401F1
   int *attrs;  // attr's to project on
@@ -237,7 +237,7 @@ class PROJECT : public LOG_OP {
   //##ModelId=3B0C08740210
   PROJECT(PROJECT &Op);
   //##ModelId=3B0C08740219
-  OP *Clone() { return new PROJECT(*this); };
+  Operator *Clone() { return new PROJECT(*this); };
 
   //##ModelId=3B0C0874021A
   ~PROJECT() {
@@ -255,7 +255,7 @@ class PROJECT : public LOG_OP {
   //##ModelId=3B0C08740237
   inline int GetNameId() { return PROJECT_ID; };  // Name of this operator
   //##ModelId=3B0C08740241
-  inline bool operator==(OP *other) {
+  inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((PROJECT *)other)->attrs, attrs, size));  // arguments are equal
   };
@@ -278,14 +278,14 @@ class PROJECT : public LOG_OP {
 */
 
 //##ModelId=3B0C087402F5
-class RM_DUPLICATES : public LOG_OP {
+class RM_DUPLICATES : public LogicalOperator {
  public:
   //##ModelId=3B0C08740300
   RM_DUPLICATES();
   //##ModelId=3B0C08740309
   RM_DUPLICATES(RM_DUPLICATES &Op);
   //##ModelId=3B0C0874030B
-  OP *Clone() { return new RM_DUPLICATES(*this); };
+  Operator *Clone() { return new RM_DUPLICATES(*this); };
 
   //##ModelId=3B0C08740313
   ~RM_DUPLICATES() {
@@ -302,7 +302,7 @@ class RM_DUPLICATES : public LOG_OP {
   //##ModelId=3B0C08740328
   inline int GetNameId() { return RM_DUPLICATES_ID; };  // Name of this operator
   //##ModelId=3B0C08740331
-  inline bool operator==(OP *other) { return (other->GetNameId() == GetNameId()); };
+  inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); };
 
   // since this operator has arguments
   //##ModelId=3B0C0874033C
@@ -331,7 +331,7 @@ class RM_DUPLICATES : public LOG_OP {
 */
 
 //##ModelId=3B0C08750043
-class AGG_LIST : public LOG_OP {
+class AGG_LIST : public LogicalOperator {
  public:
   //##ModelId=3B0C08750057
   int *GbyAtts;
@@ -361,7 +361,7 @@ class AGG_LIST : public LOG_OP {
   };
 
   //##ModelId=3B0C087500BB
-  OP *Clone() { return new AGG_LIST(*this); };
+  Operator *Clone() { return new AGG_LIST(*this); };
 
   //##ModelId=3B0C087500BC
   ~AGG_LIST() {
@@ -382,7 +382,7 @@ class AGG_LIST : public LOG_OP {
   //##ModelId=3B0C087500DA
   inline int GetNameId() { return AGG_LIST_ID; };  // Name of this operator
   //##ModelId=3B0C087500DB
-  bool operator==(OP *other);
+  bool operator==(Operator *other);
 
   // since this operator has arguments
   //##ModelId=3B0C087500EE
@@ -403,7 +403,7 @@ class AGG_LIST : public LOG_OP {
 */
 
 //##ModelId=3B0C087501CA
-class FUNC_OP : public LOG_OP {
+class FUNC_OP : public LogicalOperator {
  public:
   //##ModelId=3B0C087501DF
   string RangeVar;
@@ -423,7 +423,7 @@ class FUNC_OP : public LOG_OP {
   };
 
   //##ModelId=3B0C08750211
-  OP *Clone() { return new FUNC_OP(*this); };
+  Operator *Clone() { return new FUNC_OP(*this); };
 
   //##ModelId=3B0C0875021A
   ~FUNC_OP() {
@@ -441,7 +441,7 @@ class FUNC_OP : public LOG_OP {
   //##ModelId=3B0C08750242
   inline int GetNameId() { return FUNC_OP_ID; };
   //##ModelId=3B0C0875024C
-  inline bool operator==(OP *other) {
+  inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((FUNC_OP *)other)->Atts, Atts, AttsSize) &&  // arguments are equal
             ((FUNC_OP *)other)->RangeVar == RangeVar);

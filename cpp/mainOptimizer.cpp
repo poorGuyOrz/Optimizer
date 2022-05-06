@@ -14,7 +14,6 @@ int main(int argc, char const *argv[]) {
   OptStat = new OPT_STAT;
 
   costModel = new CostModel("../case/cost");
-  cout << costModel->Dump() << endl;
 
   ruleSet = new RuleSet();
   cout << ruleSet->Dump() << endl;
@@ -28,7 +27,7 @@ int main(int argc, char const *argv[]) {
   query = new Query("../case/query");
   cout << endl << query->Dump() << endl;
 
-  Ssp = new SSP;
+  Ssp = new SearchSpace;
   Ssp->Init();
   Ssp->FastDump();
 
@@ -44,6 +43,7 @@ int main(int argc, char const *argv[]) {
 
   std::chrono::duration<double, std::milli> diff = std::chrono::system_clock::now() - now;
   cout << "Optimization elapsed time:" << (diff).count() << "ms" << endl;
+  cout << "ssp-->" << endl << Ssp->DumpHashTable() << endl;
 
   PHYS_PROP *PhysProp = CONT::vc[0]->GetPhysProp();
   Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);

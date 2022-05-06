@@ -789,8 +789,7 @@ string AGG_LIST::Dump() {
   return os;
 }  // AGG_LIST::Dump
 
-//##ModelId=3B0C087500DB
-bool AGG_LIST::operator==(OP *other) {
+bool AGG_LIST::operator==(Operator *other) {
   bool result;
   result = other->GetNameId() == GetNameId() && EqualArray(((AGG_LIST *)other)->GbyAtts, GbyAtts, GbySize);
 

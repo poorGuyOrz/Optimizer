@@ -164,7 +164,7 @@ typedef enum DOM_TYPE { string_t, int_t, real_t, unknown } DOM_TYPE;
 
 class Query;
 class OptimizerTaskStack;
-class SSP;
+class SearchSpace;
 class CAT;
 class RULE;
 class OPT_STAT;
@@ -219,7 +219,7 @@ extern int printnx;
 
 extern Query *query;
 extern OptimizerTaskStack PTasks;
-extern SSP *Ssp;
+extern SearchSpace *Ssp;
 extern CAT *Cat;
 extern RuleSet *ruleSet;
 extern CostModel *costModel;
@@ -228,8 +228,6 @@ extern KEYS_SET IntOrdersSet;  // set of Interesting Orders
 extern bool NO_PHYS_IN_GROUP;
 
 /* ======= Pragmas ====== */
-
-#pragma warning(disable : 4291)  // Allows Bill's memory mgr to work w/o warnings
 
 /* ======= Symbolic Constants ====== */
 

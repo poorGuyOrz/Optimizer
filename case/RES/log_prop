@@ -100,7 +100,7 @@ SELECT:
   Schema:
     keep the same attrs as rel_input, 
     For each attr, if CuCard != -1, CuCard = ceil(1 / (1/old_cucard - 1/(rel_input->Card) + 1/new_card) );
-    XX Should chang Min and Max, Min and Max should come from right_input(ITEM_OP)
+    XX Should chang Min and Max, Min and Max should come from right_input(ItemOperator)
 
 PROJECT:
   Card:

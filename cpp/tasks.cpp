@@ -154,7 +154,7 @@ void OptimizeGroupTask::perform() {
     // if (property is ANY)
     if (LocalReqdProp->GetOrder() == any) {
       PTRACE("add winner with null plan, push OptimizeExprTask on 1st logical expression");
-      group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
+      group->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
       if (GlobepsPruning) {
         Cost *eps_bound = new Cost(*EpsBound);
         PTasks.push(new OptimizeExprTask(FirstLogMExpr, false, ContextID, TaskNo, true, eps_bound));
@@ -255,7 +255,7 @@ void OptimizeGroupTask::perform() {
       // add a winner to the circle, with null plan.
       //(i.e., initialize the winner's circle for this property.)
       PTRACE("Init winner's circle for this property");
-      if (moreSearch && !SCReturn) group->NewWinner(LocalReqdProp, NULL, new Cost(*LocalCost), false);
+      if (moreSearch && !SCReturn) group->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
     }
   }
 #endif
@@ -273,16 +273,12 @@ string OptimizeGroupTask::Dump() {
   return os;
 }  // OptimizeGroupTask::Dump
 
-// ************  ExploreGroupTask ******************
-//    Task to explore a group
 ExploreGroupTask::ExploreGroupTask(int grpID, int ContextID, int parentTaskNo, bool last, Cost *bound)
     : OptimizerTask(ContextID, parentTaskNo), GrpID(grpID), Last(last), EpsBound(bound) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_E_GROUP].New();
-};  // ExploreGroupTask::ExploreGroupTask
+};
 
 void ExploreGroupTask::perform() {
-  SET_TRACE Trace(true);
-
   PTRACE("ExploreGroupTask " << GrpID << " performing");
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
 
@@ -328,7 +324,7 @@ string ExploreGroupTask::Dump() {
   os = "ExploreGroupTask group " + to_string(GrpID) + ",";
   os += " parent task " + to_string(ParentTaskNo);
   return os;
-}  // ExploreGroupTask::Dump
+}
 
 // ************  OptimizeExprTask ******************
 
@@ -369,7 +365,7 @@ void OptimizeExprTask::perform() {
   for (int RuleNo = 0; RuleNo < ruleSet->RuleCount; RuleNo++) {
     RULE *Rule = (*ruleSet)[RuleNo];
 
-    if (Rule == NULL) continue;  // some rules may be turned off
+    if (Rule == nullptr) continue;  // some rules may be turned off
 
 #ifdef UNIQ
     if (!(MExpr->can_fire(Rule->get_index()))) {
@@ -468,8 +464,8 @@ O_INPUTS::O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last
   // We can only calculate cost for physical operators
 
   // Cache local properties
-  OP *Op = (PHYS_OP *)(MExpr->GetOp());  // the op of the expr
-  arity = Op->GetArity();                // cache arity of mexpr
+  Operator *Op = (PhysicalOperator *)(MExpr->GetOp());  // the op of the expr
+  arity = Op->GetArity();                               // cache arity of mexpr
 
   // create the arrays of input costs and logical properties
   if (arity) {
@@ -606,7 +602,7 @@ void O_INPUTS::perform() {
 
   // Cache local properties of G and the expression being optimized
 
-  OP *Op = MExpr->GetOp();  // the op of the expr
+  Operator *Op = MExpr->GetOp();  // the op of the expr
   assert(Op->is_physical());
   Group *LocalGroup = Ssp->GetGroup(MExpr->GetGrpID());  // Group of the MExpr
 
@@ -677,7 +673,7 @@ void O_INPUTS::perform() {
       PHYS_PROP *ReqProp;
       if (Op->is_physical()) {
         // Determine property required of that input
-        ReqProp = ((PHYS_OP *)Op)->InputReqdProp(LocalReqdProp, InputLogProp[input], input, possible);
+        ReqProp = ((PhysicalOperator *)Op)->InputReqdProp(LocalReqdProp, InputLogProp[input], input, possible);
 
         if (!possible)  // if not possible, means no such input prop can satisfied
         {
@@ -772,7 +768,7 @@ void O_INPUTS::perform() {
     PHYS_PROP *ReqProp;
     if (Op->is_physical()) {
       // Determine property required of that input
-      ReqProp = ((PHYS_OP *)Op)->InputReqdProp(LocalReqdProp, InputLogProp[input], input, possible);
+      ReqProp = ((PhysicalOperator *)Op)->InputReqdProp(LocalReqdProp, InputLogProp[input], input, possible);
 
       if (Pruning) assert(possible);  // should be possible since in the first pass, we checked it
       if (!possible) {
@@ -951,7 +947,7 @@ void O_INPUTS::perform() {
   // If arity is zero, we need to ensure that this expression can
   // satisfy this required property.
   if (arity == 0 && LocalReqdProp->GetOrder() != any && Op->is_physical()) {
-    PHYS_PROP *OutputPhysProp = ((PHYS_OP *)Op)->FindPhysProp();
+    PHYS_PROP *OutputPhysProp = ((PhysicalOperator *)Op)->FindPhysProp();
     if (!(*LocalReqdProp == *OutputPhysProp)) {
       PTRACE("physical epxr: " << MExpr->Dump() << " does not satisfy required phys_prop: " << LocalReqdProp->Dump());
       delete OutputPhysProp;
@@ -1061,7 +1057,7 @@ void O_INPUTS::perform() {
   // compare cost to current winner for this context
   // update the winner and upperbound accordingly
 #ifdef IRPROP
-  if ((M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp) != NULL) &&
+  if ((M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp) != nullptr) &&
       (CostSoFar >= *(M_WINNER::mc[GrpNo]->GetUpperBd(LocalReqdProp)))) {
     goto TerminateThisTask;
   } else {
@@ -1070,7 +1066,7 @@ void O_INPUTS::perform() {
 
     MExression *OldWinner = M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp);
 
-    if (OldWinner != NULL) {
+    if (OldWinner != nullptr) {
       // decrement the counter of old winner and if it becomes 0, delete it
       OldWinner->DecCounter();
 
@@ -1137,8 +1133,8 @@ TerminateThisTask:
 #ifdef _DEBUG
     string os;
     MExression *TempME = LocalWinner->GetMPlan();
-    os.Format("Terminate: replaced winner with %s, %s, %s\n", LocalReqdProp->Dump(), TempME ? TempME->Dump() : " NULL ",
-              LocalWinner->GetCost()->Dump());
+    os.Format("Terminate: replaced winner with %s, %s, %s\n", LocalReqdProp->Dump(),
+              TempME ? TempME->Dump() : " nullptr ", LocalWinner->GetCost()->Dump());
     PTRACE("%s", os);
 #endif
   }
@@ -1259,10 +1255,10 @@ void ApplyRuleTask::perform() {
   if (!ForGlobalEpsPruning) OptStat->FiredRule++;  // Count invocations of this task
 
   // main variables for the loop over all possible bindings
-  BINDERY *bindery;    // Expression bindery. Used to bind MExpr to rule's original pattern
-  Expression *before;  // see below
-  Expression *after;   // see below
-  MExression *NewMExpr;    // see below
+  BINDERY *bindery;      // Expression bindery. Used to bind MExpr to rule's original pattern
+  Expression *before;    // see below
+  Expression *after;     // see below
+  MExression *NewMExpr;  // see below
 
   // Guide to closely related variables
 
@@ -1289,7 +1285,7 @@ void ApplyRuleTask::perform() {
     // There must be a Binding since advance() returned non-null.
     // Extract the bound Expression from the bindery
     before = bindery->extract_expr();
-    PTRACE("new Binding is: " << before->Dump());
+    PTRACE("new Binding is: " << endl << before->Dump());
 #ifdef _DEBUG
     Bindings[Rule->get_index()]++;
 #endif
@@ -1309,7 +1305,7 @@ void ApplyRuleTask::perform() {
     // try to derive a new substitute expression
     after = Rule->next_substitute(before, ReqdProp);
 
-    assert(after != NULL);
+    assert(after != nullptr);
 
     PTRACE("substitute expr is : " << endl << after->Dump());
 
@@ -1325,25 +1321,21 @@ void ApplyRuleTask::perform() {
       NewMExpr = Ssp->CopyIn(after, group_no);
 
     // If substitute was already known
-    if (NewMExpr == NULL) {
+    if (NewMExpr == nullptr) {
       PTRACE("duplicate substitute " << after->Dump());
-
       delete after;  // "after" no longer used
-
-      continue;  // try to find another substitute
+      continue;      // try to find another substitute
     }
 
     PTRACE("New Mexpr is : " << NewMExpr->Dump());
     Memo_M_Exprs++;
-    PTRACE("New MEXPR " << 3);
-    PTRACE("Memo_M_Exprs value is " << Memo_M_Exprs);
 
     delete after;  // "after" no longer used
 
     // Give this expression the rule's mask
     NewMExpr->set_rule_mask(Rule->get_mask());
 
-    // We need to handle this case for rules like project -> NULL,
+    // We need to handle this case for rules like project -> nullptr,
     // by merging groups
     assert(MExpr->GetGrpID() == NewMExpr->GetGrpID());
 
@@ -1396,13 +1388,13 @@ void ApplyRuleTask::perform() {
           if ((NewMExpr->GetOp())->GetName() == "QSORT") j = 1;
           for (int i = j; i < M_WINNER::mc[GrpNo]->GetWide(); i++) {
             if (i != ContextID) {
-              PTasks.push(new O_INPUTS(NewMExpr, i, TaskNo, Flag, NULL, contextNo++));
+              PTasks.push(new O_INPUTS(NewMExpr, i, TaskNo, Flag, nullptr, contextNo++));
             }
           }
           if (!(j == 1 && ContextID == 0))
-            PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, NULL, contextNo++));
+            PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, nullptr, contextNo++));
 #else
-          PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, NULL));
+          PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, nullptr));
 #endif
         }
 
@@ -1437,9 +1429,9 @@ void ApplyRuleTask::perform() {
     // try to derive a new substitute expression
     after = Rule->next_substitute(before, ReqdProp);
 
-    assert(after != NULL);
+    assert(after != nullptr);
 
-    PTRACE("substitute expr is : "<<  endl << after->Dump());
+    PTRACE("substitute expr is : " << endl << after->Dump());
 
     // include substitute in MEMO, find duplicates, etc.
     int group_no = MExpr->GetGrpID();
@@ -1453,7 +1445,7 @@ void ApplyRuleTask::perform() {
       NewMExpr = Ssp->CopyIn(after, group_no);
 
     // If substitute was already known
-    if (NewMExpr == NULL) {
+    if (NewMExpr == nullptr) {
       PTRACE("duplicate substitute %s", after->Dump());
 
       delete after;  // "after" no longer used
@@ -1519,7 +1511,7 @@ void ApplyRuleTask::perform() {
     // Give this expression the rule's mask
     Afters[num_afters].m_expr->set_rule_mask(Rule->get_mask());
 
-    // We need to handle this case for rules like project -> NULL,
+    // We need to handle this case for rules like project -> nullptr,
     // by merging groups
     assert(MExpr->GetGrpID() == Afters[num_afters].m_expr->GetGrpID());
 

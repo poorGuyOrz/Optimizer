@@ -47,7 +47,7 @@ typedef struct AFTERS {
 
         In Cascades and Columbia, tasks store winners in memos; they do not
         actually produce a best plan.  After the optimization terminates,
-        SSP::CopyOut() is called to print the best plan.
+        SearchSpace::CopyOut() is called to print the best plan.
 
         OptimizerTask is an abstract class.  Its subclasses are specific tasks.
 
@@ -222,7 +222,7 @@ class ExploreGroupTask : public OptimizerTask {
 
 class OptimizeExprTask : public OptimizerTask {
  private:
-  MExression *MExpr;       // Which expression to optimize
+  MExression *MExpr;   // Which expression to optimize
   const bool explore;  // if this task is for exploring  Should not happen - see ExploreGroupTask
   bool Last;           // if this task is the last task for the group
   Cost *EpsBound;      // if global eps pruning is on, this is the eps bound of this task
@@ -301,7 +301,8 @@ class O_INPUTS : public OptimizerTask {
   LOG_PROP **InputLogProp;
 
  public:
-  O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last = false, Cost *epsbound = nullptr, int ContNo = 0);
+  O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last = false, Cost *epsbound = nullptr,
+           int ContNo = 0);
 
   ~O_INPUTS();
 
@@ -322,7 +323,7 @@ class O_INPUTS : public OptimizerTask {
 class ApplyRuleTask : public OptimizerTask {
  private:
   RULE *Rule;          // rule to apply
-  MExression *MExpr;       // root of expr. before rule
+  MExression *MExpr;   // root of expr. before rule
   const bool explore;  // if this task is for exploring
   bool Last;           // if this task is the last task for the group
   Cost *EpsBound;      // if global eps pruning is on, this is the eps bound for eps pruning

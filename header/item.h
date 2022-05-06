@@ -29,7 +29,7 @@ In Columbia, ATTR_OP is 1, ATTR is 2.a, and ATTR_EXP is 2.b .
 
 // ATTR_OP represents the value of an attribute, as in emp.age < 40
 //##ModelId=3B0C0875027E
-class ATTR_OP : public ITEM_OP {
+class ATTR_OP : public ItemOperator {
  private:
   //##ModelId=3B0C08750292
   int AttId;
@@ -46,7 +46,7 @@ class ATTR_OP : public ITEM_OP {
   };
 
   //##ModelId=3B0C087502B0
-  OP *Clone() { return new ATTR_OP(*this); };
+  Operator *Clone() { return new ATTR_OP(*this); };
 
   //##ModelId=3B0C087502B1
   ~ATTR_OP() {
@@ -65,7 +65,7 @@ class ATTR_OP : public ITEM_OP {
   string Dump() { return "ATTR(" + GetAttName(AttId) + ")"; }
 };
 
-class ATTR_EXP : public ITEM_OP {
+class ATTR_EXP : public ItemOperator {
  private:
   string RangeVar;
   int *Atts;
@@ -80,7 +80,7 @@ class ATTR_EXP : public ITEM_OP {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_EXP].New();
   };
 
-  OP *Clone() { return new ATTR_EXP(*this); };
+  Operator *Clone() { return new ATTR_EXP(*this); };
 
   //##ModelId=3B0C08750398
   ~ATTR_EXP() {
@@ -109,7 +109,7 @@ class ATTR_EXP : public ITEM_OP {
 
 // constant op
 //##ModelId=3B0C087503DD
-class CONST_OP : public ITEM_OP {
+class CONST_OP : public ItemOperator {
  public:
   //##ModelId=3B0C08760009
   inline bool is_const() { return true; };
@@ -137,7 +137,7 @@ class CONST_INT_OP : public CONST_OP {
   };
 
   //##ModelId=3B0C08760077
-  OP *Clone() { return new CONST_INT_OP(*this); };
+  Operator *Clone() { return new CONST_INT_OP(*this); };
 
   //##ModelId=3B0C08760078
   ~CONST_INT_OP() {
@@ -157,39 +157,29 @@ class CONST_INT_OP : public CONST_OP {
 //##ModelId=3B0C087600EF
 class CONST_STR_OP : public CONST_OP {
  private:
-  //##ModelId=3B0C08760104
   string value;
 
  public:
   // constructor for constant
-  //##ModelId=3B0C0876010D
   CONST_STR_OP(string value) : value(value) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].New();
   };
 
-  //##ModelId=3B0C08760118
   CONST_STR_OP(CONST_STR_OP &Op) : value(Op.value) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].New();
   };
 
-  //##ModelId=3B0C08760121
-  OP *Clone() { return new CONST_STR_OP(*this); };
+  Operator *Clone() { return new CONST_STR_OP(*this); };
 
-  //##ModelId=3B0C08760122
   ~CONST_STR_OP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].Delete();
   };
 
-  //##ModelId=3B0C0876012B
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C0876012D
   inline string get_value() { return value; }
-  //##ModelId=3B0C08760135
   inline int GetArity() { return (0); };
-  //##ModelId=3B0C0876013F
   inline string GetName() { return ("STR_OP"); };
-  //##ModelId=3B0C08760140
   inline bool is_const() { return true; };
   // inline Cost * get_cost() { return new Cost(0); };
 
@@ -217,7 +207,7 @@ class CONST_SET_OP : public CONST_OP {
   };
 
   //##ModelId=3B0C087601C3
-  OP *Clone() { return new CONST_SET_OP(*this); };
+  Operator *Clone() { return new CONST_SET_OP(*this); };
 
   //##ModelId=3B0C087601CB
   ~CONST_SET_OP() {
@@ -242,7 +232,7 @@ class CONST_SET_OP : public CONST_OP {
 
 // Boolean Operator
 //##ModelId=3B0C087601FD
-class BOOLE_OP : public ITEM_OP {
+class BOOLE_OP : public ItemOperator {
  private:
  public:
 };  // BOOLE_OP
@@ -278,7 +268,7 @@ class COMP_OP : public BOOLE_OP {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].New();
   };
 
-  OP *Clone() { return new COMP_OP(*this); };
+  Operator *Clone() { return new COMP_OP(*this); };
 
   ~COMP_OP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].Delete();

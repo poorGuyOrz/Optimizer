@@ -80,7 +80,7 @@ CLASS_STAT ClassStat[] =  // class statistics object
         CLASS_STAT("HGROUP_LIST", sizeof(class HGROUP_LIST)),
         CLASS_STAT("INDEXED_FILTER", sizeof(class INDEXED_FILTER)),
         CLASS_STAT("KEYS_SET", sizeof(class KEYS_SET)),
-        CLASS_STAT("LEAF_OP", sizeof(class LEAF_OP)),
+        CLASS_STAT("LeafOperator", sizeof(class LeafOperator)),
         CLASS_STAT("LOG_COLL_PROP", sizeof(class LOG_COLL_PROP)),
         CLASS_STAT("LOG_ITEM_PROP", sizeof(class LOG_ITEM_PROP)),
         CLASS_STAT("LOOPS_INDEX_JOIN", sizeof(class LOOPS_INDEX_JOIN)),
@@ -109,7 +109,7 @@ RuleSet *ruleSet;       // Rule set
 CAT *Cat;               // read catalog in
 Query *query;           // read query in
 CostModel *costModel;   // read cost model in
-SSP *Ssp;               // Create Search space
+SearchSpace *Ssp;               // Create Search space
 KEYS_SET IntOrdersSet;  // set of interesting orders
 
 ofstream OutputFile;        // result file

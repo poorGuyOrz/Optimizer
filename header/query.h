@@ -6,6 +6,8 @@
 class Expression;
 class Query;
 
+// 编译语句到Expression，SQL的便宜模块，后期可以使用更标准的语法模块替换掉。
+// 只要最后的结果是语法树即可
 class Query {
  public:
   ~Query();
@@ -58,22 +60,18 @@ class Query {
   AGG_OP *GetOneAggOp(char *&p);
 };
 
-class Expression  // An Expression corresponds to a detailed solution to
-// the original query or a subquery.
-// An Expression is modeled as an operator with arguments (class OP),
-// plus input expressions (class Expression).
-
-// EXPRs are used to calculate the initial query and the final plan,
-// and are also used in rules.
-
-{
+// An Expression corresponds to a detailed solution to the original query or a subquery.
+// An Expression is modeled as an operator with arguments (class Operator), plus input expressions (class Expression).
+// EXPRs are used to calculate the initial query and the final plan, and are also used in rules.
+// 表达式，可以用来组织SQL，由op和输入expression组成，arity标记输入个数，query初始化的时候使用表达式来表示一个树形语句
+class Expression {
  private:
-  OP *Op;               // Operator
+  Operator *Op;         // Operator
   int arity;            // Number of input expressions.
   Expression **Inputs;  // Input expressions
 
  public:
-  Expression(OP *Op, Expression *First = nullptr, Expression *Second = nullptr, Expression *Third = nullptr,
+  Expression(Operator *Op, Expression *First = nullptr, Expression *Second = nullptr, Expression *Third = nullptr,
              Expression *Fourth = nullptr)
       : Op(Op), arity(0) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
@@ -92,7 +90,7 @@ class Expression  // An Expression corresponds to a detailed solution to
     }
   };
 
-  Expression(OP *Op, Expression **inputs) : Op(Op), Inputs(inputs), arity(Op->GetArity()) {
+  Expression(Operator *Op, Expression **inputs) : Op(Op), Inputs(inputs), arity(Op->GetArity()) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
   };
 
@@ -114,7 +112,7 @@ class Expression  // An Expression corresponds to a detailed solution to
     }
   };
 
-  inline OP *GetOp() { return Op; };
+  inline Operator *GetOp() { return Op; };
   inline int GetArity() { return arity; };
   inline Expression *GetInput(int i) { return Inputs[i]; };
 
@@ -133,5 +131,4 @@ class Expression  // An Expression corresponds to a detailed solution to
     os += ")";
     return os;
   };
-
 };

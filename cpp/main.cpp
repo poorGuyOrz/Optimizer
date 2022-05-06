@@ -213,7 +213,7 @@ void Optimizer() {
         ForGlobalEpsPruning = true;
         Cat = new CAT(CatFile);
         query = new Query(QueryFile);
-        Ssp = new SSP;
+        Ssp = new SearchSpace;
         Ssp->Init();
         delete query;
         Ssp->optimize();
@@ -259,7 +259,7 @@ void Optimizer() {
         // every query read because the search space for the previous
         // query is deleted after it is optimized
         if ((PiggyBack && (0 == q)) || (!PiggyBack)) {
-          Ssp = new SSP;
+          Ssp = new SearchSpace;
         }
 
         Ssp->Init();

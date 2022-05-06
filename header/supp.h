@@ -305,15 +305,11 @@ class COLL_PROP {
 };
 
 // Index Properties
-//##ModelId=3B0C0860030A
 class IND_PROP {
  public:
-  //##ModelId=3B0C08600314
   IND_PROP(){};
-  //##ModelId=3B0C0860031E
   ~IND_PROP() { delete Keys; };
 
-  //##ModelId=3B0C08600328
   IND_PROP &operator=(IND_PROP &other)  //  = operator
   {
     Keys = new KEYS_SET(*other.Keys);
@@ -323,43 +319,28 @@ class IND_PROP {
   };
 
   // Physical Properties
-  //##ModelId=3B0C08600333
-  KEYS_SET *Keys;  // Index is on this ordered set of attributes
-  //##ModelId=3B0C08600347
+  KEYS_SET *Keys;       // Index is on this ordered set of attributes
   ORDER_INDEX IndType;  // hash or sort (Btree)
-  //##ModelId=3B0C0860035A
   bool Clustered;
   // Transform each key from A.X to NewName.X
-  //##ModelId=3B0C08600364
   void update(string NewName);
-  //##ModelId=3B0C08600378
   string Dump();
 };
 
 // Bit Index Properties
-//##ModelId=3B0C08610008
 class BIT_IND_PROP {
  public:
-  //##ModelId=3B0C08610013
-  KEYS_SET *BitAttr;  // attributes for which all values are bit indexed
-  //##ModelId=3B0C08610027
-  int IndexAttr;  // indexing attributes -- this is the key of the table
-                  // it is dense key. we assume it is integer type
-                  // bit indexes are only allowed for tables with single
-                  //  attibute keys
-  //##ModelId=3B0C08610031
+  KEYS_SET *BitAttr;     // attributes for which all values are bit indexed
+  int IndexAttr;         // indexing attributes -- this is the key of the table
+                         // it is dense key. we assume it is integer type
+                         // bit indexes are only allowed for tables with single
+                         //  attibute keys
   string BitPredString;  // assume store the index for each predicate separately
-  //##ModelId=3B0C08610045
   string IndexAttrString;
-  //##ModelId=3B0C08610059
   BIT_IND_PROP(){};
-  //##ModelId=3B0C08610077
   ~BIT_IND_PROP() { delete BitAttr; };
-  //##ModelId=3B0C08610078
   void update(string NewName);
-  //##ModelId=3B0C0861008B
   string Dump();
-  //##ModelId=3B0C0861008C
   BIT_IND_PROP &operator=(BIT_IND_PROP &other)  //  = operator
   {
     BitAttr = new KEYS_SET(*other.BitAttr);
@@ -374,47 +355,34 @@ ATTR - Attribute
 ============================================================
 */
 
-//##ModelId=3B0C0861015D
 class ATTR {
  public:
-  //##ModelId=3B0C08610171
   int AttId;
-  //##ModelId=3B0C0861017B
   float CuCard;  // cardinality
-  //##ModelId=3B0C08610185
-  float Max;  // max, min value
-  //##ModelId=3B0C0861018F
+  float Max;     // max, min value
   float Min;
 
-  //##ModelId=3B0C08610199
   ATTR() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
   };
 
-  //##ModelId=3B0C086101A3
   ATTR(const int attId, const float CuCard, const float min, const float max)
       : AttId(attId), CuCard(CuCard), Min(min), Max(max) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
   };
 
-  //##ModelId=3B0C086101B0
   ATTR(string range_var, int *atts, int size);
 
-  //##ModelId=3B0C086101C1
   ATTR(ATTR &other) : AttId(other.AttId), CuCard(other.CuCard), Min(other.Min), Max(other.Max) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
   };
 
-  //##ModelId=3B0C086101CB
   ~ATTR() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].Delete();
   };
 
-  //##ModelId=3B0C086101CC
   string Dump();
-  //##ModelId=3B0C086101D5
   string attrDump();
-  //##ModelId=3B0C086101D6
   string DumpCOVE();
 
 };  // class ATTR
@@ -432,31 +400,24 @@ class ATTR {
 // An attribute is represented by a path name plus the name of the attribute,
 // e.g. Emp plus age.
 
-//##ModelId=3B0C086103AC
 class SCHEMA {
  private:
-  //##ModelId=3B0C086103B7
   ATTR **Attrs;  // Attributes
-  //##ModelId=3B0C086103CA
-  int Size;  // number of the attrs
+  int Size;      // number of the attrs
 
  public:
-  //##ModelId=3B0C086103DE
   int *TableId;  // Base tables appearing in this schema - used for calculating Max cucards
   //  for each base table in a schema, and for calculating log prop of aggregate.
-  //##ModelId=3B0C08620000
   int TableNum;  // number of the tables
 
  public:
   // Make space for n attrs
-  //##ModelId=3B0C0862000A
   SCHEMA(int n) : Size(n) {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SCHEMA].New();
     assert(Size >= 0);
     Attrs = new ATTR *[Size];
   };
 
-  //##ModelId=3B0C08620015
   SCHEMA(SCHEMA &other) : Size(other.Size), TableNum(other.TableNum) {
     int i;
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SCHEMA].New();
@@ -467,23 +428,18 @@ class SCHEMA {
     for (i = 0; i < TableNum; i++) TableId[i] = other.GetTableId(i);
   }
 
-  //##ModelId=3B0C0862001F
   ~SCHEMA();
 
   // return FALSE if duplicate found
-  //##ModelId=3B0C08620028
   bool AddAttr(int Index, ATTR *attr);
 
   // return true if the attr is in the schema
-  //##ModelId=3B0C08620033
   bool InSchema(int AttId);
 
   // return true if contains all the keys
-  //##ModelId=3B0C0862003D
   bool Contains(KEYS_SET *Keys);
 
   // 	projection of attrs onto schema
-  //##ModelId=3B0C08620047
   SCHEMA *projection(int *attrs, int size);
 
   // union the schema of the joined collection
@@ -529,8 +485,7 @@ class LOG_PROP {
 
   virtual string Dump() = 0;
   virtual string DumpCOVE() = 0;
-
-};  // class LOG_PROP
+};
 
 /*
 ============================================================
@@ -561,7 +516,6 @@ class LOG_COLL_PROP : public LOG_PROP {
           };
   */
 
-  //##ModelId=3B0C086202DC
   ~LOG_COLL_PROP() {
     delete Schema;
     delete CandidateKey;
@@ -569,31 +523,16 @@ class LOG_COLL_PROP : public LOG_PROP {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_COLL_PROP].Delete();
   };
 
-  //##ModelId=3B0C086202E5
   string Dump();
-  //##ModelId=3B0C086202E6
   string DumpCOVE();
+};
 
-};  // class LOG_COLL_PROP
-
-/*
-============================================================
-LOGICAL PROPERTIES OF ITEMS
-============================================================
-*/
-
-//##ModelId=3B0C086203DF
 class LOG_ITEM_PROP : public LOG_PROP {
  public:
-  //##ModelId=3B0C08630002
   float Max;
-  //##ModelId=3B0C0863000B
   float Min;
-  //##ModelId=3B0C0863001F
   float CuCard;
-  //##ModelId=3B0C08630029
   float Selectivity;
-  //##ModelId=3B0C0863003E
   KEYS_SET FreeVars;
 
  public:
@@ -619,8 +558,7 @@ class LOG_ITEM_PROP : public LOG_PROP {
     // os.Format("%d %d %s%s%s \n",Card, UCard, "{", (*Schema).DumpCOVE(), "}");
     return os;
   };
-
-};  // class LOG_ITEM_PROP
+};
 
 /*
 ============================================================
@@ -637,56 +575,37 @@ PHYS_PROP: PHYSICAL PROPERTIES
 //  can have only one physical property.  Extensions should be
 //  tedious but not too hard.
 
-//##ModelId=3B0C086301EC
 class PHYS_PROP {
  public:
-  //##ModelId=3B0C08630201
-  const ORDER Order;  // any, heap, sorted or hashed
-  //##ModelId=3B0C08630215
-  KEYS_SET *Keys;  // Keys on which sorted or hashed
-  // null if heap or any, nonnull otherwise
-  //##ModelId=3B0C08630233
+  const ORDER Order;       // any, heap, sorted or hashed
+  KEYS_SET *Keys;          // Keys on which sorted or hashed null if heap or any, nonnull otherwise
   KeyOrderArray KeyOrder;  // if order is sorted
                            // need ascending/descending for each key
- public:
   //	PHYS_PROP(KeyOrderArray *KeyOrder, KEYS_SET * Keys, ORDER Order);
-  //##ModelId=3B0C0863023C
   PHYS_PROP(KEYS_SET *Keys, ORDER Order);
-  //##ModelId=3B0C08630250
   PHYS_PROP(ORDER Order);
-  //##ModelId=3B0C0863025A
   PHYS_PROP(PHYS_PROP &other);
 
-  //##ModelId=3B0C08630264
   ~PHYS_PROP() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].Delete();
     if (Order != any) delete Keys;
     // if (Order == sorted) delete [] KeyOrder;
   }
 
-  //##ModelId=3B0C08630265
   ORDER GetOrder() { return (Order); }
-  //##ModelId=3B0C0863026E
   KEYS_SET *GetKeysSet() { return (Keys); }
-  //##ModelId=3B0C0863026F
   void SetKeysSet(KEYS_SET *NewKeys) { Keys = NewKeys; }
 
   // merge other phys_prop in
-  //##ModelId=3B0C08630279
   void Merge(PHYS_PROP &other);
-  //##ModelId=3B0C0863028C
   void bestKey();  // returns the key and keyorder of the key
   // with the most distinct values
 
-  //##ModelId=3B0C0863028D
   bool operator==(PHYS_PROP &other);
 
-  //##ModelId=3B0C08630296
   string Dump();
-  //##ModelId=3B0C086302A0
   string DumpCOVE();
-
-};  // class PHYS_PROP
+};
 
 /*
     ============================================================

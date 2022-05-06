@@ -43,20 +43,20 @@
 #define TABSPACE '\t'
 #define QUOTE '"'
 
-#define PARSE_OP1(KEYWORD_OP, OP)           \
+#define PARSE_OP1(KEYWORD_OP, Operator)     \
   if (p = strstr(OneElement, KEYWORD_OP)) { \
     Expr = ParseExpr(ExprStr);              \
     free(OneElement);                       \
-    Op = new COMP_OP(OP);                   \
+    Op = new COMP_OP(Operator);             \
     return new Expression(Op, Expr);        \
   }
 
-#define PARSE_OP2(KEYWORD_OP, OP)                   \
+#define PARSE_OP2(KEYWORD_OP, Operator)             \
   if (p = strstr(OneElement, KEYWORD_OP)) {         \
     LeftExpr = ParseExpr(ExprStr);                  \
     RightExpr = ParseExpr(ExprStr);                 \
     free(OneElement);                               \
-    Op = new COMP_OP(OP);                           \
+    Op = new COMP_OP(Operator);                     \
     return new Expression(Op, LeftExpr, RightExpr); \
   }
 
@@ -141,7 +141,7 @@ Query::~Query() {
 Expression *Query::ParseExpr(char *&ExprStr) {
   Expression *LeftExpr, *RightExpr;
   Expression *Expr;
-  OP *Op;
+  Operator *Op;
   char *p;
   char *OneElement;
 
@@ -500,7 +500,6 @@ char *Query::GetOneElement(char *&Expr) {
 }
 
 // get an GET string
-//##ModelId=3B0C086D03A9
 string Query::ParseOneParameter(char *&p) {
   string Str;
 
@@ -518,7 +517,6 @@ string Query::ParseOneParameter(char *&p) {
 }
 
 // get the project keys
-//##ModelId=3B0C086D0364
 void Query::ParsePJKeys(char *&p, KEYS_SET &Keys) {
   p = SkipSpace(p);
   p++;  // skip '('
@@ -533,7 +531,6 @@ void Query::ParsePJKeys(char *&p, KEYS_SET &Keys) {
 }
 
 // get the AGG_OP_ARRAY
-//##ModelId=3B0C086D03B3
 void Query::ParseAggOps(char *&p, AGG_OP_ARRAY &AggOps) {
   p = SkipSpace(p);
   p++;  // skip '('
@@ -548,7 +545,6 @@ void Query::ParseAggOps(char *&p, AGG_OP_ARRAY &AggOps) {
 }
 
 // get the group by keys
-//##ModelId=3B0C086D03BE
 void Query::ParseGby(char *&p, KEYS_SET &Keys) {
   p = SkipSpace(p);
   p++;  // skip '('
@@ -567,7 +563,6 @@ void Query::ParseGby(char *&p, KEYS_SET &Keys) {
 }
 
 // get two KEYSs
-//##ModelId=3B0C086D036F
 void Query::ParseKeys(char *p, KEYS_SET &Keys1, KEYS_SET &Keys2) {
   p = SkipSpace(p);
   p++;  // skip '('
@@ -609,7 +604,6 @@ void Query::GetOneKeys(char *&p, KEYS_SET &Keys) {
 }
 
 // get one KeySET, and add to KEYS_SET
-//##ModelId=3B0C086D0395
 void Query::GetKey(char *&p, KEYS_SET &Keys) {
   string Col, Attr;
 

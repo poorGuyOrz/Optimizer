@@ -387,7 +387,6 @@ string ATTR::attrDump() { return GetAttName(AttId); }
 string ATTR::DumpCOVE() { return GetAttName(AttId) + " " + to_string((int)CuCard); };
 
 // SCHEMA function
-//##ModelId=3B0C08620028
 bool SCHEMA::AddAttr(int Index, ATTR *attr) {
   assert(Index < Size);
   Attrs[Index] = attr;
@@ -396,7 +395,6 @@ bool SCHEMA::AddAttr(int Index, ATTR *attr) {
 }
 
 // return true if the relname.attname is in the schema
-//##ModelId=3B0C08620033
 bool SCHEMA::InSchema(int AttId) {
   int i = 0;
   for (i = 0; i < Size; i++)
@@ -409,7 +407,6 @@ bool SCHEMA::InSchema(int AttId) {
 }
 
 // max cucard of each tables in the schema
-//##ModelId=3B0C08620079
 float SCHEMA::GetTableMaxCuCard(int TableIndex) {
   float Max = 0;
 
@@ -541,7 +538,6 @@ SCHEMA::~SCHEMA() {
 }
 
 // SCHEMA dump function
-//##ModelId=3B0C086200A1
 string SCHEMA::Dump() {
   string os;
   for (int i = 0; i < Size; i++) {
@@ -551,7 +547,6 @@ string SCHEMA::Dump() {
   return os;
 }
 
-//##ModelId=3B0C086200AA
 string SCHEMA::DumpCOVE() {
   string os;
   for (int i = 0; i < Size; i++) os += (*(Attrs[i])).DumpCOVE();
@@ -911,7 +906,6 @@ void PHYS_PROP::bestKey() {
 
 //=============  CONT Methods  ===================
 
-//##ModelId=3B0C0864032E
 CONT::CONT(PHYS_PROP *RP, Cost *U, bool D) : ReqdPhys(RP), UpperBd(U), Finished(false) {
   // If the Physical Property has >1 attribute, use only the most selective attribute
   if (RP && (RP->GetKeysSet()) && (RP->GetKeysSet()->GetSize() > 1))
@@ -920,7 +914,6 @@ CONT::CONT(PHYS_PROP *RP, Cost *U, bool D) : ReqdPhys(RP), UpperBd(U), Finished(
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONT].New();
 };
 
-//##ModelId=3B0C086402DF
 vector<CONT *> CONT::vc;
 
 //=============  Cost Methods  ===================

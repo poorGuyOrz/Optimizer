@@ -1,13 +1,13 @@
-// SSP.H - Search Space
+// SearchSpace.H - Search Space
 
 #pragma once
 #include "../header/query.h"
 
-#define NEW_GRPID -1  // used by SSP::CopyIn and MExression::MExression
+#define NEW_GRPID -1  // used by SearchSpace::CopyIn and MExression::MExression
 // means need to create a new group
-#define NEW_GRPID_NOWIN -2  // use by SSP::CopyIn.  Means NEW_GRPID, and this is a
+#define NEW_GRPID_NOWIN -2  // use by SearchSpace::CopyIn.  Means NEW_GRPID, and this is a
 // subgroup of DUMMY so don't init nontrivial winners
-class SSP;
+class SearchSpace;
 class Group;
 class MExression;
 class WINNER;
@@ -15,7 +15,7 @@ class M_WINNER;
 
 /*
 ============================================================
-SEARCH SPACE - class SSP
+SEARCH SPACE - class SearchSpace
 ============================================================
 We borrow the term Search Space from AI, where it is a tool for solving a
 problem  In query optimization the problem is to find the cheapest plan
@@ -39,18 +39,18 @@ Space is represented compactly, by what we call a Multi-expression
 more detail by an expression (class Expression).
 */
 // Search Space
-class SSP {
+class SearchSpace {
  public:
   MExression **HashTbl;  // To identify duplicate MExprs
 
-  SSP();
+  SearchSpace();
 
   void Init();  // Create some default number of empty Groups, the number
                 // depending on the initial query.  Read in initial query.
 
-  ~SSP();
+  ~SearchSpace();
 
-  void optimize();  // Later add a conditon.  Prepare the SSP so an optimal plan can be found
+  void optimize();  // Later add a conditon.  Prepare the SearchSpace so an optimal plan can be found
 
   // Convert the Expression into a Mexpr.
   // If Mexpr is not already in the search space, then copy Mexpr into the
@@ -61,11 +61,10 @@ class SSP {
   // NEW_GRPID(-1), make a new group with that ID and return its value in GrpID.
   MExression *CopyIn(Expression *Expr, int &GrpID);
 
-  // Copy out the final plan.  Recursive, each time increasing tabs by
-  //  one, so the plan is indented.
+  // Copy out the final plan.  Recursive, each time increasing tabs by one, so the plan is indented.
   void CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs);
 
-  // return the next available grpID in SSP
+  // return the next available grpID in SearchSpace
   inline int GetNewGrpID() { return (++NewGrpID); };
 
   // return the ID of the Root group
@@ -96,15 +95,14 @@ class SSP {
   string DumpHashTable();
 
  private:
-  int RootGID;  // ID of the oldest, root group.  Set to NEW_GRPID in SSP""Init then
-  // never changes
+  int RootGID;       // ID of the oldest, root group.  Set to NEW_GRPID in SearchSpace""Init then never changes
   int InitGroupNum;  //(seems to be the same as RootGID)
   int NewGrpID;      // ID of the newest group, initially -1
 
   // Collection of Groups, indexed by int
   vector<Group *> Groups;
 
-};  // class SSP
+};  // class SearchSpace
 
 /*
    ============================================================
@@ -120,7 +118,7 @@ class MExression {
   MExression *HashPtr;  // list within hash bucket
   BIT_VECTOR RuleMask;  // If 1, do not fire rule with that index
   int counter;          // to keep track of how many winners point to this MEXPR
-  OP *Op;               // Operator
+  Operator *Op;         // Operator
   int *Inputs;
   int GrpID;  // I reside in this group
 
@@ -137,18 +135,16 @@ class MExression {
     delete Op;
   };
 
-  // MExression(OP * Op, int* inputs); //Used by CopyIn
-
   // Transform an Expression into an MExression.  May involve creating new Groups.
   //  GrpID is the ID of the group where the MExression will be put.  If GrpID is
-  //  NEW_GRPID(-1), make a new group with that ID.  (Same as SSP::CopyIn)
+  //  NEW_GRPID(-1), make a new group with that ID.  (Same as SearchSpace::CopyIn)
   MExression(Expression *Expr, int grpid)
       : Op(Expr->GetOp()->Clone()),
         NextMExpr(nullptr),
         GrpID((grpid == NEW_GRPID) ? Ssp->GetNewGrpID() : grpid),
         HashPtr(nullptr),
         RuleMask(0) {
-    int GID;
+    int groupID;
     Expression *input;
     counter = 0;
 
@@ -161,18 +157,18 @@ class MExression {
       for (int i = 0; i < arity; i++) {
         input = Expr->GetInput(i);
 
-        if (input->GetOp()->is_leaf())  // deal with LEAF_OP, sharing the existing group
-          GID = ((LEAF_OP *)input->GetOp())->GetGroup();
+        if (input->GetOp()->is_leaf())  // deal with LeafOperator, sharing the existing group
+          groupID = ((LeafOperator *)input->GetOp())->GetGroup();
         else {
           // create a new sub group
           if (Op->GetName() == "DUMMY")
-            GID = NEW_GRPID_NOWIN;  // DUMMY subgroups have only trivial winners
+            groupID = NEW_GRPID_NOWIN;  // DUMMY subgroups have only trivial winners
           else
-            GID = NEW_GRPID;
-          MExression *MExpr = Ssp->CopyIn(input, GID);
+            groupID = NEW_GRPID;
+          MExression *MExpr = Ssp->CopyIn(input, groupID);
         }
 
-        Inputs[i] = GID;
+        Inputs[i] = groupID;
       }
     }  // if(arity)
   };
@@ -198,7 +194,7 @@ class MExression {
   inline void DecCounter() {
     if (counter != 0) counter--;
   };
-  inline OP *GetOp() { return (Op); };
+  inline Operator *GetOp() { return (Op); };
   inline int GetInput(int i) const { return (Inputs[i]); };
   inline void SetInput(int i, int grpId) { Inputs[i] = grpId; };
   inline int GetGrpID() { return (GrpID); };
@@ -430,40 +426,27 @@ While the physical mexpressions of a group are being costed (i.e. Done=false),
 the cheapest plan yet found, and its cost, are stored in a winner.
 */
 
-//##ModelId=3B0C08670350
 class WINNER {
  private:
-  //##ModelId=3B0C08670365
   MExression *MPlan;
-  //##ModelId=3B0C08670379
   PHYS_PROP *PhysProp;  // PhysProp and Cost typically represent the context of
-  //##ModelId=3B0C08670397
-  Cost *cost;  // the most recent search which generated this winner.
+  Cost *cost;           // the most recent search which generated this winner.
 
-  //##ModelId=3B0C086703AA
   bool Done;  // Is this a real winner; is the current search complete?
  public:
-  //##ModelId=3B0C086703BE
   WINNER(MExression *, PHYS_PROP *, Cost *, bool done = false);
-  //##ModelId=3B0C086703DD
   ~WINNER() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].Delete();
     delete MPlan;
     delete cost;
   };
 
-  //##ModelId=3B0C086703DE
   inline MExression *GetMPlan() { return (MPlan); };
-  //##ModelId=3B0C086703E7
   inline PHYS_PROP *GetPhysProp() { return (PhysProp); };
-  //##ModelId=3B0C086703E8
   inline Cost *GetCost() { return (cost); };
-  //##ModelId=3B0C08680009
   inline bool GetDone() { return (Done); };
-  //##ModelId=3B0C08680013
   inline void SetDone(bool value) { Done = value; };
-
-};  // class WINNER
+};
 
 /*
     ============================================================

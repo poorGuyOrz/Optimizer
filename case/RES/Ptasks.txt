@@ -35,7 +35,7 @@ Module Statistics for wcol.exe
      492.529   0.5      492.529   0.5   344528 MExression::can_fire(int) (tasks.obj)
      443.923   0.5      443.923   0.5   409021 RULE::get_index(void) (tasks.obj)
      416.168   0.4      416.168   0.4    70874 O_INPUTS::operator new(unsigned int) (tasks.obj)
-     415.342   0.4      415.342   0.4   215720 LOG_OP::OpMatch(class LOG_OP *) (tasks.obj)
+     415.342   0.4      415.342   0.4   215720 LogicalOperator::OpMatch(class LogicalOperator *) (tasks.obj)
      315.093   0.3      315.093   0.3   314164 OptimizerTaskStack::empty(void) (tasks.obj)
      272.859   0.3     4665.345   5.0    70874 O_INPUTS::`scalar deleting destructor'(unsigned int) (tasks.obj)
      272.268   0.3      351.303   0.4   157081 OptimizerTaskStack::pop(void) (tasks.obj)

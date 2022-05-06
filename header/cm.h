@@ -42,7 +42,7 @@ class CostModel {
     BIT_BF = j["BIT_BF"].get<double>();
 
     ifs.close();
-  };  // read information into cost model from some default file
+  };
 
   json toJson() {
     json j;

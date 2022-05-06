@@ -83,7 +83,7 @@ class RuleSet {
    At the heart of every rule- (transform-) based optimizer is the concept of
    a rule.  A rule includes two patterns, called the Original and Substitute
    patterns.  For example, the Left to Right (LTOR) Associative Rule includes the
-   following patterns, where L(i) denotes the LEAF_OP with index i (L(i) is
+   following patterns, where L(i) denotes the LeafOperator with index i (L(i) is
    essentially a multiexpression indexed by i):
                 Original: (L(1) join L(2)) join L(3)
                 Substitute: L(1) join (L(2) join L(3))
@@ -207,7 +207,7 @@ class BINDERY {
       multi-expressions is done by ApplyRuleTask::perform(), in two parts:
   First a BINDERY object produces a binding of the original pattern to an Expression
   in the search space.  Then next_substitute() produces the new expression,
-  which is integrated into the search space by SSP::include().
+  which is integrated into the search space by SearchSpace::include().
 
   A rule is called an implementation rule if the root operator of its substitute
       pattern is a physical operator, for example the rule GET_TO_SCAN.
@@ -292,18 +292,18 @@ class RULE {
   inline Expression *GetOriginal() { return (original); };
   inline Expression *GetSubstitute() { return (substitute); };
 
-  bool top_match(OP *op_arg) {
+  bool top_match(Operator *op_arg) {
     assert(op_arg->is_logical());  // to make sure never OptimizeExprTask a physcial mexpr
 
     // if original is a leaf, it represents a group, so it always matches
     if (original->GetOp()->is_leaf()) return true;
 
     // otherwise, the original pattern should have a logical root op
-    return (((LOG_OP *)(original->GetOp()))->OpMatch((LOG_OP *)op_arg));
+    return (((LogicalOperator *)(original->GetOp()))->OpMatch((LogicalOperator *)op_arg));
   };
 
   // default value is 1.0, resulting in exhaustive search
-  virtual int promise(OP *op_arg, int ContextID) {
+  virtual int promise(Operator *op_arg, int ContextID) {
     return (substitute->GetOp()->is_physical() ? PHYS_PROMISE : LOG_PROMISE);
   };
 
@@ -348,7 +348,7 @@ class GET_TO_FILE_SCAN : public RULE {
   GET_TO_FILE_SCAN();
   ~GET_TO_FILE_SCAN(){};
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-  int promise(OP *op_arg, int ContextID) { return FILESCAN_PROMISE; };
+  int promise(Operator *op_arg, int ContextID) { return FILESCAN_PROMISE; };
 };
 
 /*
@@ -375,7 +375,7 @@ class EQ_TO_LOOPS : public RULE {
 class EQ_TO_MERGE : public RULE {
  public:
   EQ_TO_MERGE();
-  int promise(OP *op_arg, int ContextID);
+  int promise(Operator *op_arg, int ContextID);
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 #ifdef CONDPRUNE
   bool condition(Expression *before, MExression *mexpr, int ContextID);
@@ -390,7 +390,7 @@ EQJOIN to Hash Join Rule
 class EQ_TO_HASH : public RULE {
  public:
   EQ_TO_HASH();
-  int promise(OP *op_arg, int ContextID);
+  int promise(Operator *op_arg, int ContextID);
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
 };  // EQ_TO_HASH
 
@@ -443,7 +443,7 @@ class EQJOIN_LTOR : public RULE {
   //##ModelId=3B0C086B00B7
   bool condition(Expression *before, MExression *mexpr, int ContextID);
   //##ModelId=3B0C086B00C3
-  int promise(OP *op_arg, int ContextID) { return ASSOC_PROMISE; };
+  int promise(Operator *op_arg, int ContextID) { return ASSOC_PROMISE; };
 
 };  // EQJOIN_LTOR
 
@@ -517,7 +517,7 @@ class SORT_RULE : public RULE {
   ~SORT_RULE(){};
 
   //##ModelId=3B0C086C0041
-  int promise(OP *op_arg, int ContextID);
+  int promise(Operator *op_arg, int ContextID);
 
   //##ModelId=3B0C086C004C
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
