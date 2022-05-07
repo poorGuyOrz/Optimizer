@@ -97,7 +97,7 @@ class EQJOIN : public LogicalOperator {
   int *lattrs;  // left attr's that are the same
                 //##ModelId=3B0C087302FD
   int *rattrs;  // right attr's that are the same
-  int size;  // number of the attrs
+  int size;     // number of the attrs
 
  public:
   EQJOIN(int *lattrs, int *rattrs, int size);
@@ -112,9 +112,9 @@ class EQJOIN : public LogicalOperator {
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  inline int GetArity() { return (2); };  // Inputs are left and right streams
+  inline int GetArity() { return (2); };           // Inputs are left and right streams
   inline string GetName() { return ("EQJOIN"); };  // Name of this operator
-  inline int GetNameId() { return EQJOIN_ID; };  // Name of this operator
+  inline int GetNameId() { return EQJOIN_ID; };    // Name of this operator
   inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((EQJOIN *)other)->lattrs, lattrs, size) &&  // arguments are equal
@@ -180,39 +180,28 @@ class DUMMY : public LogicalOperator {
    could be handled with the Cascades transformation mechanism.
 */
 
-//##ModelId=3B0C087400F6
 class SELECT : public LogicalOperator {
  public:
-  //##ModelId=3B0C08740101
   SELECT();
-  //##ModelId=3B0C0874010A
   SELECT(SELECT &Op);
-  //##ModelId=3B0C08740114
   Operator *Clone() { return new SELECT(*this); };
 
-  //##ModelId=3B0C08740115
   ~SELECT() {
     if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].Delete();
   };
 
-  //##ModelId=3B0C08740116
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C0874011F
   inline int GetArity() {
     return (2);
   };                                               // For input and predicate
                                                    //##ModelId=3B0C08740128
   inline string GetName() { return ("SELECT"); };  // Name of this operator
-  //##ModelId=3B0C08740132
-  inline int GetNameId() { return SELECT_ID; };  // Name of this operator
-  //##ModelId=3B0C08740133
+  inline int GetNameId() { return SELECT_ID; };    // Name of this operator
   inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); }
 
-  //##ModelId=3B0C0874013D
   ub4 hash();
 
-  //##ModelId=3B0C08740146
   string Dump();
 };  // SELECT
 

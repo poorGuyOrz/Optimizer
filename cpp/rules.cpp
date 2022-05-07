@@ -98,11 +98,11 @@ string RuleSet::Dump() {
 string RuleSet::DumpStats() {
   string os;
 
-  os = "Rule#\tTopMatch\t Bindings\tConditions\n";
-  // for (int i = 0; i < RuleCount; i++) {
-  //   os += to_string(i) + "\t" + to_string(TopMatch[i]) + "\t" + to_string(Bindings[i]) + "\t" +
-  //         to_string(Conditions[i]) + "\t" + rule_set[i]->GetName() + "\n";
-  // }
+  os = "Rule#\tTopMatch\tBindings\tConditions\n";
+  for (int i = 0; i < RuleCount; i++) {
+    os += to_string(i) + "\t" + to_string(TopMatch[i]) + "\t  \t" + to_string(Bindings[i]) + "\t  \t" +
+          to_string(Conditions[i]) + "\t \t" + rule_set[i]->GetName() + "\n";
+  }
   return os;
 }
 
@@ -117,7 +117,6 @@ BINDERY::BINDERY(int group_no, Expression *original)
       one_expr(false)  // try all expressions within this group
 {
   assert(original);
-
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 }  // BINDERY::BINDERY
 
@@ -520,9 +519,11 @@ Expression *GET_TO_FILE_SCAN::next_substitute(Expression *before, PHYS_PROP *Req
 
 //  Rule  EQJOIN  -> LOOPS JOIN
 EQ_TO_LOOPS::EQ_TO_LOOPS()
-    : RULE("EQJOIN->LOOPS_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
-           new Expression(new LOOPS_JOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
+    : RULE(
+          "EQJOIN->LOOPS_JOIN", 2,
+          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+          new Expression(new LOOPS_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                         new Expression(new LeafOperator(1)))) {
   set_index(R_EQ_TO_LOOPS);
 }
 
@@ -580,7 +581,6 @@ Expression *EQ_TO_LOOPS_INDEX::next_substitute(Expression *before, PHYS_PROP *Re
 //	that the join is on a attribute from each table (not a multi-attribute
 // 	join)
 //	there is an index for the right join attribute -- need log-bulk-props
-//##ModelId=3B0C086A0355
 bool EQ_TO_LOOPS_INDEX::condition(Expression *before, MExression *mexpr, int ContextID) {
   // Get the GET logical operator in order to get the indexed collection
   GET *g = (GET *)before->GetInput(1)->GetOp();
@@ -605,16 +605,16 @@ bool EQ_TO_LOOPS_INDEX::condition(Expression *before, MExression *mexpr, int Con
   ====  ======  == ===== ====
 */
 
-//##ModelId=3B0C086A0214
 EQ_TO_MERGE::EQ_TO_MERGE()
-    : RULE("EQJOIN -> MERGE_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
-           new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
+    : RULE(
+          "EQJOIN -> MERGE_JOIN", 2,
+          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+          new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                         new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_EQ_TO_MERGE);
 }  // EQ_TO_MERGE::EQ_TO_MERGE
 
-//##ModelId=3B0C086A0215
 int EQ_TO_MERGE::promise(Operator *op_arg, int ContextID) {
   // if the merge-join attributes set is empty, don't fire this rule
   int result = (((EQJOIN *)op_arg)->size == 0) ? 0 : MERGE_PROMISE;
@@ -622,7 +622,6 @@ int EQ_TO_MERGE::promise(Operator *op_arg, int ContextID) {
   return (result);
 }  // EQ_TO_MERGE::promise
 
-//##ModelId=3B0C086A0228
 Expression *EQ_TO_MERGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
 
@@ -658,9 +657,11 @@ bool EQ_TO_MERGE::condition(Expression *before, MExression *mexpr, int ContextID
 
 //##ModelId=3B0C086A02B4
 EQ_TO_HASH::EQ_TO_HASH()
-    : RULE("EQJOIN->HASH_JOIN", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
-           new Expression(new HASH_JOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
+    : RULE(
+          "EQJOIN->HASH_JOIN", 2,
+          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+          new Expression(new HASH_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                         new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_EQ_TO_HASH);
 }  // EQ_TO_HASH::EQ_TO_HASH
@@ -695,9 +696,11 @@ Expression *EQ_TO_HASH::next_substitute(Expression *before, PHYS_PROP *ReqdProp)
 */
 //##ModelId=3B0C086A03CE
 EQJOIN_COMMUTE::EQJOIN_COMMUTE()
-    : RULE("EQJOIN_COMMUTE", 2,
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
-           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(1)), new Expression(new LeafOperator(0)))) {
+    : RULE(
+          "EQJOIN_COMMUTE", 2,
+          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
+          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(1)),
+                         new Expression(new LeafOperator(0)))) {
   // set rule mask and index
   set_index(R_EQJOIN_COMMUTE);
   set_mask(1 << R_EQJOIN_COMMUTE | 1 << R_EQJOIN_LTOR | 1 << R_EQJOIN_RTOL | 1 << R_EXCHANGE);
@@ -724,7 +727,6 @@ Expression *EQJOIN_COMMUTE::next_substitute(Expression *before, PHYS_PROP *ReqdP
   ====  ============= == =============
 */
 // assoc of join left to right
-//##ModelId=3B0C086B00A3
 EQJOIN_LTOR::EQJOIN_LTOR()
     : RULE("EQJOIN_LTOR", 3,
            new Expression(new EQJOIN(0, 0, 0),
@@ -733,7 +735,7 @@ EQJOIN_LTOR::EQJOIN_LTOR()
                                          new Expression(new LeafOperator(1))   // B
                                          ),
                           new Expression(new LeafOperator(2))  // C
-                          ),                              // original pattern
+                          ),                                   // original pattern
            new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(1)),
                                          new Expression(new LeafOperator(2))))  // substitute
@@ -746,7 +748,6 @@ EQJOIN_LTOR::EQJOIN_LTOR()
 
 }  // EQJOIN_LTOR::EQJOIN_LTOR
 
-//##ModelId=3B0C086B00AD
 Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   /*
    * Join numbering convention:
@@ -806,7 +807,6 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
     }
   }
 
-#ifdef _DEBUG
   // Check that each join is legal
 
   // Get C's schema
@@ -825,14 +825,12 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   LeafOperator *A = (LeafOperator *)(AB->GetInput(0)->GetOp());
   group_no = A->GetGroup();
   group = Ssp->GetGroup(group_no);
-  ;
   SCHEMA *As_schema = ((LOG_COLL_PROP *)group->get_log_prop())->Schema;
 
   // Check (mostly) that second join is legal
   for (i = 0; i < nsize2; i++) {
     assert(As_schema->InSchema(nlattrs2[i]));
   }
-#endif
 
   // create transformed expression
   Expression *result = new Expression(
@@ -937,21 +935,20 @@ EQJOIN_RTOL::EQJOIN_RTOL()
                           new Expression(new EQJOIN(0, 0, 0),
                                          new Expression(new LeafOperator(1)),  // B
                                          new Expression(new LeafOperator(2))   // C
-                                         )),                              // original pattern
+                                         )),                                   // original pattern
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
                                          new Expression(new LeafOperator(0)),  // A
                                          new Expression(new LeafOperator(1))   // B
                                          ),
                           new Expression(new LeafOperator(2))  // C
-                          )                               // substitute
+                          )                                    // substitute
       ) {
   // set rule mask and index
   set_index(R_EQJOIN_RTOL);
   set_mask(1 << R_EQJOIN_LTOR | 1 << R_EQJOIN_RTOL | 1 << R_EXCHANGE);
 }  // EQJOIN_RTOL::EQJOIN_RTOL
 
-//##ModelId=3B0C086B0176
 Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   /*
    * Join numbering convention:
@@ -1012,8 +1009,6 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
     }
   }
 
-#ifdef _DEBUG
-
   // check (mostly) that first join is legal
   for (i = 0; i < nsize1; i++) {
     assert(Bs_schema->InSchema(nrattrs1[i]));
@@ -1032,7 +1027,6 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
     assert(Cs_schema->InSchema(nrattrs2[i]));
     //"Bad C join atts"
   }
-#endif
 
   // create transformed expression
   Expression *result =
@@ -1451,15 +1445,12 @@ P_TO_PP::P_TO_PP()
   set_index(R_P_TO_PP);
 }  // P_TO_PP::P_TO_PP
 
-//##ModelId=3B0C086B02DF
 Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
 
   PROJECT *Op = (PROJECT *)before->GetOp();
   int size = Op->size;
   int *attrs = CopyArray(Op->attrs, size);
-
-#ifdef _DEBUG
 
   // Get input's schema
   LeafOperator *A = (LeafOperator *)(before->GetInput(0)->GetOp());
@@ -1472,8 +1463,6 @@ Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
    * Check that project list is in incoming schema
    */
   for (int i = 0; i < size; i++) assert(As_schema->InSchema(attrs[i]));
-
-#endif
 
   // create transformed expression
   result = new Expression(new P_PROJECT(attrs, size), new Expression(*(before->GetInput(0))));
@@ -1613,8 +1602,9 @@ Expression *FO_TO_PFO::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
 //##ModelId=3B0C086C0308
 AGG_THRU_EQJOIN::AGG_THRU_EQJOIN(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
     : RULE("AGGREGATE EQJOIN -> JOIN AGGREGATE", 2,
-           new Expression(new AGG_LIST(0, 0, list1), new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
-                                                                    new Expression(new LeafOperator(1)))),
+           new Expression(new AGG_LIST(0, 0, list1),
+                          new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
+                                         new Expression(new LeafOperator(1)))),
            new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                           new Expression(new AGG_LIST(0, 0, list2), new Expression(new LeafOperator(1))))) {
   // set rule index
@@ -1740,10 +1730,11 @@ EQ_TO_BIT::EQ_TO_BIT()
     : RULE("EQJOIN -> BIT_JOIN", 2,
            new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                           new Expression(new SELECT,
-                                         new Expression(new GET(0)),     // table
+                                         new Expression(new GET(0)),          // table
                                          new Expression(new LeafOperator(1))  // predicate
                                          )),
-           new Expression(new BIT_JOIN(0, 0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
+           new Expression(new BIT_JOIN(0, 0, 0, 0), new Expression(new LeafOperator(0)),
+                          new Expression(new LeafOperator(1)))) {
   // set rule index
   set_index(R_EQ_TO_BIT);
 }  // EQ_TO_BIT::EQ_TO_BIT
@@ -1845,7 +1836,7 @@ Rule  SELECT  -> INDEXED_FILTER
 SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER()
     : RULE("SELECT -> INDEXED_FILTER", 1,
            new Expression(new SELECT,
-                          new Expression(new GET(0)),     // table
+                          new Expression(new GET(0)),          // table
                           new Expression(new LeafOperator(0))  // predicate
                           ),
            new Expression(new INDEXED_FILTER(0), new Expression(new LeafOperator(0)))) {
@@ -1901,9 +1892,10 @@ PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
                                          new Expression(new LeafOperator(0)),
                                          new Expression(new LeafOperator(1))  // predicate
                                          )),
-           new Expression(new PROJECT(0, 0),
-                          new Expression(new SELECT, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
-                                         new Expression(new LeafOperator(1))))) {
+           new Expression(
+               new PROJECT(0, 0),
+               new Expression(new SELECT, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
+                              new Expression(new LeafOperator(1))))) {
   // set rule index
   set_index(R_PROJECT_THRU_SELECT);
   set_mask(1 << R_PROJECT_THRU_SELECT);

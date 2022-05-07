@@ -10,9 +10,7 @@
 //##ModelId=3B0C087301FB
 GET::GET(int collId) : CollId(collId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
-#ifdef _DEBUG
   name = GetName() + GetCollName(CollId);  // for debug
-#endif
 };
 
 //##ModelId=3B0C087301F0
@@ -86,17 +84,12 @@ GET::GET(string collection, string rangeVar) {
   }
 
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
-#ifdef _DEBUG
   name = GetName() + GetCollName(CollId);  // for debug
-#endif
 }
 
-//##ModelId=3B0C08730204
 GET::GET(GET &Op) : CollId(Op.GetCollection()) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
-#ifdef _DEBUG
   name = Op.name;  // for debug
-#endif
 }
 
 string GET::Dump() { return GetName() + "(" + GetCollName(CollId) + ")"; }
@@ -143,30 +136,22 @@ LOG_PROP *GET::FindLogProp(LOG_PROP **input) {
   return result;
 }
 
-//##ModelId=3B0C08730253
 ub4 GET::hash() {
   ub4 hashval = GetInitval();
-
   hashval = lookup2(CollId, hashval);
-
   return (hashval % (HtblSize - 1));
 }
 
 /*********** EQJOIN functions ****************/
-//##ModelId=3B0C08730311
 EQJOIN::EQJOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].New();
-#ifdef _DEBUG
   name = GetName();  // for debug
-#endif
 };
 
 EQJOIN::EQJOIN(EQJOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].New();
-#ifdef _DEBUG
   name = Op.name;  // for debug
-#endif
 };
 
 string EQJOIN::Dump() {
@@ -368,7 +353,6 @@ LOG_PROP *EQJOIN::FindLogProp(LOG_PROP **input) {
   return result;
 }
 
-//##ModelId=3B0C08730362
 ub4 EQJOIN::hash() {
   ub4 hashval = GetInitval();
 
@@ -381,17 +365,11 @@ ub4 EQJOIN::hash() {
 }
 /*********** DUMMY functions ****************/
 DUMMY::DUMMY() {
-#ifdef _DEBUG
   name = GetName();  // for debug
-#endif
 };
 
-DUMMY::DUMMY(DUMMY &Op)
-
-{
-#ifdef _DEBUG
+DUMMY::DUMMY(DUMMY &Op) {
   name = Op.name;  // for debug
-#endif
 };
 
 string DUMMY::Dump() { return GetName(); }
@@ -443,23 +421,16 @@ ub4 DUMMY::hash() {
 
 /*********** PROJECT functions ****************/
 
-//##ModelId=3B0C08740205
 PROJECT::PROJECT(int *attrs, int size) : attrs(attrs), size(size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].New();
-#ifdef _DEBUG
   name = GetName();  // for debug
-#endif
 };
 
-//##ModelId=3B0C08740210
 PROJECT::PROJECT(PROJECT &Op) : attrs(CopyArray(Op.attrs, Op.size)), size(Op.size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].New();
-#ifdef _DEBUG
   name = Op.name;  // for debug
-#endif
 };
 
-//##ModelId=3B0C0874024C
 ub4 PROJECT::hash() {
   ub4 hashval = GetInitval();
 
@@ -523,17 +494,12 @@ string PROJECT::Dump() {
 
 SELECT::SELECT() {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].New();
-#ifdef _DEBUG
   name = GetName();  // for debug
-#endif
 };
 
-//##ModelId=3B0C0874010A
 SELECT::SELECT(SELECT &Op) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].New();
-#ifdef _DEBUG
   name = Op.name;  // for debug
-#endif
 };
 
 //##ModelId=3B0C08740116
@@ -583,26 +549,18 @@ ub4 SELECT::hash() {
   return (hashval % (HtblSize - 1));
 }
 
-//##ModelId=3B0C08740146
 string SELECT::Dump() { return GetName(); }
 
-//##ModelId=3B0C08740300
 RM_DUPLICATES::RM_DUPLICATES() {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].New();
-#ifdef _DEBUG
   name = GetName();  // for debug
-#endif
 };
 
-//##ModelId=3B0C08740309
 RM_DUPLICATES::RM_DUPLICATES(RM_DUPLICATES &Op) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].New();
-#ifdef _DEBUG
   name = Op.name;  // for debug
-#endif
 };
 
-//##ModelId=3B0C08740314
 LOG_PROP *RM_DUPLICATES::FindLogProp(LOG_PROP **input) {
   LOG_COLL_PROP *rel_input = (LOG_COLL_PROP *)input[0];
 
@@ -669,9 +627,7 @@ AGG_LIST::AGG_LIST(int *gby_atts, int gby_size, AGG_OP_ARRAY *agg_ops)
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-#ifdef _DEBUG
   name = GetName();  // for debug
-#endif
 }
 
 //##ModelId=3B0C087500EE

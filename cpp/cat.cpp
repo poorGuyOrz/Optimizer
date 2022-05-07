@@ -506,7 +506,6 @@ INT_ARRAY *CAT::GetAttNames(int CollId) {
 }
 
 /*****************   parse Function  **************/
-//##ModelId=3B0C087800B6
 void CAT::parseKeys(char *p, KEYS_SET *Keys, string CollName) {
   char *str;
 
@@ -641,11 +640,11 @@ string CAT::Dump() {
   // dump collection properties
   os += "******* COLL_PROP: ********\n";
   for (int CollId = 1; CollId < CollProps.size(); CollId++)
-    os += GetCollName(CollId) + ":\n" + CollProps[CollId]->Dump() + "\n";
+    os += GetCollName(CollId) + ":\t" + CollProps[CollId]->Dump();
 
   // dump attribute properties
   os += "\n******** ATT_PROP: ********\n";
-  for (int AttId = 1; AttId < Attrs.size(); AttId++) os += GetAttName(AttId) + ":\n" + Attrs[AttId]->Dump() + "\n";
+  for (int AttId = 1; AttId < Attrs.size(); AttId++) os += Attrs[AttId]->Dump() + "\n";
 
   // dump index properties
   os += "\n******** IND_PROP: ********\n";

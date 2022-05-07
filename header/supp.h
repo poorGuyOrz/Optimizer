@@ -65,6 +65,14 @@ class CLASS_STAT {
 
   void Delete() { Count--; };
 
+  string formatDump() {
+    // class\tSize\tMemUse\tMax\tTotal\tCount
+    string pname = Name;
+    pname.resize(20);
+    return pname + ":\t" + to_string(Size) + "\t" + to_string(Max * Size) + "\t" + to_string(Max) + "\t" +
+           to_string(Total) + "\t" + to_string(Count);
+  };
+
   string Dump() {
     return "MemUse = " + to_string(Max * Size) + ", " + Name + " --- Size = " + to_string(Size) +
            ", Total = " + to_string(Total) + " , Max = " + to_string(Max) + " , Count = " + to_string(Count) + "\n";

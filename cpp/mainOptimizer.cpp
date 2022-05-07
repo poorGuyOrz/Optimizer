@@ -4,16 +4,33 @@
 #include "../header/global.h"
 #include "../header/physop.h"
 
+INT_ARRAY TopMatch;
+INT_ARRAY Bindings;
+INT_ARRAY Conditions;
+
 int main(int argc, char const *argv[]) {
   OutputFile.open("../colout.txt");
   OutputCOVE.open("../script.cove");
+  for (int i = 0; i < CLASS_NUM; i++) {
+    ClassStat[i].Count = 0;
+    ClassStat[i].Max = 0;
+    ClassStat[i].Total = 0;
+  }
   GlobepsPruning = false;
   ForGlobalEpsPruning = false;
   OptStat = new OPT_STAT;
+  ruleSet = new RuleSet();
+  // Initialize Rule Firing Statistics
+  TopMatch.resize(ruleSet->RuleCount);
+  Bindings.resize(ruleSet->RuleCount);
+  Conditions.resize(ruleSet->RuleCount);  // 625
+  for (int RuleNum = 0; RuleNum < ruleSet->RuleCount; RuleNum++) {
+    TopMatch[RuleNum] = 0;
+    Bindings[RuleNum] = 0;
+    Conditions[RuleNum] = 0;
+  }
 
   costModel = new CostModel("../case/cost");
-
-  ruleSet = new RuleSet();
 
   Cost *HeuristicCost = new Cost(0);
 
@@ -37,6 +54,11 @@ int main(int argc, char const *argv[]) {
 
   Ssp->optimize();
 
+  cout << "class\t \tSize\tMemUse\tMax\tTotal\tCount" << endl;
+  for (size_t i = 0; i < CLASS_NUM; i++) {
+    cout << ClassStat[i].formatDump() << endl;
+  }
+
   std::chrono::duration<double, std::milli> diff = std::chrono::system_clock::now() - now;
   cout << "Optimization elapsed time:" << (diff).count() << "ms" << endl;
   cout << "ssp-->" << endl << Ssp->DumpHashTable() << endl;
@@ -52,11 +74,9 @@ int main(int argc, char const *argv[]) {
   delete Cat;
   GlobepsPruning = true;
   ForGlobalEpsPruning = false;
+  OUTPUT(ruleSet->DumpStats());
 
   OutputFile.close();
   OutputCOVE.close();
   return 0;
 }
-
-// g++ -g  supp.cpp cat.cpp group.cpp item.cpp logop.cpp  physop.cpp query.cpp rules.cpp ssp.cpp tasks.cpp
-// mainOptimizer.cpp -std=c++17

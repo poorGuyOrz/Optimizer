@@ -49,7 +49,11 @@
     "typeinfo": "cpp",
     "utility": "cpp",
     "valarray": "cpp",
-    "algorithm": "cpp"
+    "algorithm": "cpp",
+    "atomic": "cpp",
+    "iterator": "cpp",
+    "memory_resource": "cpp",
+    "random": "cpp"
   },
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

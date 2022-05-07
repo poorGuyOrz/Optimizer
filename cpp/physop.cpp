@@ -216,12 +216,9 @@ LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN(int *lattrs, int *rattrs, int size, int CollI
 LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN(LOOPS_INDEX_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size), CollId(Op.CollId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 };
 
-//##ModelId=3B0C086F0059
 Cost *LOOPS_INDEX_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float LeftCard = ((LOG_COLL_PROP *)InputLogProp[0])->Card;
   float RightCard = Cat->GetCollProp(CollId)->Card;
@@ -293,24 +290,17 @@ Merge join
 ==========
 */
 
-//##ModelId=3B0C086F013F
 MERGE_JOIN::MERGE_JOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 }  // MERGE_JOIN::MERGE_JOIN
 
-//##ModelId=3B0C086F014B
 MERGE_JOIN::MERGE_JOIN(MERGE_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 };
 
-//##ModelId=3B0C086F0167
 Cost *MERGE_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float LeftCard = ((LOG_COLL_PROP *)InputLogProp[0])->Card;
   float RightCard = ((LOG_COLL_PROP *)InputLogProp[1])->Card;
@@ -393,21 +383,15 @@ HASH join
        Like Merge join, but inputs can have any property.  Operator constructs a hash table.
 */
 
-//##ModelId=3B0C086F0239
 HASH_JOIN::HASH_JOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 }  // HASH_JOIN::HASH_JOIN
 
-//##ModelId=3B0C086F024D
 HASH_JOIN::HASH_JOIN(HASH_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 };
 
 Cost *HASH_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
@@ -516,20 +500,14 @@ PHYS_PROP *FILTER::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, in
   return (new PHYS_PROP(*PhysProp));
 }
 
-//##ModelId=3B0C086F0348
 P_PROJECT::P_PROJECT(int *attrs, int size) : attrs(attrs), size(size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 }  // P_PROJECT::P_PROJECT
 
-//##ModelId=3B0C086F0352
 P_PROJECT::P_PROJECT(P_PROJECT &Op) : attrs(CopyArray(Op.attrs, Op.size)), size(Op.size) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 };
 
 //##ModelId=3B0C086F0367
@@ -587,26 +565,18 @@ string P_PROJECT::Dump() {
   =======
 */
 
-//##ModelId=3B0C08700136
 QSORT::QSORT() {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 }  // QSORT::QSORT
 
-//##ModelId=3B0C08700140
 QSORT::QSORT(QSORT &Op) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 };
 
-//##ModelId=3B0C0870017D
 string QSORT::Dump() { return GetName(); }  // QSORT::Dump
 
-//##ModelId=3B0C0870014C
 Cost *QSORT::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float InputCard = ((LOG_COLL_PROP *)InputLogProp[0])->Card;
 
@@ -776,17 +746,13 @@ string P_FUNC_OP::Dump() {
 BIT_JOIN::BIT_JOIN(int *lattrs, int *rattrs, int size, int CollId)
     : lattrs(lattrs), rattrs(rattrs), size(size), CollId(CollId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BIT_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 }  // BIT_JOIN::BIT_JOIN
 
 BIT_JOIN::BIT_JOIN(BIT_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size), CollId(Op.CollId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
-#ifdef _DEBUG
   name = GetName();
-#endif
 };
 
 Cost *BIT_JOIN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
@@ -865,23 +831,16 @@ PHYS_PROP *BIT_JOIN::FindPhysProp(PHYS_PROP **input_phys_props) {
 }  // BIT_JOIN::FindPhysProp
 
 // INDEXED_FILTER
-//##ModelId=3B0C08720036
 INDEXED_FILTER ::INDEXED_FILTER(const int fileId) : FileId(fileId) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].New();
-#ifdef _DEBUG
   name = GetName() + GetCollName(FileId);
-#endif
 };
 
-//##ModelId=3B0C0872003F
 INDEXED_FILTER::INDEXED_FILTER(INDEXED_FILTER &Op) : FileId(Op.GetFileId()) {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].New();
-#ifdef _DEBUG
   name = Op.name;
-#endif
 }
 
-//##ModelId=3B0C08720053
 Cost *INDEXED_FILTER::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float InputCard = Cat->GetCollProp(FileId)->Card;
   float Width = Cat->GetCollProp(FileId)->Width;

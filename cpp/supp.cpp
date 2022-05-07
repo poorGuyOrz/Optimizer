@@ -323,12 +323,12 @@ void COLL_PROP::update(string NewName) {
 // dump collection property content
 string COLL_PROP::Dump() {
   string os;
-  os = "  Card:" + to_string(Card) + "  UCard:" + to_string(UCard);
-  if (Keys->GetSize() > 0) os += "  Order:" + OrderToString(Order);
+  os = "Card: " + to_string(Card) + "\tUCard: " + to_string(UCard);
+  if (Keys->GetSize() > 0) os += "\tOrder: " + OrderToString(Order);
 
-  os += "  Keys:" + (*Keys).Dump();
+  os += "\tKeys: " + (*Keys).Dump();
 
-  os += "  CandidateKey:" + (*CandidateKey).Dump() + "\n";
+  os += "\tCandidateKey: " + (*CandidateKey).Dump() + "\n";
 
   if (FKeyArray.size() > 0) {
     os += "  Foreign Keys:";
@@ -375,8 +375,8 @@ ATTR::ATTR(string range_var, int *atts, int size) {
 
 // ATTR dump function
 string ATTR::Dump() {
-  return GetAttName(AttId) + " Domain:" + DomainToString(Cat->GetDomain(AttId)) + " CuCard:" + to_string(CuCard) +
-         " Min:" + to_string(Min) + " Max:" + to_string(Max);
+  return GetAttName(AttId) + ":\tDomain: " + DomainToString(Cat->GetDomain(AttId)) + "\tCuCard: " + to_string(CuCard) +
+         "\tMin: " + to_string(Min) + "\tMax: " + to_string(Max);
 };
 
 string ATTR::attrDump() { return GetAttName(AttId); }
@@ -422,7 +422,6 @@ float SCHEMA::GetTableMaxCuCard(int TableIndex) {
 }
 
 // width of the table in the schema
-//##ModelId=3B0C08620083
 float SCHEMA::GetTableWidth(int TableIndex) {
   // add Width=0 for Table "", used for AGG_OP
   if (TableId[TableIndex] == 0) return 0;
@@ -431,7 +430,6 @@ float SCHEMA::GetTableWidth(int TableIndex) {
 
 // projection
 // 	projection of attrs onto schema
-//##ModelId=3B0C08620047
 SCHEMA *SCHEMA::projection(int *attrs, int size) {
   SCHEMA *new_schema = new SCHEMA(size);
 
@@ -470,7 +468,6 @@ SCHEMA *SCHEMA::projection(int *attrs, int size) {
 // union the attributes from the two joined SCHEMA.
 // also check the joined predicates(attributes) are in the catalog(schema)
 // calculate the ATT_PROP
-//##ModelId=3B0C0862005A
 SCHEMA *SCHEMA::UnionSchema(SCHEMA *other) {
   int i, j;
 
@@ -514,7 +511,6 @@ SCHEMA *SCHEMA::UnionSchema(SCHEMA *other) {
 }
 
 // return true if contains all the keys
-//##ModelId=3B0C0862003D
 bool SCHEMA::Contains(KEYS_SET *Keys) {
   for (int i = 0; i < Keys->GetSize(); i++) {
     if (!InSchema((*Keys)[i])) return false;
@@ -525,7 +521,6 @@ bool SCHEMA::Contains(KEYS_SET *Keys) {
 }  // Contains
 
 // free up memory
-//##ModelId=3B0C0862001F
 SCHEMA::~SCHEMA() {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SCHEMA].Delete();
   for (int i = 0; i < Size; i++) delete Attrs[i];
@@ -551,7 +546,6 @@ string SCHEMA::DumpCOVE() {
 }
 
 // SCHEMA attributes store function
-//##ModelId=3B0C086200A0
 KEYS_SET *SCHEMA::AttrStore() {
   KEYS_SET *largeKeySet = new KEYS_SET();
   // PTRACE ("Schema Size is %d", GetSize());

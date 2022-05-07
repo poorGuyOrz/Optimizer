@@ -37,7 +37,6 @@ int compare_afters(void const *x, void const *y) {
   return result;
 }  // compare_afters
 
-
 /*
 OptimizeGroupTask::perform
 {
@@ -74,6 +73,12 @@ OptimizeGroupTask::perform
                             add a winner for this context to the circle, with null plan.
                               (i.e., initialize the winner's circle for this property.)
 
+*/
+/*
+
+  group中的所有表達式，
+    對於邏輯表達式。使用OptimizeExprTask去優化表達式
+    對於物理表達式。使用optinputtask優化
 */
 void OptimizeGroupTask::perform() {
   PTRACE("OptimizeGroupTask: " << GrpID << " is performing");
@@ -370,9 +375,7 @@ void OptimizeExprTask::perform() {
     if (Rule->top_match(MExpr->GetOp()) && Promise > 0) {
       Move[moves].promise = Promise;
       Move[moves++].rule = Rule;
-#ifdef _DEBUG
       TopMatch[RuleNo]++;
-#endif
     }
   }
 
@@ -461,7 +464,6 @@ O_INPUTS::O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last
   }
 };
 
-//##ModelId=3B0C085E02E9
 O_INPUTS::~O_INPUTS() {
   if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_INPUTS].Delete();
 
@@ -1117,13 +1119,10 @@ TerminateThisTask:
   if (Last) {
     LocalWinner = LocalGroup->GetWinner(LocalReqdProp);
     LocalWinner->SetDone(true);
-#ifdef _DEBUG
-    string os;
     MExression *TempME = LocalWinner->GetMPlan();
-    os.Format("Terminate: replaced winner with %s, %s, %s\n", LocalReqdProp->Dump(),
-              TempME ? TempME->Dump() : " nullptr ", LocalWinner->GetCost()->Dump());
-    PTRACE("%s", os);
-#endif
+    PTRACE("Terminate: replaced winner with " << LocalReqdProp->Dump() << ", "
+                                              << (TempME ? TempME->Dump() : " nullptr ") << ", "
+                                              << LocalWinner->GetCost()->Dump());
   }
 #endif
 
@@ -1273,9 +1272,7 @@ void ApplyRuleTask::perform() {
     // Extract the bound Expression from the bindery
     before = bindery->extract_expr();
     PTRACE("new Binding is: " << endl << before->Dump());
-#ifdef _DEBUG
     Bindings[Rule->get_index()]++;
-#endif
     // check the rule's condition function
     CONT *Cont = CONT::vc[ContextID];
     PHYS_PROP *ReqdProp = Cont->GetPhysProp();  // What prop is required of
@@ -1286,9 +1283,7 @@ void ApplyRuleTask::perform() {
     }
     PTRACE("Binding SATISFIES condition function.  Mexpr: " << MExpr->Dump());
 
-#ifdef _DEBUG
     Conditions[Rule->get_index()]++;
-#endif
     // try to derive a new substitute expression
     after = Rule->next_substitute(before, ReqdProp);
 
