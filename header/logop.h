@@ -52,9 +52,7 @@ class GET : public LogicalOperator {
   GET(GET &Op);
   Operator *Clone() { return new GET(*this); };
 
-  ~GET() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].Delete();
-  };
+  ~GET(){};
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
@@ -105,7 +103,6 @@ class EQJOIN : public LogicalOperator {
   Operator *Clone() { return new EQJOIN(*this); };
 
   ~EQJOIN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
@@ -186,9 +183,7 @@ class SELECT : public LogicalOperator {
   SELECT(SELECT &Op);
   Operator *Clone() { return new SELECT(*this); };
 
-  ~SELECT() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].Delete();
-  };
+  ~SELECT(){};
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
@@ -229,10 +224,7 @@ class PROJECT : public LogicalOperator {
   Operator *Clone() { return new PROJECT(*this); };
 
   //##ModelId=3B0C0874021A
-  ~PROJECT() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].Delete();
-    delete[] attrs;
-  };
+  ~PROJECT() { delete[] attrs; };
 
   //##ModelId=3B0C08740223
   LOG_PROP *FindLogProp(LOG_PROP **input);
@@ -250,10 +242,8 @@ class PROJECT : public LogicalOperator {
   };
 
   // since this operator has arguments
-  //##ModelId=3B0C0874024C
   ub4 hash();
 
-  //##ModelId=3B0C0874024D
   string Dump();
 
 };  // PROJECT
@@ -277,27 +267,18 @@ class RM_DUPLICATES : public LogicalOperator {
   Operator *Clone() { return new RM_DUPLICATES(*this); };
 
   //##ModelId=3B0C08740313
-  ~RM_DUPLICATES() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].Delete();
-  };
+  ~RM_DUPLICATES(){};
 
-  //##ModelId=3B0C08740314
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C0874031E
-  inline int GetArity() { return (1); };  // Only input is the stream of bytes.
-  //##ModelId=3B0C08740327
+  inline int GetArity() { return (1); };                  // Only input is the stream of bytes.
   inline string GetName() { return ("RM_DUPLICATES"); };  // Name of this operator
-  //##ModelId=3B0C08740328
-  inline int GetNameId() { return RM_DUPLICATES_ID; };  // Name of this operator
-  //##ModelId=3B0C08740331
+  inline int GetNameId() { return RM_DUPLICATES_ID; };    // Name of this operator
   inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); };
 
   // since this operator has arguments
-  //##ModelId=3B0C0874033C
   ub4 hash();
 
-  //##ModelId=3B0C08740345
   string Dump();
 
 };  // RM_DUPLICATES
@@ -346,7 +327,6 @@ class AGG_LIST : public LogicalOperator {
     for (int i = 0; i < Op.AggOps->size(); i++) {
       (*AggOps)[i] = new AGG_OP(*(*Op.AggOps)[i]);
     }
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
   };
 
   //##ModelId=3B0C087500BB
@@ -358,26 +338,18 @@ class AGG_LIST : public LogicalOperator {
     for (int i = 0; i < AggOps->size(); i++) delete (*AggOps)[i];
     delete AggOps;
     delete[] FlattenedAtts;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].Delete();
   };
 
-  //##ModelId=3B0C087500BD
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C087500C7
-  inline int GetArity() { return (1); };  // Only input is the stream of bytes.
-  //##ModelId=3B0C087500D0
+  inline int GetArity() { return (1); };             // Only input is the stream of bytes.
   inline string GetName() { return ("AGG_LIST"); };  // Name of this operator
-  //##ModelId=3B0C087500DA
-  inline int GetNameId() { return AGG_LIST_ID; };  // Name of this operator
-  //##ModelId=3B0C087500DB
+  inline int GetNameId() { return AGG_LIST_ID; };    // Name of this operator
   bool operator==(Operator *other);
 
   // since this operator has arguments
-  //##ModelId=3B0C087500EE
   ub4 hash();
 
-  //##ModelId=3B0C087500EF
   string Dump();
 
 };  // AGG_LIST
@@ -391,45 +363,25 @@ class AGG_LIST : public LogicalOperator {
    if it involves an aggregate, see AGG_OP
 */
 
-//##ModelId=3B0C087501CA
 class FUNC_OP : public LogicalOperator {
  public:
-  //##ModelId=3B0C087501DF
   string RangeVar;
-  //##ModelId=3B0C087501E8
   int *Atts;
-  //##ModelId=3B0C087501F2
   int AttsSize;
 
-  //##ModelId=3B0C087501FC
-  FUNC_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].New();
-  };
+  FUNC_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size){};
 
-  //##ModelId=3B0C08750209
-  FUNC_OP(FUNC_OP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].New();
-  };
+  FUNC_OP(FUNC_OP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize){};
 
-  //##ModelId=3B0C08750211
   Operator *Clone() { return new FUNC_OP(*this); };
 
-  //##ModelId=3B0C0875021A
-  ~FUNC_OP() {
-    delete[] Atts;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FUNC_OP].Delete();
-  };
+  ~FUNC_OP() { delete[] Atts; };
 
-  //##ModelId=3B0C08750224
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C08750226
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C0875022E
   inline string GetName() { return ("FUNC_OP"); };
-  //##ModelId=3B0C08750242
   inline int GetNameId() { return FUNC_OP_ID; };
-  //##ModelId=3B0C0875024C
   inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((FUNC_OP *)other)->Atts, Atts, AttsSize) &&  // arguments are equal

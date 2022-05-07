@@ -177,20 +177,16 @@ class LeafOperator : public Operator {
 
  public:
   LeafOperator(int index, int group = -1) : Index(index), Group(group) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
     name = GetName();  // for debug
   };
 
   LeafOperator(LeafOperator &Op) : Index(Op.Index), Group(Op.Group) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].New();
     name = Op.name;  // for debug
   };
 
   inline Operator *Clone() { return new LeafOperator(*this); };
 
-  ~LeafOperator() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LEAF_OP].Delete();
-  };
+  ~LeafOperator(){};
 
   inline int GetArity() { return (0); };
   inline string GetName() { return ("LeafOperator"); };
@@ -240,18 +236,11 @@ class AGG_OP {
   int *Atts;        // Attributes involved in the function
   int AttsSize;     // Number of attributes above
  public:
-  AGG_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_OP].New();
-  };
+  AGG_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size){};
 
-  AGG_OP(AGG_OP &Op) : RangeVar(Op.RangeVar), AttsSize(Op.AttsSize), Atts(CopyArray(Op.Atts, Op.AttsSize)) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  };
+  AGG_OP(AGG_OP &Op) : RangeVar(Op.RangeVar), AttsSize(Op.AttsSize), Atts(CopyArray(Op.Atts, Op.AttsSize)){};
 
-  ~AGG_OP() {
-    delete[] Atts;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_OP].Delete();
-  };
+  ~AGG_OP() { delete[] Atts; };
 
   inline string GetName() { return ("AGG_OP"); };
   inline string GetRangeVar() { return (RangeVar); };

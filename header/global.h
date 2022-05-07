@@ -52,59 +52,6 @@ bool TraceOn = true;  // global Trace flag
 
 class OPT_STAT *OptStat;  // Opt statistics object
 
-CLASS_STAT ClassStat[] =  // class statistics object
-    {
-        CLASS_STAT("AGG_LIST", sizeof(AGG_LIST)),
-        CLASS_STAT("AGG_OP", sizeof(AGG_OP)),
-        CLASS_STAT("ApplyRuleTask", sizeof(ApplyRuleTask)),
-        CLASS_STAT("ATTR", sizeof(class ATTR)),
-        CLASS_STAT("ATTR_EXP", sizeof(class ATTR_EXP)),
-        CLASS_STAT("ATTR_OP", sizeof(class ATTR_OP)),
-        CLASS_STAT("BINDERY", sizeof(class BINDERY)),
-        CLASS_STAT("BIT_JOIN", sizeof(class BIT_JOIN)),
-        CLASS_STAT("COMP_OP", sizeof(class COMP_OP)),
-        CLASS_STAT("CONST_INT_OP", sizeof(class CONST_INT_OP)),
-        CLASS_STAT("CONST_SET_OP", sizeof(class CONST_SET_OP)),
-        CLASS_STAT("CONST_STR_OP", sizeof(class CONST_STR_OP)),
-        CLASS_STAT("CONT", sizeof(class CONT)),
-        CLASS_STAT("Cost", sizeof(class Cost)),
-        CLASS_STAT("ExploreGroupTask", sizeof(class ExploreGroupTask)),
-        CLASS_STAT("EQJOIN", sizeof(class EQJOIN)),
-        CLASS_STAT("Expression", sizeof(class Expression)),
-        CLASS_STAT("FILE_SCAN", sizeof(class FILE_SCAN)),
-        CLASS_STAT("FILTER", sizeof(class FILTER)),
-        CLASS_STAT("FUNC_OP", sizeof(class FUNC_OP)),
-        CLASS_STAT("GET", sizeof(class GET)),
-        CLASS_STAT("Group", sizeof(class Group)),
-        CLASS_STAT("HASH_DUPLICATES", sizeof(class HASH_DUPLICATES)),
-        CLASS_STAT("HGROUP_LIST", sizeof(class HGROUP_LIST)),
-        CLASS_STAT("INDEXED_FILTER", sizeof(class INDEXED_FILTER)),
-        CLASS_STAT("KEYS_SET", sizeof(class KEYS_SET)),
-        CLASS_STAT("LeafOperator", sizeof(class LeafOperator)),
-        CLASS_STAT("LOG_COLL_PROP", sizeof(class LOG_COLL_PROP)),
-        CLASS_STAT("LOG_ITEM_PROP", sizeof(class LOG_ITEM_PROP)),
-        CLASS_STAT("LOOPS_INDEX_JOIN", sizeof(class LOOPS_INDEX_JOIN)),
-        CLASS_STAT("LOOPS_JOIN", sizeof(class LOOPS_JOIN)),
-        CLASS_STAT("MExression", sizeof(class MExression)),
-        CLASS_STAT("M_WINNER", sizeof(class M_WINNER)),
-        CLASS_STAT("MERGE_JOIN", sizeof(class MERGE_JOIN)),
-        CLASS_STAT("HASH_JOIN", sizeof(class HASH_JOIN)),
-        CLASS_STAT("OptimizeExprTask", sizeof(class OptimizeExprTask)),
-        CLASS_STAT("OptimizeGroupTask", sizeof(class OptimizeGroupTask)),
-        CLASS_STAT("O_INPUTS", sizeof(class O_INPUTS)),
-        CLASS_STAT("P_FUNC_OP", sizeof(class P_FUNC_OP)),
-        CLASS_STAT("P_PROJECT", sizeof(class P_PROJECT)),
-        CLASS_STAT("PHYS_PROP", sizeof(class PHYS_PROP)),
-        CLASS_STAT("PROJECT", sizeof(class PROJECT)),
-        CLASS_STAT("QSORT", sizeof(class QSORT)),
-        CLASS_STAT("RM_DUPLICATES", sizeof(class RM_DUPLICATES)),
-        CLASS_STAT("SCHEMA", sizeof(class SCHEMA)),
-        CLASS_STAT("SELECT", sizeof(class SELECT)),
-        CLASS_STAT("WINNER", sizeof(class WINNER)),
-};  // class CLASS_STAT
-
-int CLASS_NUM = slotsof(ClassStat);  // sizeof of ClassStat
-
 RuleSet *ruleSet;       // Rule set
 CAT *Cat;               // read catalog in
 Query *query;           // read query in

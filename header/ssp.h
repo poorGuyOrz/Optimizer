@@ -11,7 +11,6 @@ class SearchSpace;
 class Group;
 class MExression;
 class WINNER;
-class M_WINNER;
 
 /*
 ============================================================
@@ -127,7 +126,6 @@ class MExression {
 
  public:
   ~MExression() {
-    if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].Delete();
     if (GetArity()) {
       delete[] Inputs;
     }
@@ -147,8 +145,6 @@ class MExression {
     int groupID;
     Expression *input;
     counter = 0;
-
-    if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].New();
 
     // copy in the sub-expression
     int arity = GetArity();
@@ -179,8 +175,6 @@ class MExression {
         NextMExpr(other.NextMExpr),
         Op(other.Op->Clone()),
         RuleMask(other.RuleMask) {
-    if (!ForGlobalEpsPruning) ClassStat[C_M_EXPR].New();
-
     // Inputs are the only member data left to copy.
     int arity = Op->GetArity();
     if (arity) {
@@ -341,12 +335,6 @@ class Group {
   */
   bool search_circle(CONT *C, bool &moresearch);
 
-#ifdef IRPROP
-  // return whether the group is completely optimized or not.
-  // GrpNo and moreSearch are irrelevant
-  bool search_circle(int GrpNo, PHYS_PROP *, bool &moreSearch);
-#endif
-
   // Manipulate Winner's circle
   // Return winner for this property, nullptr if there is none
   WINNER *GetWinner(PHYS_PROP *PhysProp);
@@ -361,10 +349,8 @@ class Group {
 
   bool CheckWinnerDone();  // check if there is at least one winner done in this group
 
-#ifdef FIRSTPLAN
   void setfirstplan(bool boolean) { firstplan = boolean; };
   bool getfirstplan() { return firstplan; };
-#endif
 
  private:
   int GroupID;  // ID of this group
@@ -390,9 +376,7 @@ class Group {
 
   int EstimateNumTables(MExression *MExpr);
 
-#ifdef FIRSTPLAN
   static bool firstplan;
-#endif
 
 };  // class Group
 
@@ -436,7 +420,6 @@ class WINNER {
  public:
   WINNER(MExression *, PHYS_PROP *, Cost *, bool done = false);
   ~WINNER() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].Delete();
     delete MPlan;
     delete cost;
   };
@@ -447,102 +430,3 @@ class WINNER {
   inline bool GetDone() { return (Done); };
   inline void SetDone(bool value) { Done = value; };
 };
-
-/*
-    ============================================================
-    MULTIWINNERS of a search - used only when IRPROP is defined
-    ============================================================
-        A M_WINNER (multiwinner) data structure will, when the group is optimized, contain a
-        winner (best plan) for each interesting and relevant (i.e., in the schema) property of
-        the group.  The M_WINNER elements are initialized with an infinite bound to indicate
-        that no qualifying plan has yet been found.
-
-    The idea is then to optimize a group not only for the motivating context but also for
-        all the contexts stored in a M_WINNER for that group. In this way, we do not have to
-        revisit that group, thus saving CPU time and memory.
-*/
-
-class M_WINNER {
- public:
-  static vector<M_WINNER *> mc;
-  static Cost InfCost;
-
- private:
-  int wide;  // size of each element
-  MExression **BPlan;
-  PHYS_PROP **PhysProp;
-  Cost **Bound;
-
- public:
-  M_WINNER(int);
-  ~M_WINNER() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_M_WINNER].Delete();
-    delete[] BPlan;
-    for (int i = 0; i < wide; i++) {
-      delete PhysProp[i];
-      if (Bound[i] != nullptr) delete Bound[i];
-    }
-    delete[] PhysProp;
-    delete[] Bound;
-  };
-
-  inline int GetWide() { return wide; };
-
-  // Return the requested MEXPR indexed by an integer
-  inline MExression *GetBPlan(int i) { return (BPlan[i]); };
-
-  // Return the MEXPR indexed by the physical property
-  inline MExression *GetBPlan(PHYS_PROP *PhysProp) {
-    for (int i = 0; i < wide; i++) {
-      if (*GetPhysProp(i) == *PhysProp) {
-        return (BPlan[i]);
-      }
-    }
-    return (nullptr);
-  };
-
-  inline void SetPhysProp(int i, PHYS_PROP *Prop) { PhysProp[i] = Prop; }
-
-  // Return the requested physical property from multiwinner
-  inline PHYS_PROP *GetPhysProp(int i) { return (PhysProp[i]); };
-
-  // Return the upper bound of the required physical property
-  inline Cost *GetUpperBd(PHYS_PROP *PhysProp) {
-    for (int i = 0; i < wide; i++) {
-      if (*GetPhysProp(i) == *PhysProp) {
-        return (Bound[i]);
-      }
-    }
-    return (&InfCost);
-  };
-
-  //  Update bounds, when we get new bound for the context.
-  inline void SetUpperBound(Cost *NewUB, PHYS_PROP *Prop) {
-    for (int i = 0; i < wide; i++) {
-      if (*GetPhysProp(i) == *Prop) {
-        if (Bound[i] != nullptr) delete Bound[i];
-        Bound[i] = NewUB;
-      }
-    }
-  };
-
-  // Update the MEXPR
-  inline void SetBPlan(MExression *Winner, int i) { BPlan[i] = Winner; };
-
-  // print the multiwinners
-  string Dump() {
-    string os;
-    for (int i = 0; i < wide; i++) {
-      os += PhysProp[i]->Dump();
-      os += ",  ";
-      os += Bound[i]->Dump();
-      os += ",  ";
-      if (BPlan[i] != nullptr)
-        os += BPlan[i]->Dump();
-      else
-        os += "nullptr";
-      os += "\n";
-    }
-    return os;
-  }
-};  // class M_WINNER

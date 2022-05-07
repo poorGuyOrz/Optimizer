@@ -151,16 +151,13 @@ class OptimizeGroupTask : public OptimizerTask {
  public:
   OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr)
       : OptimizerTask(ContextID, parent_task_no), GrpID(GrpID), Last(last), EpsBound(epsbound) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].New();
-
-      // if INFBOUND flag is on, set the bound to be INF
+    // if INFBOUND flag is on, set the bound to be INF
 #ifdef INFBOUND
     Cost *INFCost = new Cost(-1);
     CONT::vc[ContextID]->SetUpperBound(*INFCost);
 #endif
   };
   ~OptimizeGroupTask() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_GROUP].Delete();
     if (EpsBound) delete EpsBound;
   };
 
@@ -209,7 +206,6 @@ class ExploreGroupTask : public OptimizerTask {
  public:
   ExploreGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
   ~ExploreGroupTask() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_E_GROUP].Delete();
     if (EpsBound) delete EpsBound;
   };
 
@@ -243,7 +239,6 @@ class OptimizeExprTask : public OptimizerTask {
     if (Last) {
       Group *group = Ssp->GetGroup(MExpr->GetGrpID());
       if (!explore) {
-#ifndef IRPROP
         CONT *LocalCont = CONT::vc[ContextID];
         // What prop is required of
         PHYS_PROP *LocalReqdProp = LocalCont->GetPhysProp();
@@ -253,7 +248,6 @@ class OptimizeExprTask : public OptimizerTask {
         if (Winner) assert(!Winner->GetDone());
 
         Winner->SetDone(true);
-#endif
         // this's still the last applied rule in the group,
         // so mark the group with completed optimizing
         group->set_optimized(true);
@@ -261,7 +255,6 @@ class OptimizeExprTask : public OptimizerTask {
         group->set_explored(true);
     }
 
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_EXPR].Delete();
     if (EpsBound) delete EpsBound;
   };
 

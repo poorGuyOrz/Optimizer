@@ -21,7 +21,6 @@ item.cpp -
 #include "../header/stdafx.h"
 extern bool ForGlobalEpsPruning;
 
-//##ModelId=3B0C08750379
 ATTR_EXP::ATTR_EXP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size) {
   // do not add to CAT since it is not a real collection
   // add .RangeVar to AttTable,
@@ -30,7 +29,6 @@ ATTR_EXP::ATTR_EXP(string range_var, int *atts, int size) : RangeVar(range_var),
   int AttId = GetAttId("", RangeVar);
   // we do not know the cadinalities, use (-1, -1, -1)
   AttNew = new ATTR(AttId, -1, -1, -1);
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_EXP].New();
 };
 
 string ATTR_EXP::Dump() {

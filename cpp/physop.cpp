@@ -55,12 +55,10 @@ double FetchingCost(LOG_COLL_PROP *LogProp) {
 }
 
 FILE_SCAN ::FILE_SCAN(const int fileId) : FileId(fileId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].New();
   name = GetName() + GetCollName(FileId);
 };
 
 FILE_SCAN::FILE_SCAN(FILE_SCAN &Op) : FileId(Op.GetFileId()) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].New();
   name = Op.name;
 }
 
@@ -88,13 +86,11 @@ Cost *FILE_SCAN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) 
 }
 
 LOOPS_JOIN::LOOPS_JOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].New();
   name = GetName();
 }
 
 LOOPS_JOIN::LOOPS_JOIN(LOOPS_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].New();
   name = GetName();
 };
 
@@ -209,13 +205,11 @@ Nested loops index join
 
 LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN(int *lattrs, int *rattrs, int size, int CollId)
     : lattrs(lattrs), rattrs(rattrs), size(size), CollId(CollId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
   name = GetName();
 }  // LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN
 
 LOOPS_INDEX_JOIN::LOOPS_INDEX_JOIN(LOOPS_INDEX_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size), CollId(Op.CollId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
   name = GetName();
 };
 
@@ -291,13 +285,11 @@ Merge join
 */
 
 MERGE_JOIN::MERGE_JOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].New();
   name = GetName();
 }  // MERGE_JOIN::MERGE_JOIN
 
 MERGE_JOIN::MERGE_JOIN(MERGE_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].New();
   name = GetName();
 };
 
@@ -384,13 +376,11 @@ HASH join
 */
 
 HASH_JOIN::HASH_JOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].New();
   name = GetName();
 }  // HASH_JOIN::HASH_JOIN
 
 HASH_JOIN::HASH_JOIN(HASH_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].New();
   name = GetName();
 };
 
@@ -501,12 +491,10 @@ PHYS_PROP *FILTER::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, in
 }
 
 P_PROJECT::P_PROJECT(int *attrs, int size) : attrs(attrs), size(size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].New();
   name = GetName();
 }  // P_PROJECT::P_PROJECT
 
 P_PROJECT::P_PROJECT(P_PROJECT &Op) : attrs(CopyArray(Op.attrs, Op.size)), size(Op.size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].New();
   name = GetName();
 };
 
@@ -566,12 +554,10 @@ string P_PROJECT::Dump() {
 */
 
 QSORT::QSORT() {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].New();
   name = GetName();
 }  // QSORT::QSORT
 
 QSORT::QSORT(QSORT &Op) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].New();
   name = GetName();
 };
 
@@ -745,13 +731,11 @@ string P_FUNC_OP::Dump() {
 
 BIT_JOIN::BIT_JOIN(int *lattrs, int *rattrs, int size, int CollId)
     : lattrs(lattrs), rattrs(rattrs), size(size), CollId(CollId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BIT_JOIN].New();
   name = GetName();
 }  // BIT_JOIN::BIT_JOIN
 
 BIT_JOIN::BIT_JOIN(BIT_JOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size), CollId(Op.CollId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].New();
   name = GetName();
 };
 
@@ -825,19 +809,16 @@ string BIT_JOIN::Dump() {
 };
 
 // the physprop of the output is the left input prop
-//##ModelId=3B0C087102F1
 PHYS_PROP *BIT_JOIN::FindPhysProp(PHYS_PROP **input_phys_props) {
   return input_phys_props[0];
 }  // BIT_JOIN::FindPhysProp
 
 // INDEXED_FILTER
 INDEXED_FILTER ::INDEXED_FILTER(const int fileId) : FileId(fileId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].New();
   name = GetName() + GetCollName(FileId);
 };
 
 INDEXED_FILTER::INDEXED_FILTER(INDEXED_FILTER &Op) : FileId(Op.GetFileId()) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].New();
   name = Op.name;
 }
 

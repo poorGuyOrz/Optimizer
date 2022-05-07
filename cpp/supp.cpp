@@ -369,7 +369,6 @@ ATTR::ATTR(string range_var, int *atts, int size) {
   Min = ae->GetAttNew()->Min;
   Max = ae->GetAttNew()->Max;
 
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
   delete ae;
 };  // ATTR::ATTR(string range_var, int * atts, int size)
 
@@ -522,7 +521,6 @@ bool SCHEMA::Contains(KEYS_SET *Keys) {
 
 // free up memory
 SCHEMA::~SCHEMA() {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SCHEMA].Delete();
   for (int i = 0; i < Size; i++) delete Attrs[i];
   delete Attrs;
 
@@ -790,18 +788,15 @@ void parseString(char *p) {
 
 //=============  PHYS_PROP Methods  ===================
 PHYS_PROP::PHYS_PROP(KEYS_SET *Keys, ORDER Order) : Keys(Keys), Order(Order) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New();
 };
 
 // a constructor for ANY property
 PHYS_PROP::PHYS_PROP(ORDER Order) : Keys(NULL), Order(Order) {
   assert(Order == any);
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New();
 }
 
 PHYS_PROP::PHYS_PROP(PHYS_PROP &other)
     : Keys(other.Order == any ? NULL : new KEYS_SET(*(other.Keys))), Order(other.Order) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].New();
   if (Order == sorted) {
     assert(other.KeyOrder.size() == other.Keys->GetSize());
     for (int i = 0; i < other.KeyOrder.size(); i++) this->KeyOrder.push_back(other.KeyOrder[i]);
@@ -897,7 +892,6 @@ CONT::CONT(PHYS_PROP *RP, Cost *U, bool D) : ReqdPhys(RP), UpperBd(U), Finished(
   if (RP && (RP->GetKeysSet()) && (RP->GetKeysSet()->GetSize() > 1))
     // RP-> SetKeysSet( RP->GetKeysSet() -> best());
     RP->bestKey();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONT].New();
 };
 
 vector<CONT *> CONT::vc;
@@ -915,13 +909,3 @@ void Cost::FinalCost(Cost *LocalCost, Cost **TotalInputCost, int Size) {
 }
 
 string Cost::Dump() { return to_string(Value); }
-
-string DumpStatistics() {
-  string os;
-  string temp;
-
-  os = "Class Statistics:\n";
-  for (int i = 0; i < CLASS_NUM; i++) os += ClassStat[i].Dump();
-
-  return os;
-}

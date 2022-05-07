@@ -81,51 +81,22 @@ OptimizeGroupTask::perform
     對於物理表達式。使用optinputtask優化
 */
 void OptimizeGroupTask::perform() {
-  PTRACE("OptimizeGroupTask: " << GrpID << " is performing");
+  PTRACE("OptimizeGroupTask: " << GrpID << " is performing "
+                               << "Last flag is " << Last);
 
-#ifndef IRPROP
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
-#endif
-  PTRACE("Last flag is " << Last);
 
   Group *group = Ssp->GetGroup(GrpID);
   MExression *FirstLogMExpr = group->GetFirstLogMExpr();
 
   if (FirstLogMExpr->GetOp()->is_const()) {
     PTRACE("Group " << GrpID << " is const group");
-#ifndef IRPROP
     MExression *WPlan = new MExression(*FirstLogMExpr);
     group->NewWinner(new PHYS_PROP(any), WPlan, new Cost(0), true);
-#endif
     return;
   }
 
   bool moreSearch, SCReturn;
-
-#ifdef IRPROP
-
-  PHYS_PROP *LocalReqdProp = M_WINNER::mc[GrpID]->GetPhysProp(ContextID);  // What prop is required of
-  SCReturn = group->search_circle(GrpID, LocalReqdProp, moreSearch);
-  if (!moreSearch) {
-    // group is completely optimized
-    PTRACE("%s", "Winner's circle is prepared so terminate this task");
-    delete this;
-    return;
-  } else  // group is not optimized at all
-  {
-    // Get the first logical mexpr in the group
-    MExression *LogMExpr = group->GetFirstLogMExpr();
-
-    // push the enforcer rule before pushing the first logical MEXPR
-    PTRACE("%s", "Push ApplyRuleTask on enforcer rule");
-    RULE *Rule = (*ruleSet)[R_SORT_RULE];
-    PTasks.push(new ApplyRuleTask(Rule, FirstLogMExpr, false, 0, TaskNo, false));
-
-    // push the OptimizeExprTask on first logical expression
-    PTasks.push(new OptimizeExprTask(FirstLogMExpr, false, 0, TaskNo, true));
-  }
-
-#else
 
   CONT *LocalCont = CONT::vc[ContextID];
   PHYS_PROP *LocalReqdProp = LocalCont->GetPhysProp();  // What prop is required
@@ -250,8 +221,6 @@ void OptimizeGroupTask::perform() {
       if (moreSearch && !SCReturn) group->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
     }
   }
-#endif
-
   delete this;
 
 }  // OptimizeGroupTask::perform
@@ -266,9 +235,7 @@ string OptimizeGroupTask::Dump() {
 }  // OptimizeGroupTask::Dump
 
 ExploreGroupTask::ExploreGroupTask(int grpID, int ContextID, int parentTaskNo, bool last, Cost *bound)
-    : OptimizerTask(ContextID, parentTaskNo), GrpID(grpID), Last(last), EpsBound(bound) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_E_GROUP].New();
-};
+    : OptimizerTask(ContextID, parentTaskNo), GrpID(grpID), Last(last), EpsBound(bound){};
 
 void ExploreGroupTask::perform() {
   PTRACE("ExploreGroupTask " << GrpID << " performing");
@@ -322,18 +289,16 @@ string ExploreGroupTask::Dump() {
 
 OptimizeExprTask::OptimizeExprTask(MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last,
                                    Cost *bound)
-    : OptimizerTask(ContextID, parent_task_no), MExpr(mexpr), explore(explore), Last(last), EpsBound(bound) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_EXPR].New();
-};  // OptimizeExprTask::OptimizeExprTask
+    : OptimizerTask(ContextID, parent_task_no),
+      MExpr(mexpr),
+      explore(explore),
+      Last(last),
+      EpsBound(bound){};  // OptimizeExprTask::OptimizeExprTask
 
 void OptimizeExprTask::perform() {
   PTRACE("OptimizeExprTask performing, " << (explore ? "exploring" : "optimizing") << " mexpr: " << MExpr->Dump());
-#ifdef IRPROP
-  int GrpNo = MExpr->GetGrpID();
-  PTRACE("ContextID: %d, %s", ContextID, (M_WINNER::mc[GrpNo]->GetPhysProp(ContextID))->Dump());
-#else
+
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
-#endif
   PTRACE("Last flag is " << Last);
 
   if (explore) assert(MExpr->GetOp()->is_logical());  // explore is only for logical expression
@@ -448,8 +413,6 @@ O_INPUTS::O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last
       PrevInputNo(-1),
       EpsBound(bound),
       ContNo(ContNo) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_INPUTS].New();
-
   assert(MExpr->GetOp()->is_physical() || MExpr->GetOp()->is_item());
   // We can only calculate cost for physical operators
 
@@ -465,8 +428,6 @@ O_INPUTS::O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last
 };
 
 O_INPUTS::~O_INPUTS() {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_INPUTS].Delete();
-
   // localcost was new by find_local_cost, so need to delete it
   delete LocalCost;
   if (EpsBound) delete EpsBound;
@@ -581,12 +542,8 @@ Update the upper bound of the current context
 
 void O_INPUTS::perform() {
   PTRACE("O_INPUT performing Input " << InputNo << ", expr: " << MExpr->Dump());
-#ifdef IRPROP
-  int GrpNo = MExpr->GetGrpID();
-  PTRACE("ContextID: %d, %s", ContextID, (M_WINNER::mc[GrpNo]->GetPhysProp(ContextID))->Dump());
-#else
+
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
-#endif
   PTRACE("Last flag is " << Last);
 
   // Cache local properties of G and the expression being optimized
@@ -595,19 +552,12 @@ void O_INPUTS::perform() {
   assert(Op->is_physical());
   Group *LocalGroup = Ssp->GetGroup(MExpr->GetGrpID());  // Group of the MExpr
 
-#ifdef IRPROP
-  PHYS_PROP *LocalReqdProp = M_WINNER::mc[GrpNo]->GetPhysProp(ContextID);
-  Cost *LocalUB = M_WINNER::mc[GrpNo]->GetUpperBd(LocalReqdProp);
-  PTRACE("Bound (LocalUB) is %s", LocalUB->Dump());
-#else
   PHYS_PROP *LocalReqdProp = CONT::vc[ContextID]->GetPhysProp();  // What prop is required
   Cost *LocalUB = CONT::vc[ContextID]->GetUpperBd();
-#endif
 
   // if global eps pruning happened, terminate this task
   if (GlobepsPruning && CONT::vc[ContextID]->is_done()) {
     PTRACE("Task terminated due to global eps pruning");
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_O_INPUTS].Delete();
     if (Last)
       // this's the last task for the group, so mark the group with completed optimizing
       LocalGroup->set_optimized(true);
@@ -622,9 +572,7 @@ void O_INPUTS::perform() {
                   //	Cost * CostSoFar = new Cost(0);
   Cost CostSoFar(0);
 
-#ifndef IRPROP
   WINNER *LocalWinner = LocalGroup->GetWinner(LocalReqdProp);  // Winner in G
-#endif
   Cost Zero(0);
 
   // On the first (and no other) execution, code must initialize some O_INPUTS members.
@@ -678,28 +626,6 @@ void O_INPUTS::perform() {
       bool moreSearch, SCReturn;
       Cost *INFCost = new Cost(-1);
 
-#ifdef IRPROP
-      // the ReqProp will already be set up in multiwinner
-      SCReturn = IG->search_circle(IGNo, ReqProp, moreSearch);
-      if (!moreSearch && !SCReturn)  // input group is optimized
-      {
-        // if winner's cost >= INFCost then "impossible search, bad input"
-        PTRACE("Impossible search: Bad input %d", input);
-        delete INFCost;
-        delete ReqProp;
-        goto TerminateThisTask;
-      } else if (!moreSearch && SCReturn) {
-        Cost *WinCost = M_WINNER::mc[IGNo]->GetUpperBd(ReqProp);
-        InputCost[input] = WinCost;
-      } else if (!CuCardPruning)  // Group Pruning case
-        InputCost[input] = &Zero;
-      else  // group is not optimized or CuCard Pruning case
-        InputCost[input] = IG->GetLowerBd();
-
-      delete ReqProp;
-      delete INFCost;
-#else
-
       CONT *IGContext = new CONT(ReqProp, INFCost, false);
       SCReturn = IG->search_circle(IGContext, moreSearch);
       PTRACE("search_circle(): more search " << (moreSearch ? "" : "not") << " needed, return value is "
@@ -726,7 +652,6 @@ void O_INPUTS::perform() {
         InputCost[input] = IG->GetLowerBd();
 
       delete IGContext;
-#endif
     }  // initialize some O_INPUTS members
 
     InputNo++;  // Ensure that previous code will not be executed again; begin with Input 0
@@ -769,77 +694,6 @@ void O_INPUTS::perform() {
 
     bool moreSearch, SCReturn;
     Cost *INFCost = new Cost(-1);
-
-#ifdef IRPROP
-
-    SCReturn = IG->search_circle(IGNo, ReqProp, moreSearch);
-    if (!moreSearch && !SCReturn)  // input group is optimized
-    {
-      PTRACE("Impossible search: Bad input %d", input);
-      delete INFCost;
-      delete ReqProp;
-      goto TerminateThisTask;
-    } else if (!moreSearch && SCReturn)  // there is a winner with nonzero plan
-    {
-      PTRACE("Found Winner for Input : %d", input);
-      Cost *WinCost = M_WINNER::mc[IGNo]->GetUpperBd(ReqProp);
-      InputCost[input] = WinCost;
-      CostSoFar.FinalCost(LocalCost, InputCost, arity);
-
-      // if (Pruning && CostSoFar >= upper bound) terminate this task
-      if (Pruning && CostSoFar >= *LocalUB) {
-        PTRACE("Expr LowerBd %s, exceed Cond UpperBd %s,Pruning applied!", CostSoFar.Dump(), LocalUB->Dump());
-        PTRACE("This happened at group %d ", IGNo);
-
-        delete ReqProp;
-        delete INFCost;
-        goto TerminateThisTask;
-      }
-      delete ReqProp;
-      delete INFCost;
-    }
-
-    // group is not optimized
-    else if (input != PrevInputNo)  // no winner, and we did not just return from OptimizeGroupTask
-    {
-      PTRACE("No Winner for Input : %d", input);
-
-      // Adjust PrevInputNo and InputNo to track progress after returning from pushes
-      PrevInputNo = input;
-      InputNo = input;
-
-      // push this task
-      PTasks.push(this);
-      PTRACE("push myself, %s", "O_INPUT");
-
-      Cost *InputBd = new Cost(*LocalUB);  // Start with upper bound of G's context
-      if (Pruning) {
-        PTRACE("LocalCost is %s", LocalCost->Dump());
-        CostSoFar.FinalCost(LocalCost, InputCost, arity);
-        *InputBd -= CostSoFar;          // Subtract CostSoFar
-        *InputBd += *InputCost[input];  // push_back IG's contribution to CostSoFar
-      }
-
-      // update the new motivating bounds, but do not do so if need INFBOUND
-      // M_WINNER::mc[IGNo]->SetUpperBound(InputBd, ReqProp);
-
-      PTRACE("push OptimizeGroupTask %d", IGNo);
-      PTasks.push(
-          new OptimizeGroupTask(IGNo, 0, TaskNo, true));  // pass context as "any", as the group is not at all optimized
-
-      delete InputBd;
-      delete ReqProp;
-      delete INFCost;
-      return;
-    } else  // We just returned from OptimizeGroupTask on IG
-    {
-      // impossible plan for this context
-      PTRACE("impossible plan since no winner possible at input %d", InputNo);
-      delete ReqProp;
-      delete INFCost;
-      goto TerminateThisTask;
-    }
-#else
 
     // call search_circle on IG with that property, infinite cost.
     CONT *IGContext = new CONT(ReqProp, INFCost, false);
@@ -930,7 +784,6 @@ void O_INPUTS::perform() {
       delete IGContext;
       goto TerminateThisTask;
     }
-#endif
   }  // Calculate the cost of remaining inputs
 
   // If arity is zero, we need to ensure that this expression can
@@ -948,33 +801,11 @@ void O_INPUTS::perform() {
 
   // All inputs have been been optimized, so compute cost of the expression being optimized.
 
-#ifdef FIRSTPLAN
   // If we are in the root group and no plan in it has been costed
   if (!(MExpr->GetGrpID()) && !(LocalGroup->getfirstplan())) {
     OUTPUT("First Plan is costed at task " << TaskNo);
     LocalGroup->setfirstplan(true);
-#ifndef _TABLE_
-    long time;             // total seconds from start to finish
-    unsigned short msecs;  // milliseconds from start to finish
-    struct _timeb start, finish;
-    _ftime(&finish);
-    if (finish.millitm >= start.millitm) {
-      time = finish.time - start.time;
-      msecs = finish.millitm - start.millitm;
-    } else {
-      time = finish.time - start.time - 1;
-      msecs = 1000 + finish.millitm - start.millitm;
-    }
-    long hrs, mins, secs;  // Printed differences from start to finish
-    secs = time % 60;
-    mins = ((time - secs) / 60) % 60;
-    hrs = (time - secs - 60 * mins) / 3600;
-    string tmpbuf;
-    tmpbuf.Format("%0.2d:%0.2d:%0.2d.%0.3d\n", hrs, mins, secs, msecs);
-    OUTPUT("elapsed time:\t%s", tmpbuf);
-#endif
   }
-#endif
 
   CostSoFar.FinalCost(LocalCost, InputCost, arity);
   PTRACE("Expression's Cost is " << CostSoFar.Dump());
@@ -1003,7 +834,6 @@ void O_INPUTS::perform() {
   // if halt, halt optimize the group when either number of plans since the
   // last winner >= HaltGrpSize*EstiGrpSize or the improvement in last HaltWinSize
   // winners is <= HaltImpr. This only works for EQJOIN
-#ifndef IRPROP
   if (Halt) {
     if (LocalGroup->GetFirstLogMExpr()->GetOp()->GetName() == ("EQJOIN")) {
       double esti_grp_size = LocalGroup->GetEstiGrpSize();
@@ -1035,7 +865,6 @@ void O_INPUTS::perform() {
       }
     }
   }
-#endif
 
   // Check that winner satisfies current context
   if (CostSoFar >= *LocalUB) {
@@ -1045,50 +874,7 @@ void O_INPUTS::perform() {
 
   // compare cost to current winner for this context
   // update the winner and upperbound accordingly
-#ifdef IRPROP
-  if ((M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp) != nullptr) &&
-      (CostSoFar >= *(M_WINNER::mc[GrpNo]->GetUpperBd(LocalReqdProp)))) {
-    goto TerminateThisTask;
-  } else {
-    Group *group = Ssp->GetGroup(GrpNo);
-    Cost *WinCost = new Cost(CostSoFar);
 
-    MExression *OldWinner = M_WINNER::mc[GrpNo]->GetBPlan(LocalReqdProp);
-
-    if (OldWinner != nullptr) {
-      // decrement the counter of old winner and if it becomes 0, delete it
-      OldWinner->DecCounter();
-
-      if (OldWinner->GetCounter() == 0) {
-        PTRACE("Deleted Physical MExpr %s  !!!\n", OldWinner->Dump());
-        group->DeletePhysMExpr(OldWinner);
-      }
-    }
-
-    // update the multiwinner with new winner MEXPR and its cost
-    M_WINNER::mc[GrpNo]->SetBPlan(MExpr, ContextID);
-    M_WINNER::mc[GrpNo]->SetUpperBound(WinCost, LocalReqdProp);
-
-    // inc the count of number of winner pointing to this MEXPR
-    MExpr->IncCounter();
-
-    if (Last)
-      // this's the last task for the group, so mark the group with completed optimizing
-      group->set_optimized(true);
-
-    // set the flag, so that the changed search space is output onto the trace
-    group->set_changed(true);
-
-    // if the new winner is not good for any of the contexts, delete it
-    if ((ContNo == 0) && (MExpr->GetCounter() == 0)) {
-      PTRACE("New winner %s is not cheaper than old winner, so deleted !!!", MExpr->Dump());
-      group->DeletePhysMExpr(MExpr);
-    }
-
-    delete this;
-    return;
-  }
-#else
   if (LocalWinner->GetMPlan() &&              // If there is already a non-null local winner
       CostSoFar >= *(LocalWinner->GetCost())  // and current expression is more expensive
   )
@@ -1107,7 +893,6 @@ void O_INPUTS::perform() {
 
     goto TerminateThisTask;
   }
-#endif
 
 TerminateThisTask:
 
@@ -1115,7 +900,6 @@ TerminateThisTask:
   // delete (void*) CostSoFar;
 
   // if this is the last task in the group, set the localwinner done=true
-#ifndef IRPROP
   if (Last) {
     LocalWinner = LocalGroup->GetWinner(LocalReqdProp);
     LocalWinner->SetDone(true);
@@ -1124,7 +908,6 @@ TerminateThisTask:
                                               << (TempME ? TempME->Dump() : " nullptr ") << ", "
                                               << LocalWinner->GetCost()->Dump());
   }
-#endif
 
   if (NO_PHYS_IN_GROUP)
     // delete this physical mexpr to save memory; it may not be used again.
@@ -1133,14 +916,6 @@ TerminateThisTask:
   if (Last)
     // this's the last task for the group, so mark the group with completed optimizing
     Ssp->GetGroup(MExpr->GetGrpID())->set_optimized(true);
-
-#ifdef IRPROP
-  // if the new MExpr is not good for any contexts, delete it
-  if ((ContNo == 0) && (MExpr->GetCounter() == 0)) {
-    assert(MExpr->GetOp()->is_physical());
-    (Ssp->GetGroup(GrpNo))->DeletePhysMExpr(MExpr);
-  }
-#endif
 
   // tasks must destroy themselves
   delete this;
@@ -1151,15 +926,9 @@ string O_INPUTS::Dump() {
   string os;
   os = "O_INPUTS expression: " + MExpr->Dump() + ",";
   os += " parent task " + to_string(ParentTaskNo) + ",";
-#ifdef IRPROP
-  int GrpNo = MExpr->GetGrpID();
-  temp.Format(" %s", (M_WINNER::mc[GrpNo]->GetPhysProp(ContextID))->Dump());
-  os += temp;
-  return os;
-#else
+
   os += " " + CONT::vc[ContextID]->Dump();
   return os;
-#endif
 }  // Dump
 
 //  ***************  ApplyRuleTask  *****************
@@ -1170,15 +939,12 @@ ApplyRuleTask::ApplyRuleTask(RULE *rule, MExression *mexpr, bool explore, int Co
       MExpr(mexpr),
       explore(explore),
       Last(last),
-      EpsBound(bound) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_APPLY_RULE].New();
-};  // ApplyRuleTask::ApplyRuleTask
+      EpsBound(bound){};  // ApplyRuleTask::ApplyRuleTask
 
 ApplyRuleTask::~ApplyRuleTask() {
   if (Last) {
     Group *group = Ssp->GetGroup(MExpr->GetGrpID());
     if (!explore) {
-#ifndef IRPROP
       CONT *LocalCont = CONT::vc[ContextID];
       // What prop is required of
       PHYS_PROP *LocalReqdProp = LocalCont->GetPhysProp();
@@ -1188,7 +954,6 @@ ApplyRuleTask::~ApplyRuleTask() {
 
       // mark the winner as done
       Winner->SetDone(true);
-#endif
       // this's still the last applied rule in the group,
       // so mark the group with completed optimization or exploration
       Ssp->GetGroup(MExpr->GetGrpID())->set_optimized(true);
@@ -1196,7 +961,6 @@ ApplyRuleTask::~ApplyRuleTask() {
       Ssp->GetGroup(MExpr->GetGrpID())->set_explored(true);
   }
 
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_APPLY_RULE].Delete();
   if (EpsBound) delete EpsBound;
 };  // ApplyRuleTask::~ApplyRuleTask
 
@@ -1361,23 +1125,7 @@ void ApplyRuleTask::perform() {
           Cost *eps_bound = new Cost(*EpsBound);
           PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, eps_bound));
         } else {
-          int contextNo = 0;
-          int j = 0;
-#ifdef IRPROP
-          if (Last) Last = false;
-
-          int GrpNo = NewMExpr->GetGrpID();
-          if ((NewMExpr->GetOp())->GetName() == "QSORT") j = 1;
-          for (int i = j; i < M_WINNER::mc[GrpNo]->GetWide(); i++) {
-            if (i != ContextID) {
-              PTasks.push(new O_INPUTS(NewMExpr, i, TaskNo, Flag, nullptr, contextNo++));
-            }
-          }
-          if (!(j == 1 && ContextID == 0))
-            PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, nullptr, contextNo++));
-#else
           PTasks.push(new O_INPUTS(NewMExpr, ContextID, TaskNo, Flag, nullptr));
-#endif
         }
 
       }  // for a physical operator, optimize the inputs

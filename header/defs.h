@@ -43,58 +43,6 @@ typedef unsigned int BIT_VECTOR;  // Used to implement unique rule set.  Note th
 extern bool ForGlobalEpsPruning;  // If true, we are running the optimizer to get an
 // estimated cost to use for global epsilon pruning.
 
-// Used to trace the number of objects in each class,
-//  to determine where to use memory pooling.
-typedef enum CLASS {
-  C_AGG_LIST,
-  C_AGG_OP,
-  C_APPLY_RULE,
-  C_ATTR,
-  C_ATTR_EXP,
-  C_ATTR_OP,
-  C_BINDERY,
-  C_BIT_JOIN,
-  C_COMP_OP,
-  C_CONST_INT_OP,
-  C_CONST_SET_OP,
-  C_CONST_STR_OP,
-  C_CONT,
-  C_COST,
-  C_E_GROUP,
-  C_EQJOIN,
-  C_EXPR,
-  C_FILE_SCAN,
-  C_FILTER,
-  C_FUNC_OP,
-  C_GET,
-  C_GROUP,
-  C_HASH_DUPLICATES,
-  C_HGROUP_LIST,
-  C_INDEXED_FILTER,
-  C_KEYS_SET,
-  C_LEAF_OP,
-  C_LOG_COLL_PROP,
-  C_LOG_ITEM_PROP,
-  C_LOOPS_INDEX_JOIN,
-  C_LOOPS_JOIN,
-  C_M_EXPR,
-  C_M_WINNER,
-  C_MERGE_JOIN,
-  C_HASH_JOIN,
-  C_O_EXPR,
-  C_O_GROUP,
-  C_O_INPUTS,
-  C_P_FUNC_OP,
-  C_P_PROJECT,
-  C_PHYS_PROP,
-  C_PROJECT,
-  C_QSORT,
-  C_RM_DUPLICATES,
-  C_SCHEMA,
-  C_SELECT,
-  C_WINNER
-} CLASS;
-
 typedef enum ORDER_AD { ascending, descending } ORDER_AD;
 
 typedef vector<ORDER_AD> KeyOrderArray;
@@ -168,15 +116,13 @@ class SearchSpace;
 class CAT;
 class RULE;
 class OPT_STAT;
-class CLASS_STAT;
 class SET_TRACE;
 class RuleSet;
 class CostModel;
 class KEYS_SET;
 class MExression;
 
-extern OPT_STAT *OptStat;       // stat. info. of Optimizer
-extern CLASS_STAT ClassStat[];  // stat. info of all classes
+extern OPT_STAT *OptStat;  // stat. info. of Optimizer
 extern int CLASS_NUM;
 
 extern INT_ARRAY TopMatch;
@@ -232,12 +178,10 @@ extern bool NO_PHYS_IN_GROUP;
 /* ======= Symbolic Constants ====== */
 
 /*
-IRPROP: off == Optimize each group for one property only
-                on == Optimize each group for all Interesting Relevant Properties
+
 UNIQ:   on == Use the unique rule set rules
 SORT_AFTERS: sort possible moves in order of estimated cost
 INFBOUND: When optimizing a group, ignore the initial upper bound; use infinity instead
-FIRSTPLAN: trace when the first complete plan is costed
 _COSTS_ Prints the cost of each mexpr as it is costed, in the output window
 _TABLE_: prints one summary line for each optimization, using different epsilons
 _GEN_LOG: Used to control the generation of logical expressions when eps pruning is done.

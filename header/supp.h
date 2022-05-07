@@ -4,9 +4,8 @@
 
 #include "../header/stdafx.h"  // general definitions
 
-class SET_TRACE;   // set trace flag
-class OPT_STAT;    // opt statistics
-class CLASS_STAT;  // class statistics
+class SET_TRACE;  // set trace flag
+class OPT_STAT;   // opt statistics
 
 // Properties of stored objects, including physical and logical properties.
 class COLL_PROP;  // Collections
@@ -45,40 +44,6 @@ class SET_TRACE {
   }
 };  // class SET_TRACE
 
-// class statistics
-class CLASS_STAT {
- public:
-  string Name;  // the name of the class
-  int Size;     // the size of the class
-  int Count;    // the count of the class being allocated
-  int Max;      // the max count of the class
-  int Total;    // the total count
-
- public:
-  CLASS_STAT(string name, int size) : Name(name), Size(size), Count(0), Max(0), Total(0){};
-
-  void New() {
-    Count++;
-    Total++;
-    if (Count > Max) Max = Count;
-  };
-
-  void Delete() { Count--; };
-
-  string formatDump() {
-    // class\tSize\tMemUse\tMax\tTotal\tCount
-    string pname = Name;
-    pname.resize(20);
-    return pname + ":\t" + to_string(Size) + "\t" + to_string(Max * Size) + "\t" + to_string(Max) + "\t" +
-           to_string(Total) + "\t" + to_string(Count);
-  };
-
-  string Dump() {
-    return "MemUse = " + to_string(Max * Size) + ", " + Name + " --- Size = " + to_string(Size) +
-           ", Total = " + to_string(Total) + " , Max = " + to_string(Max) + " , Count = " + to_string(Count) + "\n";
-  };
-};  // class CLASS_STAT
-
 // other statistics
 class OPT_STAT {
  public:
@@ -115,19 +80,15 @@ class KEYS_SET {
   vector<int> KeyArray;
 
  public:
-  KEYS_SET() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_KEYS_SET].New();
-  };
+  KEYS_SET(){};
 
   KEYS_SET(int *array, int size) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_KEYS_SET].New();
     KeyArray.resize(size);
     for (int i = 0; i < size; i++) KeyArray[i] = array[i];
   }
 
   KEYS_SET(KEYS_SET &other)  // copy constructor
   {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_KEYS_SET].New();
     KeyArray = (other.KeyArray);
   };
 
@@ -137,9 +98,7 @@ class KEYS_SET {
     return *this;
   };
 
-  ~KEYS_SET() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_KEYS_SET].Delete();
-  };
+  ~KEYS_SET(){};
 
   // return FALSE if duplicate found, and don't add it to the ordered set.
   bool AddKey(string CollName, string KeyName);
@@ -370,24 +329,16 @@ class ATTR {
   float Max;     // max, min value
   float Min;
 
-  ATTR() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
-  };
+  ATTR(){};
 
   ATTR(const int attId, const float CuCard, const float min, const float max)
-      : AttId(attId), CuCard(CuCard), Min(min), Max(max) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
-  };
+      : AttId(attId), CuCard(CuCard), Min(min), Max(max){};
 
   ATTR(string range_var, int *atts, int size);
 
-  ATTR(ATTR &other) : AttId(other.AttId), CuCard(other.CuCard), Min(other.Min), Max(other.Max) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].New();
-  };
+  ATTR(ATTR &other) : AttId(other.AttId), CuCard(other.CuCard), Min(other.Min), Max(other.Max){};
 
-  ~ATTR() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR].Delete();
-  };
+  ~ATTR(){};
 
   string Dump();
   string attrDump();
@@ -421,14 +372,12 @@ class SCHEMA {
  public:
   // Make space for n attrs
   SCHEMA(int n) : Size(n) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SCHEMA].New();
     assert(Size >= 0);
     Attrs = new ATTR *[Size];
   };
 
   SCHEMA(SCHEMA &other) : Size(other.Size), TableNum(other.TableNum) {
     int i;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SCHEMA].New();
     assert(Size >= 0);
     Attrs = new ATTR *[Size];
     for (i = 0; i < Size; i++) Attrs[i] = new ATTR(*(other[i]));
@@ -512,9 +461,7 @@ class LOG_COLL_PROP : public LOG_PROP {
   vector<FOREIGN_KEY *> FKeyList;
 
   LOG_COLL_PROP(float card, float ucard, SCHEMA *schema, KEYS_SET *cand_keys = NULL)
-      : Card(card), UCard(ucard), Schema(schema), CandidateKey(cand_keys) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_COLL_PROP].New();
-  };
+      : Card(card), UCard(ucard), Schema(schema), CandidateKey(cand_keys){};
 
   /*	LOG_COLL_PROP(LOG_COLL_PROP & other) : Card(other.Card), UCard(other.UCard),
           Schema(other.Schema)
@@ -528,7 +475,6 @@ class LOG_COLL_PROP : public LOG_PROP {
     delete Schema;
     delete CandidateKey;
     for (int i = 0; i < FKeyList.size(); i++) delete FKeyList[i];
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_COLL_PROP].Delete();
   };
 
   string Dump();
@@ -545,13 +491,9 @@ class LOG_ITEM_PROP : public LOG_PROP {
 
  public:
   LOG_ITEM_PROP(float max, float min, float CuCard, float selectivity, KEYS_SET &freevars)
-      : Max(max), Min(min), CuCard(CuCard), Selectivity(selectivity), FreeVars(freevars) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_ITEM_PROP].New();
-  };
+      : Max(max), Min(min), CuCard(CuCard), Selectivity(selectivity), FreeVars(freevars){};
 
-  ~LOG_ITEM_PROP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOG_ITEM_PROP].Delete();
-  };
+  ~LOG_ITEM_PROP(){};
 
   string Dump() {
     string os;
@@ -595,7 +537,6 @@ class PHYS_PROP {
   PHYS_PROP(PHYS_PROP &other);
 
   ~PHYS_PROP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PHYS_PROP].Delete();
     if (Order != any) delete Keys;
     // if (Order == sorted) delete [] KeyOrder;
   }
@@ -632,17 +573,10 @@ class Cost {
   double Value;  // Later this may be a base class specialized
                  // to various costs: CPU, IO, etc.
  public:
-  Cost(double Number) : Value(Number) {
-    assert(Number == -1 || Number >= 0);
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].New();
-  };
-  Cost(Cost &other) : Value(other.Value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].New();
-  };
+  Cost(double Number) : Value(Number) { assert(Number == -1 || Number >= 0); };
+  Cost(Cost &other) : Value(other.Value){};
 
-  ~Cost() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COST].Delete();
-  };
+  ~Cost(){};
 
   // FinalCost() makes "this" equal to the total of local and input costs.
   //  It is an error if any input is null.
@@ -784,7 +718,6 @@ class CONT
   ~CONT() {
     delete UpperBd;
     delete ReqdPhys;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONT].Delete();
   };
 
   inline PHYS_PROP *GetPhysProp() { return (ReqdPhys); };
@@ -849,9 +782,6 @@ int GetAttId(string CollName, string AttName);
 int GetAttId(string Name);
 int GetIndId(string CollName, string IndName);
 int GetBitIndId(string CollName, string IndName);
-
-// dump the memory usage Statistics
-string DumpStatistics();
 
 // convert string to Domain type
 DOM_TYPE atoDomain(char *p);

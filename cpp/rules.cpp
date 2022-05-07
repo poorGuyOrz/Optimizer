@@ -117,7 +117,6 @@ BINDERY::BINDERY(int group_no, Expression *original)
       one_expr(false)  // try all expressions within this group
 {
   assert(original);
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 }  // BINDERY::BINDERY
 
 BINDERY::BINDERY(MExression *expr, Expression *original)
@@ -130,12 +129,10 @@ BINDERY::BINDERY(MExression *expr, Expression *original)
   group_no = expr->GetGrpID();
   assert(original);
 
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].New();
 
 }  // BINDERY::BINDERY
 
 BINDERY::~BINDERY() {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BINDERY].Delete();
 
   if (input != NULL) {
     for (int i = 0; i < original->GetOp()->GetArity(); i++) delete input[i];

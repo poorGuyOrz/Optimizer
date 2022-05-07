@@ -33,19 +33,13 @@ class ATTR_OP : public ItemOperator {
   int AttId;
 
  public:
-  ATTR_OP(int attid) : AttId(attid) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_OP].New();
-  };
+  ATTR_OP(int attid) : AttId(attid){};
 
-  ATTR_OP(ATTR_OP &Op) : AttId(Op.AttId) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_OP].New();
-  };
+  ATTR_OP(ATTR_OP &Op) : AttId(Op.AttId){};
 
   Operator *Clone() { return new ATTR_OP(*this); };
 
-  ~ATTR_OP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_OP].Delete();
-  };
+  ~ATTR_OP(){};
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
@@ -70,7 +64,6 @@ class ATTR_EXP : public ItemOperator {
 
   ATTR_EXP(ATTR_EXP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize) {
     AttNew = new ATTR(*Op.AttNew);
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_EXP].New();
   };
 
   Operator *Clone() { return new ATTR_EXP(*this); };
@@ -78,7 +71,6 @@ class ATTR_EXP : public ItemOperator {
   ~ATTR_EXP() {
     delete[] Atts;
     delete AttNew;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_ATTR_EXP].Delete();
   };
 
   // inline int Get_AttId() { return (AttNew->AttId); };
@@ -106,19 +98,13 @@ class CONST_INT_OP : public CONST_OP {
 
  public:
   // constructors for constant int
-  CONST_INT_OP(int value) : value(value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_INT_OP].New();
-  };
+  CONST_INT_OP(int value) : value(value){};
 
-  CONST_INT_OP(CONST_INT_OP &Op) : value(Op.value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_INT_OP].New();
-  };
+  CONST_INT_OP(CONST_INT_OP &Op) : value(Op.value){};
 
   Operator *Clone() { return new CONST_INT_OP(*this); };
 
-  ~CONST_INT_OP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_INT_OP].Delete();
-  };
+  ~CONST_INT_OP(){};
 
   inline int get_value() { return value; }
   inline int GetArity() { return (0); };
@@ -136,19 +122,13 @@ class CONST_STR_OP : public CONST_OP {
 
  public:
   // constructor for constant
-  CONST_STR_OP(string value) : value(value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].New();
-  };
+  CONST_STR_OP(string value) : value(value){};
 
-  CONST_STR_OP(CONST_STR_OP &Op) : value(Op.value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].New();
-  };
+  CONST_STR_OP(CONST_STR_OP &Op) : value(Op.value){};
 
   Operator *Clone() { return new CONST_STR_OP(*this); };
 
-  ~CONST_STR_OP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_STR_OP].Delete();
-  };
+  ~CONST_STR_OP(){};
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
@@ -169,19 +149,13 @@ class CONST_SET_OP : public CONST_OP {
 
  public:
   // constructor for constant
-  CONST_SET_OP(string value) : value(value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_SET_OP].New();
-  };
+  CONST_SET_OP(string value) : value(value){};
 
-  CONST_SET_OP(CONST_SET_OP &Op) : value(Op.value) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_SET_OP].New();
-  };
+  CONST_SET_OP(CONST_SET_OP &Op) : value(Op.value){};
 
   Operator *Clone() { return new CONST_SET_OP(*this); };
 
-  ~CONST_SET_OP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_CONST_SET_OP].Delete();
-  };
+  ~CONST_SET_OP(){};
 
   inline string get_value() { return value; }
   inline int GetArity() { return (0); };
@@ -223,19 +197,13 @@ class COMP_OP : public BOOLE_OP {
   COMP_OP_CODE op_code;
 
  public:
-  COMP_OP(COMP_OP_CODE op_code) : op_code(op_code) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].New();
-  };
+  COMP_OP(COMP_OP_CODE op_code) : op_code(op_code){};
 
-  COMP_OP(COMP_OP &Op) : op_code(Op.op_code) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].New();
-  };
+  COMP_OP(COMP_OP &Op) : op_code(Op.op_code){};
 
   Operator *Clone() { return new COMP_OP(*this); };
 
-  ~COMP_OP() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_COMP_OP].Delete();
-  };
+  ~COMP_OP(){};
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 

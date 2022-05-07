@@ -4,7 +4,6 @@
 
 Group::Group(MExression *MExpr)
     : GroupID(MExpr->GetGrpID()), FirstLogMExpr(MExpr), LastLogMExpr(MExpr), FirstPhysMExpr(NULL), LastPhysMExpr(NULL) {
-  if (!ForGlobalEpsPruning) ClassStat[C_GROUP].New();
 
   init_state();
 
@@ -74,7 +73,6 @@ Group::Group(MExression *MExpr)
 
 // free up memory
 Group::~Group() {
-  if (!ForGlobalEpsPruning) ClassStat[C_GROUP].Delete();
 
   delete LogProp;
   delete LowerBd;
@@ -95,9 +93,7 @@ Group::~Group() {
     mexpr = next;
   }
 
-#ifndef IRPROP
   for (int i = 0; i < Winners.size(); i++) delete Winners[i];
-#endif
 }
 
 // estimate the number of tables in EQJOIN
@@ -220,11 +216,6 @@ string Group::Dump() {
   // Print Winner's circle
   os += "Winners:\n";
 
-#ifdef IRPROP
-  os += M_WINNER::mc[GroupID]->Dump();
-  os += "\n";
-#else
-
   Size = Winners.size();
   PHYS_PROP *PhysProp;
   if (!Size) os += "\tNo Winners\n";
@@ -240,8 +231,6 @@ string Group::Dump() {
     os += (Winners[i]->GetDone() ? "Done" : "Not done");
     os += "\n";
   }
-#endif
-
   os += "LowerBound: " + LowerBd->Dump() + "\n";
 
   os += "log_prop: ";
@@ -270,9 +259,6 @@ void Group::FastDump() {
   // Print Winner's circle
   OutputFile << "Winners:" << endl;
 
-#ifdef IRPROP
-  OutputFile << "\t" << M_WINNER::mc[GroupID]->Dump() << endl;
-#else
   Size = Winners.size();
   PHYS_PROP *PhysProp;
   if (!Size) OutputFile << "\tNo Winners" << endl;
@@ -283,7 +269,6 @@ void Group::FastDump() {
     OutputFile << ", " << (Winners[i]->GetCost() ? Winners[i]->GetCost()->Dump() : "-1");
     OutputFile << ", " << (Winners[i]->GetDone() ? "Done" : "Not done") << endl;
   }
-#endif
 
   OutputFile << "LowerBound: " << LowerBd->Dump() << endl;
   OutputFile << "log_prop: " << (*LogProp).Dump();

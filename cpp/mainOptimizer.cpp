@@ -11,11 +11,7 @@ INT_ARRAY Conditions;
 int main(int argc, char const *argv[]) {
   OutputFile.open("../colout.txt");
   OutputCOVE.open("../script.cove");
-  for (int i = 0; i < CLASS_NUM; i++) {
-    ClassStat[i].Count = 0;
-    ClassStat[i].Max = 0;
-    ClassStat[i].Total = 0;
-  }
+
   GlobepsPruning = false;
   ForGlobalEpsPruning = false;
   OptStat = new OPT_STAT;
@@ -44,7 +40,6 @@ int main(int argc, char const *argv[]) {
   Ssp->Init();
   Ssp->FastDump();
 
-  cout << "ssp-->" << endl << Ssp->DumpHashTable() << endl;
   delete query;
 
   std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -54,14 +49,8 @@ int main(int argc, char const *argv[]) {
 
   Ssp->optimize();
 
-  cout << "class\t \tSize\tMemUse\tMax\tTotal\tCount" << endl;
-  for (size_t i = 0; i < CLASS_NUM; i++) {
-    cout << ClassStat[i].formatDump() << endl;
-  }
-
   std::chrono::duration<double, std::milli> diff = std::chrono::system_clock::now() - now;
   cout << "Optimization elapsed time:" << (diff).count() << "ms" << endl;
-  cout << "ssp-->" << endl << Ssp->DumpHashTable() << endl;
 
   PHYS_PROP *PhysProp = CONT::vc[0]->GetPhysProp();
   Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);

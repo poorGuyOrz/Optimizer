@@ -29,8 +29,6 @@ void SearchSpace::Init() {
 // free up memory
 SearchSpace::~SearchSpace() {
   for (int i = 0; i < Groups.size(); i++) delete Groups[i];
-  for (int j = 0; j < M_WINNER::mc.size(); j++) delete M_WINNER::mc[j];
-  M_WINNER::mc.clear();
   delete[] HashTbl;
 }
 
@@ -307,36 +305,6 @@ MExression *SearchSpace::CopyIn(Expression *Expr, int &GrpID) {
     if (GrpID >= Groups.size()) Groups.resize(GrpID + 1);
     Groups[GrpID] = group;
 
-#ifdef IRPROP
-
-    // For the topmost group and for the groups containing the item operator and constant
-    // operator, set the only physical property as any and bound INF
-    if (!win || GrpID == 0 || ((MExpr->GetOp())->is_const()) || ((MExpr->GetOp())->is_item())) {
-      M_WINNER *MWin = new M_WINNER(1);
-      M_WINNER::mc.SetAtGrow(GrpID, MWin);
-    } else {
-      KEYS_SET *tmpKeySet;
-
-      // get the relevant attributes from the schema for this group
-      tmpKeySet = (((LOG_COLL_PROP *)(group->get_log_prop()))->Schema)->AttrStore();
-      int ksize = tmpKeySet->size();
-
-      M_WINNER *MWin = new M_WINNER(ksize + 1);
-      for (int i = 1; i < ksize + 1; i++) {
-        int *Keys_Arr = tmpKeySet->CopyOutOne(i - 1);
-        KEYS_SET *MKeys_Set = new KEYS_SET(Keys_Arr, 1);
-        delete[] Keys_Arr;
-
-        PHYS_PROP *Prop = new PHYS_PROP(MKeys_Set, sorted);
-        Prop->KeyOrder.Add(ascending);
-        MWin->SetPhysProp(i, Prop);
-      }
-
-      delete tmpKeySet;
-      M_WINNER::mc.SetAtGrow(GrpID, MWin);
-    }
-#endif
-
   } else {
     group = GetGroup(GrpID);
 
@@ -354,9 +322,7 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
   // print the Winner's Operator and cost
   Group *ThisGroup = Ssp->GetGroup(GrpID);
 
-#ifndef IRPROP
   WINNER *ThisWinner;
-#endif
 
   MExression *WinnerMExpr;
   Operator *WinnerOp;
@@ -364,11 +330,7 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 
   // special case : it's a const group
   if (ThisGroup->GetFirstLogMExpr()->GetOp()->is_const()) {
-#ifdef IRPROP
-    WinnerMExpr = M_WINNER::mc[GrpID]->GetBPlan(PhysProp);
-#else
     WinnerMExpr = ThisGroup->GetFirstLogMExpr();
-#endif
     os = WinnerMExpr->Dump();
     os += ", Cost = 0\n";
     OUTPUTN(tabs, os);
@@ -376,14 +338,6 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 
   // It's an item group
   else if (ThisGroup->GetFirstLogMExpr()->GetOp()->is_item()) {
-#ifdef IRPROP
-    WinnerMExpr = M_WINNER::mc[GrpID]->GetBPlan(PhysProp);
-    if (WinnerMExpr == nullptr) {
-      os.Format("No optimal plan for group: %d with phys_prop: %s\n", GrpID, PhysProp->Dump());
-      OUTPUTN(tabs, os);
-      return;
-    }
-#else
     ThisWinner = ThisGroup->GetWinner(PhysProp);
 
     if (ThisWinner == nullptr) {
@@ -394,7 +348,6 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 
     assert(ThisWinner->GetDone());
     WinnerMExpr = ThisWinner->GetMPlan();
-#endif
     WinnerOp = WinnerMExpr->GetOp();
 
     os = WinnerMExpr->Dump();
@@ -402,11 +355,7 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 
     OUTPUTN(tabs, os);
 
-#ifdef IRPROP
-    Cost *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
-#else
     Cost *WinnerCost = ThisWinner->GetCost();
-#endif
     os = WinnerCost->Dump();
 
     OUTPUT(os);
@@ -421,7 +370,6 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
   // it's a normal group
   else {
     // First extract the winning expression for this property
-#ifndef IRPROP
     ThisWinner = ThisGroup->GetWinner(PhysProp);
 
     if (ThisWinner == nullptr) {
@@ -433,16 +381,6 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
     assert(ThisWinner->GetDone());
     WinnerMExpr = ThisWinner->GetMPlan();
 
-#else
-    WinnerMExpr = M_WINNER::mc[GrpID]->GetBPlan(PhysProp);
-    if (WinnerMExpr == nullptr) {
-      os.Format("No optimal plan for group: %d with phys_prop: %s\n", GrpID, PhysProp->Dump());
-      OUTPUTN(tabs, os);
-      return;
-    }
-
-#endif
-
     // Now extract the operator from the expression and write it to the output string
     //  along with   " cost = " .  Print output string to window.
     assert(WinnerMExpr != nullptr);
@@ -452,32 +390,21 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
     if (WinnerOp->GetName() == "QSORT") os += PhysProp->Dump();
     os += ", Cost = ";
 
-#ifndef _TABLE_
     if (!SingleLineBatch) OUTPUTN(tabs, os);
-#endif
 
-      // Extract cost of the winner, write it to the output string and
-      //  print output string to window.
-#ifndef IRPROP
+    // Extract cost of the winner, write it to the output string and
+    //  print output string to window.
     Cost *WinnerCost = ThisWinner->GetCost();
-#else
-    Cost *WinnerCost = M_WINNER::mc[GrpID]->GetUpperBd(PhysProp);
-#endif
     os = WinnerCost->Dump();
 
-#ifndef _TABLE_
     OUTPUT(os);
     if (SingleLineBatch)  // In this case we want only the total cost of the Winner
     {
       OUTPUT("\n");
       return;
     }
-#else
-    OUTPUT("\t%s\n", WinnerCost->Dump());
-#endif
 
     // Recursively print inputs
-#ifndef _TABLE_
     int Arity = WinnerOp->GetArity();
     PHYS_PROP *ReqProp;
     bool possible;
@@ -493,13 +420,10 @@ void SearchSpace::CopyOut(int GrpID, PHYS_PROP *PhysProp, int tabs) {
 
       delete ReqProp;
     }
-#endif
   }
 }  // SearchSpace::CopyOut()
 
-#ifdef FIRSTPLAN
 bool Group::firstplan = false;
-#endif
 
 /* bool Group::search_circle(CONT * C, bool & moresearch)
     {
@@ -521,43 +445,6 @@ bool Group::firstplan = false;
                     else if (*WCost < *CCost) //There might be a plan between WCost and CCost
                             Case (4)
 */
-
-#ifdef IRPROP
-//##ModelId=3B0C08670095
-bool Group::search_circle(int GrpNo, PHYS_PROP *PhysProp, bool &moreSearch) {
-  // check if there is a winner for property "any"
-  MExression *Winner = M_WINNER::mc[GrpNo]->GetBPlan(0);
-  if (Winner == nullptr)
-    moreSearch = true;  // group is not optimized, moreSearch needed
-  else
-    moreSearch = false;  // the group is completely optimized
-
-  Cost *CCost = new Cost(-1);
-  if (!moreSearch)  // group is optimized
-  {
-    MExression *MWin = M_WINNER::mc[GrpNo]->GetBPlan(PhysProp);
-    Cost *WinCost = M_WINNER::mc[GrpNo]->GetUpperBd(PhysProp);
-    if (MWin != nullptr) {
-      // winner's cost is within the context's bound
-      if (*CCost >= *WinCost) {
-        delete CCost;
-        return true;
-      } else {
-        delete CCost;
-        return false;
-      }
-    } else  // since the group is optimized, nullptr plan means winner not possible
-    {
-      delete CCost;
-      return false;
-    }
-  } else  // group not optimized
-  {
-    delete CCost;
-    return false;
-  }
-}
-#endif
 
 /* Group::search_circle
 Map between four cases (see header file) and the way they arise:
@@ -668,38 +555,13 @@ bool Group::CheckWinnerDone() {
 }  // Group::CheckWinnerDone
 
 WINNER::WINNER(MExression *MExpr, PHYS_PROP *PhysProp, Cost *cost, bool done)
-    : cost(cost), MPlan((MExpr == nullptr) ? nullptr : (new MExression(*MExpr))), PhysProp(PhysProp), Done(done) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_WINNER].New();
-};
-
-M_WINNER::M_WINNER(int S) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_M_WINNER].New();
-
-  wide = S;
-  PhysProp = new PHYS_PROP *[S];
-  Bound = new Cost *[S];
-  BPlan = new MExression *[S];
-
-  // set the first physical property as "any" for all groups
-  PhysProp[0] = new PHYS_PROP(any);
-
-  // set the cost to INF and plan to nullptr initially for all groups
-  for (int i = 0; i < S; i++) {
-    Bound[i] = new Cost(-1);
-    BPlan[i] = nullptr;
-  }
-};
-
-vector<M_WINNER *> M_WINNER::mc;
-Cost M_WINNER::InfCost(-1);
+    : cost(cost), MPlan((MExpr == nullptr) ? nullptr : (new MExression(*MExpr))), PhysProp(PhysProp), Done(done){};
 
 int TaskNo;
 int Memo_M_Exprs;
 
 void SearchSpace::optimize() {
-#ifdef FIRSTPLAN
   Ssp->GetGroup(0)->setfirstplan(false);
-#endif
 
   // Create initial context, with no requested properties, infinite upper bound,
   //  zero lower bound, not yet done.  Later this may be specified by user.
@@ -728,13 +590,12 @@ void SearchSpace::optimize() {
 
     PTRACE("------------------ OPEN after task " << TaskNo << ":");
     OutputFile << PTasks.Dump() << endl;
+
+    OutputFile << endl << DumpHashTable() << endl;
   }
 
   PTRACE("Optimizing completed: " << TaskNo << " tasks\n");
   OUTPUT("TotalTask : " << TaskNo);
-  OUTPUT("TotalGroup : " << ClassStat[C_GROUP].Count);
-  OUTPUT("CurrentMExpr : " << ClassStat[C_M_EXPR].Count);
-  OUTPUT("TotalMExpr : " << ClassStat[C_M_EXPR].Total);
   OUTPUT("TotalMExpr in MEMO: " << Memo_M_Exprs);
   OUTPUT(OptStat->Dump());
 }

@@ -9,7 +9,6 @@
 /*********** GET functions ****************/
 //##ModelId=3B0C087301FB
 GET::GET(int collId) : CollId(collId) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
   name = GetName() + GetCollName(CollId);  // for debug
 };
 
@@ -83,12 +82,10 @@ GET::GET(string collection, string rangeVar) {
     PTRACE("Catalog content after fixing CollId-based tables:" << endl << Cat->Dump());
   }
 
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
   name = GetName() + GetCollName(CollId);  // for debug
 }
 
 GET::GET(GET &Op) : CollId(Op.GetCollection()) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_GET].New();
   name = Op.name;  // for debug
 }
 
@@ -144,13 +141,11 @@ ub4 GET::hash() {
 
 /*********** EQJOIN functions ****************/
 EQJOIN::EQJOIN(int *lattrs, int *rattrs, int size) : lattrs(lattrs), rattrs(rattrs), size(size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].New();
   name = GetName();  // for debug
 };
 
 EQJOIN::EQJOIN(EQJOIN &Op)
     : lattrs(CopyArray(Op.lattrs, Op.size)), rattrs(CopyArray(Op.rattrs, Op.size)), size(Op.size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EQJOIN].New();
   name = Op.name;  // for debug
 };
 
@@ -422,12 +417,10 @@ ub4 DUMMY::hash() {
 /*********** PROJECT functions ****************/
 
 PROJECT::PROJECT(int *attrs, int size) : attrs(attrs), size(size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].New();
   name = GetName();  // for debug
 };
 
 PROJECT::PROJECT(PROJECT &Op) : attrs(CopyArray(Op.attrs, Op.size)), size(Op.size) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_PROJECT].New();
   name = Op.name;  // for debug
 };
 
@@ -493,12 +486,10 @@ string PROJECT::Dump() {
 }
 
 SELECT::SELECT() {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].New();
   name = GetName();  // for debug
 };
 
 SELECT::SELECT(SELECT &Op) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_SELECT].New();
   name = Op.name;  // for debug
 };
 
@@ -552,12 +543,10 @@ ub4 SELECT::hash() {
 string SELECT::Dump() { return GetName(); }
 
 RM_DUPLICATES::RM_DUPLICATES() {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].New();
   name = GetName();  // for debug
 };
 
 RM_DUPLICATES::RM_DUPLICATES(RM_DUPLICATES &Op) {
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_RM_DUPLICATES].New();
   name = Op.name;  // for debug
 };
 
@@ -588,17 +577,14 @@ LOG_PROP *RM_DUPLICATES::FindLogProp(LOG_PROP **input) {
 
 }  // RM_DUPLICATES::FindLogProp
 
-//##ModelId=3B0C0874033C
 ub4 RM_DUPLICATES::hash() {
   ub4 hashval = GetInitval();
 
   return (hashval % (HtblSize - 1));
 }
 
-//##ModelId=3B0C08740345
 string RM_DUPLICATES::Dump() { return GetName(); }
 
-//##ModelId=3B0C0875009D
 AGG_LIST::AGG_LIST(int *gby_atts, int gby_size, AGG_OP_ARRAY *agg_ops)
     : GbyAtts(gby_atts), GbySize(gby_size), AggOps(agg_ops) {
   // produce a flattened list
@@ -620,13 +606,6 @@ AGG_LIST::AGG_LIST(int *gby_atts, int gby_size, AGG_OP_ARRAY *agg_ops)
     FAttsSize = 0;
   }
 
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
-  if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_AGG_LIST].New();
   name = GetName();  // for debug
 }
 

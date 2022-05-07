@@ -74,8 +74,6 @@ class Expression {
   Expression(Operator *Op, Expression *First = nullptr, Expression *Second = nullptr, Expression *Third = nullptr,
              Expression *Fourth = nullptr)
       : Op(Op), arity(0) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
-
     if (First) arity++;
     if (Second) arity++;
     if (Third) arity++;
@@ -90,12 +88,9 @@ class Expression {
     }
   };
 
-  Expression(Operator *Op, Expression **inputs) : Op(Op), Inputs(inputs), arity(Op->GetArity()) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
-  };
+  Expression(Operator *Op, Expression **inputs) : Op(Op), Inputs(inputs), arity(Op->GetArity()){};
 
   Expression(Expression &Expr) : Op(Expr.GetOp()->Clone()), arity(Expr.GetArity()) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].New();
     if (arity) {
       Inputs = new Expression *[arity];
       for (int i = 0; i < arity; i++) Inputs[i] = new Expression(*(Expr.GetInput(i)));
@@ -103,8 +98,6 @@ class Expression {
   };
 
   ~Expression() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_EXPR].Delete();
-
     delete Op;
     if (arity) {
       for (int i = 0; i < arity; i++) delete Inputs[i];

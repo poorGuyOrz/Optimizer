@@ -29,13 +29,6 @@ void Optimizer() {
   OutputFile.open((AppDir + "/colout.txt"));
   OutputCOVE.open((AppDir + "/script.cove"));
 
-  // clean the statistics
-  for (int i = 0; i < CLASS_NUM; i++) {
-    ClassStat[i].Count = 0;
-    ClassStat[i].Max = 0;
-    ClassStat[i].Total = 0;
-  }
-
   // Create objects to manage Opt stats, Cost model, Rule set, Heuristic cost.
   OptStat = new OPT_STAT;
   costModel = new CostModel(CMFile);
@@ -136,17 +129,7 @@ void Optimizer() {
       {
         // reset the interesting queries & M_WINNERs, clean the statistics
         IntOrdersSet.reset();
-#ifdef IRPROP
-        // In PiggyBack mode remove the winners only when the first
-        // query in a batch is created,for the remaining queries read in keep
-        // the winners created for previous queries optimized
-        if ((PiggyBack && (0 == q)) || (!PiggyBack)) {
-          M_WINNER::mc.RemoveAll();
-        }
 
-#endif
-
-        for (int i = 0; i < CLASS_NUM; i++) ClassStat[i].Count = ClassStat[i].Max = ClassStat[i].Total = 0;
         OptStat->DupMExpr = OptStat->FiredRule = OptStat->HashedMExpr = 0;
         OptStat->MaxBucket = OptStat->TotalMExpr = 0;
         for (int RuleNum = 0; RuleNum < ruleSet->RuleCount; RuleNum++) {
@@ -243,7 +226,6 @@ void Optimizer() {
       for (double ii = 0; ii <= GLOBAL_EPS * 10; ii++) {
         OUTPUT("%3.1f\t", ii / 10);
         GlobalEpsBound = (*HeuristicCost) * ii / 10;
-        ClassStat[C_M_EXPR].Count = ClassStat[C_M_EXPR].Total = 0;
 #endif
 
         // Parse and print the query and its interesting orders
@@ -267,7 +249,6 @@ void Optimizer() {
         delete query;
 
         // Keep track of initial space and time
-        PTRACE("---1--- memory statistics before optimization: " << DumpStatistics());
         std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
         auto timet = chrono::system_clock::to_time_t(now);
 #ifndef _TABLE_
@@ -301,7 +282,6 @@ void Optimizer() {
         our query )
         */
         Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);
-        PTRACE("---2--- memory statistics after optimization: " << DumpStatistics());
         if (TraceFinalSSP) {
           Ssp->FastDump();
         } else {
@@ -319,7 +299,6 @@ void Optimizer() {
         // PiggyBack mode
         // else keep the search space for reuse
         if (!PiggyBack) delete Ssp;
-        PTRACE("---3--- memory statistics after freeing searching space: " << DumpStatistics());
 
         // OUTPUT Rule Set Statistics
 #ifndef _TABLE_

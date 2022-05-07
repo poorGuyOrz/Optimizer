@@ -22,9 +22,7 @@ class FILE_SCAN : public PhysicalOperator {
 
   inline Operator *Clone() { return new FILE_SCAN(*this); };
 
-  ~FILE_SCAN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILE_SCAN].Delete();
-  };
+  ~FILE_SCAN(){};
 
   Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
@@ -61,7 +59,6 @@ class LOOPS_JOIN : public PhysicalOperator {
   inline Operator *Clone() { return new LOOPS_JOIN(*this); };
 
   ~LOOPS_JOIN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
@@ -113,7 +110,6 @@ class LOOPS_INDEX_JOIN : public PhysicalOperator {
   inline Operator *Clone() { return new LOOPS_INDEX_JOIN(*this); };
 
   ~LOOPS_INDEX_JOIN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_LOOPS_INDEX_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
@@ -157,7 +153,6 @@ class MERGE_JOIN : public PhysicalOperator {
 
   //##ModelId=3B0C086F015D
   ~MERGE_JOIN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_MERGE_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
@@ -197,7 +192,6 @@ class HASH_JOIN : public PhysicalOperator {
 
   //##ModelId=3B0C086F0257
   ~HASH_JOIN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
@@ -235,10 +229,7 @@ class P_PROJECT : public PhysicalOperator {
   inline Operator *Clone() { return new P_PROJECT(*this); };
 
   //##ModelId=3B0C086F0366
-  ~P_PROJECT() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_PROJECT].Delete();
-    delete[] attrs;
-  };
+  ~P_PROJECT() { delete[] attrs; };
 
   //##ModelId=3B0C086F0367
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
@@ -266,17 +257,11 @@ class P_PROJECT : public PhysicalOperator {
 class FILTER : public PhysicalOperator {
  public:
   //##ModelId=3B0C08700033
-  FILTER() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].New();
-  };
+  FILTER(){};
   //##ModelId=3B0C0870003C
-  FILTER(FILTER &Op) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].New();
-  };
+  FILTER(FILTER &Op){};
   //##ModelId=3B0C0870003E
-  ~FILTER() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_FILTER].Delete();
-  };
+  ~FILTER(){};
 
   //##ModelId=3B0C08700046
   inline Operator *Clone() { return new FILTER(*this); };
@@ -316,9 +301,7 @@ class QSORT : public PhysicalOperator {
   inline Operator *Clone() { return new QSORT(*this); };
 
   //##ModelId=3B0C0870014B
-  ~QSORT() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_QSORT].Delete();
-  };
+  ~QSORT(){};
 
   //##ModelId=3B0C0870014C
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
@@ -340,21 +323,15 @@ class QSORT : public PhysicalOperator {
 class HASH_DUPLICATES : public PhysicalOperator {
  public:
   //##ModelId=3B0C08700227
-  HASH_DUPLICATES() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].New();
-  };
+  HASH_DUPLICATES(){};
   //##ModelId=3B0C08700228
-  HASH_DUPLICATES(HASH_DUPLICATES &Op) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].New();
-  };
+  HASH_DUPLICATES(HASH_DUPLICATES &Op){};
 
   //##ModelId=3B0C08700231
   inline Operator *Clone() { return new HASH_DUPLICATES(*this); };
 
   //##ModelId=3B0C08700232
-  ~HASH_DUPLICATES() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HASH_DUPLICATES].Delete();
-  };
+  ~HASH_DUPLICATES(){};
 
   //##ModelId=3B0C0870023B
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
@@ -387,9 +364,7 @@ class HGROUP_LIST : public PhysicalOperator {
  public:
   //##ModelId=3B0C0870037B
   HGROUP_LIST(int *gby_atts, int gby_size, AGG_OP_ARRAY *agg_ops)
-      : GbyAtts(gby_atts), GbySize(gby_size), AggOps(agg_ops) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HGROUP_LIST].New();
-  };
+      : GbyAtts(gby_atts), GbySize(gby_size), AggOps(agg_ops){};
 
   //##ModelId=3B0C08700387
   HGROUP_LIST(HGROUP_LIST &Op) : GbyAtts(CopyArray(Op.GbyAtts, Op.GbySize)), GbySize(Op.GbySize) {
@@ -398,7 +373,6 @@ class HGROUP_LIST : public PhysicalOperator {
     for (int i = 0; i < Op.AggOps->size(); i++) {
       (*AggOps)[i] = new AGG_OP(*(*Op.AggOps)[i]);
     }
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HGROUP_LIST].New();
   };
 
   inline Operator *Clone() { return new HGROUP_LIST(*this); };
@@ -408,7 +382,6 @@ class HGROUP_LIST : public PhysicalOperator {
     for (int i = 0; i < AggOps->size(); i++) delete (*AggOps)[i];
     delete AggOps;
     delete[] GbyAtts;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_HGROUP_LIST].Delete();
   };
 
   //##ModelId=3B0C087003A3
@@ -440,23 +413,16 @@ class P_FUNC_OP : public PhysicalOperator {
   int AttsSize;
 
   //##ModelId=3B0C087100FC
-  P_FUNC_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_FUNC_OP].New();
-  };
+  P_FUNC_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size){};
 
   //##ModelId=3B0C08710109
-  P_FUNC_OP(P_FUNC_OP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize) {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_FUNC_OP].New();
-  };
+  P_FUNC_OP(P_FUNC_OP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize){};
 
   //##ModelId=3B0C08710111
   inline Operator *Clone() { return new P_FUNC_OP(*this); };
 
   //##ModelId=3B0C0871011A
-  ~P_FUNC_OP() {
-    delete[] Atts;
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_P_FUNC_OP].Delete();
-  };
+  ~P_FUNC_OP() { delete[] Atts; };
 
   //##ModelId=3B0C0871011B
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
@@ -502,7 +468,6 @@ class BIT_JOIN : public PhysicalOperator {
 
   //##ModelId=3B0C087102D3
   ~BIT_JOIN() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_BIT_JOIN].Delete();
     delete[] lattrs;
     delete[] rattrs;
   };
@@ -535,9 +500,7 @@ class INDEXED_FILTER : public PhysicalOperator {
  public:
   INDEXED_FILTER(const int fileId);
   INDEXED_FILTER(INDEXED_FILTER &Op);
-  ~INDEXED_FILTER() {
-    if (TraceOn && !ForGlobalEpsPruning) ClassStat[C_INDEXED_FILTER].Delete();
-  };
+  ~INDEXED_FILTER(){};
 
   inline Operator *Clone() { return new INDEXED_FILTER(*this); };
 
