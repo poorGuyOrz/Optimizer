@@ -21,8 +21,8 @@ double TouchCopyCost(LOG_COLL_PROP *LogProp) {
   // from A2 -- An-1 , means excluding the min and max cucard(i)
   double Min = 3.4E+38;
   double Max = 0;
-  for (int i = 0; i < LogProp->Schema->GetTableNum(); i++) {
-    float CuCard = LogProp->Schema->GetTableMaxCuCard(i);
+  for (int i = 0; i < LogProp->schema->GetTableNum(); i++) {
+    float CuCard = LogProp->schema->GetTableMaxCuCard(i);
     if (Min > CuCard) Min = CuCard;
     if (Max < CuCard) Max = CuCard;
     Total += CuCard;
@@ -44,9 +44,9 @@ double TouchCopyCost(LOG_COLL_PROP *LogProp) {
 double FetchingCost(LOG_COLL_PROP *LogProp) {
   double Total = 0;
 
-  for (int i = 0; i < LogProp->Schema->GetTableNum(); i++) {
-    float CuCard = LogProp->Schema->GetTableMaxCuCard(i);
-    float Width = LogProp->Schema->GetTableWidth(i);
+  for (int i = 0; i < LogProp->schema->GetTableNum(); i++) {
+    float CuCard = LogProp->schema->GetTableMaxCuCard(i);
+    float Width = LogProp->schema->GetTableWidth(i);
     Total += ceil(CuCard * Width) * (costModel->cpu_read() +  // cpu cost of reading from disk
                                      costModel->io());        // i/o cost of reading from disk
   }
@@ -63,7 +63,7 @@ FILE_SCAN::FILE_SCAN(FILE_SCAN &Op) : FileId(Op.GetFileId()) {
 }
 
 PHYS_PROP *FILE_SCAN::FindPhysProp(PHYS_PROP **input_phys_props) {
-  COLL_PROP *CollProp = Cat->GetCollProp(FileId);
+  CollectionsProperties *CollProp = Cat->GetCollProp(FileId);
 
   if (CollProp->Order == any) {
     return new PHYS_PROP(any);
@@ -77,7 +77,7 @@ PHYS_PROP *FILE_SCAN::FindPhysProp(PHYS_PROP **input_phys_props) {
 
 Cost *FILE_SCAN::FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp) {
   float Card = ((LOG_COLL_PROP *)LocalLogProp)->Card;
-  float Width = ((LOG_COLL_PROP *)LocalLogProp)->Schema->GetTableWidth(0);
+  float Width = ((LOG_COLL_PROP *)LocalLogProp)->schema->GetTableWidth(0);
   // cost = 表体积 * 读取cost
   Cost *Result = new Cost(ceil(Card * Width) * (costModel->cpu_read() +  // cpu cost of reading from disk
                                                 costModel->io())         // i/o cost of reading from disk
@@ -117,7 +117,7 @@ PHYS_PROP *LOOPS_JOIN::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp
   {
     if (InputNo == 0)  // left input's schema should include the prop keys
     {
-      if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+      if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
         possible = false;
         return nullptr;
       }
@@ -181,7 +181,7 @@ PHYS_PROP *PDUMMY::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, in
   {
     if (InputNo == 0)  // left input's schema should include the prop keys
     {
-      if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+      if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
         possible = false;
         return NULL;
       }
@@ -241,7 +241,7 @@ PHYS_PROP *LOOPS_INDEX_JOIN::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputL
   {
     if (InputNo == 0)  // left input's schema should include the prop keys
     {
-      if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+      if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
         possible = false;
         return NULL;
       }
@@ -428,7 +428,7 @@ PHYS_PROP *HASH_JOIN::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp,
   {
     if (InputNo == 0)  // left input's schema should include the prop keys
     {
-      if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+      if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
         possible = false;
         return NULL;
       }
@@ -477,7 +477,7 @@ PHYS_PROP *FILTER::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, in
   {
     if (InputNo == 0)  // left input's schema should include the prop keys
     {
-      if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+      if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
         possible = false;
         return NULL;
       }
@@ -522,7 +522,7 @@ PHYS_PROP *P_PROJECT::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp,
   {
     if (InputNo == 0)  // left input's schema should include the prop keys
     {
-      if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+      if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
         possible = false;
         return NULL;
       }
@@ -590,7 +590,7 @@ PHYS_PROP *QSORT::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int
 
   if (PhysProp->GetOrder() == sorted) {
     // check the keys
-    if (((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys))
+    if (((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys))
       possible = true;
     else
       possible = false;
@@ -772,7 +772,7 @@ PHYS_PROP *BIT_JOIN::InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, 
 
   if (PhysProp->GetOrder() != any)  // If specific output property is required
   {
-    if (!((LOG_COLL_PROP *)InputLogProp)->Schema->Contains(PhysProp->Keys)) {
+    if (!((LOG_COLL_PROP *)InputLogProp)->schema->Contains(PhysProp->Keys)) {
       possible = false;
       return NULL;
     }

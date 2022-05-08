@@ -4,45 +4,20 @@
 
 #include "../header/stdafx.h"  // general definitions
 
-class SET_TRACE;  // set trace flag
-class OPT_STAT;   // opt statistics
+class OPT_STAT;  // opt statistics
 
 // Properties of stored objects, including physical and logical properties.
-class COLL_PROP;  // Collections
-class IND_PROP;   // Indexes
+class CollectionsProperties;  // Collections
+class IndexProperties;        // Indexes
 
-class ATTR;           // Attribute
-class SCHEMA;         // Includes a set of attributes, some may be equivalent
+class Attribute;      // Attribute
+class Schema;         // Includes a set of attributes, some may be equivalent
 class LOG_PROP;       // Abstract class of logical properties.
 class LOG_COLL_PROP;  // For collection types
 class LOG_ITEM_PROP;  // For items (predicates)
 class PHYS_PROP;      // Physical Properties
 class CONT;           // Context: Conditions/Constraints on a search
 class Cost;           // Cost of a physical operator or expression
-
-// This class manages tracing.
-// SET_TRACE(false) turns off tracing until the function exits, similar for on.
-class SET_TRACE {
- private:
-  bool OldTrace;
-
- public:
-  SET_TRACE(bool DoTrace) {
-    TraceDepth++;
-    OldTrace = TraceOn;
-    if (!WindowTrace && !FileTrace) {
-      TraceOn = false;
-      return;
-    }
-
-    TraceOn = DoTrace;
-  }
-
-  ~SET_TRACE() {
-    TraceDepth--;
-    TraceOn = OldTrace;  // default is false, no trace
-  }
-};  // class SET_TRACE
 
 // other statistics
 class OPT_STAT {
@@ -209,11 +184,11 @@ class FOREIGN_KEY {
 
 /*
 ============================================================
-PROPERTIES OF STORED OBJECTS- classes COLL_PROP, ATT_PROP and IND_PROP
+PROPERTIES OF STORED OBJECTS- classes CollectionsProperties, ATT_PROP and IndexProperties
 ============================================================
 */
 // Properties of Stored Collections
-class COLL_PROP {
+class CollectionsProperties {
  public:
   // Logical Properties
   float Card;   // Cardinality
@@ -221,7 +196,7 @@ class COLL_PROP {
   float Width;  // width of the table, fraction of a block
 
   // Beware - this does not delete *Keys.
-  COLL_PROP &operator=(COLL_PROP &other)  //  = operator
+  CollectionsProperties &operator=(CollectionsProperties &other)  //  = operator
   {
     Keys = new KEYS_SET(*other.Keys);
     CandidateKey = new KEYS_SET(*other.CandidateKey);
@@ -251,12 +226,12 @@ class COLL_PROP {
   vector<FOREIGN_KEY *> FKeyArray;
 
   // initialize member with -1, i.e.,not known
-  COLL_PROP() : Card(-1), UCard(-1){};
+  CollectionsProperties() : Card(-1), UCard(-1){};
 
   // Transform all keys in the properties to new name
   void update(string NewName);
 
-  ~COLL_PROP() {
+  ~CollectionsProperties() {
     delete Keys;
     delete CandidateKey;
     for (int i = 0; i < FKeyArray.size(); i++) delete FKeyArray[i];
@@ -265,19 +240,19 @@ class COLL_PROP {
   string Dump();
 
   // copy constructor
-  COLL_PROP(COLL_PROP &other);
+  CollectionsProperties(CollectionsProperties &other);
 
   // store the foreign key strings, translated to foreign keys at the end of CAT
   STRING_ARRAY ForeignKeyString;
 };
 
 // Index Properties
-class IND_PROP {
+class IndexProperties {
  public:
-  IND_PROP(){};
-  ~IND_PROP() { delete Keys; };
+  IndexProperties(){};
+  ~IndexProperties() { delete Keys; };
 
-  IND_PROP &operator=(IND_PROP &other)  //  = operator
+  IndexProperties &operator=(IndexProperties &other)  //  = operator
   {
     Keys = new KEYS_SET(*other.Keys);
     IndType = other.IndType;
@@ -295,7 +270,7 @@ class IND_PROP {
 };
 
 // Bit Index Properties
-class BIT_IND_PROP {
+class BitIndexProperties {
  public:
   KEYS_SET *BitAttr;     // attributes for which all values are bit indexed
   int IndexAttr;         // indexing attributes -- this is the key of the table
@@ -304,11 +279,11 @@ class BIT_IND_PROP {
                          //  attibute keys
   string BitPredString;  // assume store the index for each predicate separately
   string IndexAttrString;
-  BIT_IND_PROP(){};
-  ~BIT_IND_PROP() { delete BitAttr; };
+  BitIndexProperties(){};
+  ~BitIndexProperties() { delete BitAttr; };
   void update(string NewName);
   string Dump();
-  BIT_IND_PROP &operator=(BIT_IND_PROP &other)  //  = operator
+  BitIndexProperties &operator=(BitIndexProperties &other)  //  = operator
   {
     BitAttr = new KEYS_SET(*other.BitAttr);
     IndexAttr = other.IndexAttr;
@@ -318,37 +293,37 @@ class BIT_IND_PROP {
 
 /*
 ============================================================
-ATTR - Attribute
+Attribute - Attribute
 ============================================================
 */
 
-class ATTR {
+class Attribute {
  public:
   int AttId;
   float CuCard;  // cardinality
   float Max;     // max, min value
   float Min;
 
-  ATTR(){};
+  Attribute(){};
 
-  ATTR(const int attId, const float CuCard, const float min, const float max)
+  Attribute(const int attId, const float CuCard, const float min, const float max)
       : AttId(attId), CuCard(CuCard), Min(min), Max(max){};
 
-  ATTR(string range_var, int *atts, int size);
+  Attribute(string range_var, int *atts, int size);
 
-  ATTR(ATTR &other) : AttId(other.AttId), CuCard(other.CuCard), Min(other.Min), Max(other.Max){};
+  Attribute(Attribute &other) : AttId(other.AttId), CuCard(other.CuCard), Min(other.Min), Max(other.Max){};
 
-  ~ATTR(){};
+  ~Attribute(){};
 
   string Dump();
   string attrDump();
   string DumpCOVE();
 
-};  // class ATTR
+};  // class Attribute
 
 /*
    ============================================================
-   SCHEMA - Structure of a Group: attributes and their properties
+   Schema - Structure of a Group: attributes and their properties
    ============================================================
 */
 
@@ -359,10 +334,10 @@ class ATTR {
 // An attribute is represented by a path name plus the name of the attribute,
 // e.g. Emp plus age.
 
-class SCHEMA {
+class Schema {
  private:
-  ATTR **Attrs;  // Attributes
-  int Size;      // number of the attrs
+  Attribute **Attrs;  // Attributes
+  int Size;           // number of the attrs
 
  public:
   int *TableId;  // Base tables appearing in this schema - used for calculating Max cucards
@@ -371,24 +346,24 @@ class SCHEMA {
 
  public:
   // Make space for n attrs
-  SCHEMA(int n) : Size(n) {
+  Schema(int n) : Size(n) {
     assert(Size >= 0);
-    Attrs = new ATTR *[Size];
+    Attrs = new Attribute *[Size];
   };
 
-  SCHEMA(SCHEMA &other) : Size(other.Size), TableNum(other.TableNum) {
+  Schema(Schema &other) : Size(other.Size), TableNum(other.TableNum) {
     int i;
     assert(Size >= 0);
-    Attrs = new ATTR *[Size];
-    for (i = 0; i < Size; i++) Attrs[i] = new ATTR(*(other[i]));
+    Attrs = new Attribute *[Size];
+    for (i = 0; i < Size; i++) Attrs[i] = new Attribute(*(other[i]));
     TableId = new int[TableNum];
     for (i = 0; i < TableNum; i++) TableId[i] = other.GetTableId(i);
   }
 
-  ~SCHEMA();
+  ~Schema();
 
   // return FALSE if duplicate found
-  bool AddAttr(int Index, ATTR *attr);
+  bool AddAttr(int Index, Attribute *attr);
 
   // return true if the attr is in the schema
   bool InSchema(int AttId);
@@ -397,13 +372,13 @@ class SCHEMA {
   bool Contains(KEYS_SET *Keys);
 
   // 	projection of attrs onto schema
-  SCHEMA *projection(int *attrs, int size);
+  Schema *projection(int *attrs, int size);
 
   // union the schema of the joined collection
-  SCHEMA *UnionSchema(SCHEMA *other);
+  Schema *UnionSchema(Schema *other);
 
   // return the nth attr in the schema
-  inline ATTR *operator[](int n) { return Attrs[n]; }
+  inline Attribute *operator[](int n) { return Attrs[n]; }
 
   inline int GetSize() { return Size; }
 
@@ -425,7 +400,7 @@ class SCHEMA {
   string Dump();
   string DumpCOVE();
 
-};  // class SCHEMA
+};  // class Schema
 
 /*
    ============================================================
@@ -453,15 +428,15 @@ class LOG_COLL_PROP : public LOG_PROP {
  public:
   const float Card;      // Cardinality
   const float UCard;     // Unique Cardinality
-  SCHEMA *const Schema;  // schema includes the column unique
+  Schema *const schema;  // schema includes the column unique
   // cardinalities
 
   KEYS_SET *CandidateKey;  // candidate key
 
   vector<FOREIGN_KEY *> FKeyList;
 
-  LOG_COLL_PROP(float card, float ucard, SCHEMA *schema, KEYS_SET *cand_keys = NULL)
-      : Card(card), UCard(ucard), Schema(schema), CandidateKey(cand_keys){};
+  LOG_COLL_PROP(float card, float ucard, Schema *schema, KEYS_SET *cand_keys = NULL)
+      : Card(card), UCard(ucard), schema(schema), CandidateKey(cand_keys){};
 
   /*	LOG_COLL_PROP(LOG_COLL_PROP & other) : Card(other.Card), UCard(other.UCard),
           Schema(other.Schema)
@@ -472,7 +447,7 @@ class LOG_COLL_PROP : public LOG_PROP {
   */
 
   ~LOG_COLL_PROP() {
-    delete Schema;
+    delete schema;
     delete CandidateKey;
     for (int i = 0; i < FKeyList.size(); i++) delete FKeyList[i];
   };
@@ -725,8 +700,7 @@ class CONT
   inline void SetPhysProp(PHYS_PROP *RP) { ReqdPhys = RP; };
 
   string Dump() {
-    return "Prop: " + ReqdPhys->Dump() + ", UB: " + UpperBd->Dump();
-    //		os.Format("Prop: %s, UB: %s", ReqdPhys==NULL ? "ANY" : ReqdPhys->Dump(), UpperBd->Dump() );
+    return "Prop: " + ReqdPhys->Dump() + ", UpperBd: " + UpperBd->Dump() + ", Finished:" + to_string(Finished);
   }
 
   // set the flag if the context is done, means we completed the search,

@@ -24,7 +24,7 @@ refers to two different attribute types:
            the array of attributes (of type 2.a) used in the expression.
 
 Goetz used ATTR_OP for 1 and 2a.
-In Columbia, ATTR_OP is 1, ATTR is 2.a, and ATTR_EXP is 2.b .
+In Columbia, ATTR_OP is 1, Attribute is 2.a, and ATTR_EXP is 2.b .
 */
 
 // ATTR_OP represents the value of an attribute, as in emp.age < 40
@@ -49,7 +49,7 @@ class ATTR_OP : public ItemOperator {
   inline bool is_const() { return true; };
   inline Cost *get_cost() { return new Cost(0); };
 
-  string Dump() { return "ATTR(" + GetAttName(AttId) + ")"; }
+  string Dump() { return "Attribute(" + GetAttName(AttId) + ")"; }
 };
 
 class ATTR_EXP : public ItemOperator {
@@ -57,13 +57,13 @@ class ATTR_EXP : public ItemOperator {
   string RangeVar;
   int *Atts;
   int AttsSize;
-  ATTR *AttNew;
+  Attribute *AttNew;
 
  public:
   ATTR_EXP(string range_var, int *atts, int size);
 
   ATTR_EXP(ATTR_EXP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize) {
-    AttNew = new ATTR(*Op.AttNew);
+    AttNew = new Attribute(*Op.AttNew);
   };
 
   Operator *Clone() { return new ATTR_EXP(*this); };
@@ -78,7 +78,7 @@ class ATTR_EXP : public ItemOperator {
   inline int *GetAtts() { return (Atts); };
   inline int GetAttsSize() { return (AttsSize); };
   inline string GetRangeVar() { return (RangeVar); };
-  inline ATTR *GetAttNew() { return (AttNew); };
+  inline Attribute *GetAttNew() { return (AttNew); };
   inline string GetName() { return ("ATTR_EXP"); };
 
   string Dump();

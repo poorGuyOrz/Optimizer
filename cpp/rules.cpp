@@ -117,7 +117,7 @@ BINDERY::BINDERY(int group_no, Expression *original)
       one_expr(false)  // try all expressions within this group
 {
   assert(original);
-}  // BINDERY::BINDERY
+}
 
 BINDERY::BINDERY(MExression *expr, Expression *original)
     : state(start),
@@ -128,12 +128,9 @@ BINDERY::BINDERY(MExression *expr, Expression *original)
 {
   group_no = expr->GetGrpID();
   assert(original);
-
-
-}  // BINDERY::BINDERY
+}
 
 BINDERY::~BINDERY() {
-
   if (input != NULL) {
     for (int i = 0; i < original->GetOp()->GetArity(); i++) delete input[i];
     delete[] input;
@@ -180,7 +177,7 @@ Expression *BINDERY::extract_expr() {
   }  // general invocation of new Expression
 
   return result;
-}  // BINDERY::extract_expr
+}
 
 /*
     Function BINDERY::advance() walks the many trees embedded in the
@@ -597,20 +594,15 @@ bool EQ_TO_LOOPS_INDEX::condition(Expression *before, MExression *mexpr, int Con
 
 }  // EQ_TO_LOOPS_INDEX::condition
 
-/*
-  Rule  EQJOIN  -> MERGE JOIN
-  ====  ======  == ===== ====
-*/
-
+// Rule  EQJOIN  -> MERGE JOIN
 EQ_TO_MERGE::EQ_TO_MERGE()
     : RULE(
           "EQJOIN -> MERGE_JOIN", 2,
           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
           new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                          new Expression(new LeafOperator(1)))) {
-  // set rule index
   set_index(R_EQ_TO_MERGE);
-}  // EQ_TO_MERGE::EQ_TO_MERGE
+}
 
 int EQ_TO_MERGE::promise(Operator *op_arg, int ContextID) {
   // if the merge-join attributes set is empty, don't fire this rule
@@ -632,7 +624,7 @@ Expression *EQ_TO_MERGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp
                           new Expression(*(before->GetInput(1))));
 
   return (result);
-}  // EQ_TO_MERGE::next_substitute
+}
 
 #ifdef CONDPRUNE
 // Is the plan a goner because an input is group pruned?
@@ -787,7 +779,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   LeafOperator *B = (LeafOperator *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
-  SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
+  Schema *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->schema;
 
   // See where second join predicates of antecedent go
   for (i = 0; i < size2; i++) {
@@ -810,7 +802,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   LeafOperator *C = (LeafOperator *)(before->GetInput(1)->GetOp());
   group_no = C->GetGroup();
   group = Ssp->GetGroup(group_no);
-  SCHEMA *Cs_schema = ((LOG_COLL_PROP *)group->get_log_prop())->Schema;
+  Schema *Cs_schema = ((LOG_COLL_PROP *)group->get_log_prop())->schema;
 
   // check that first join is legal
   for (i = 0; i < nsize1; i++) {
@@ -822,7 +814,7 @@ Expression *EQJOIN_LTOR::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   LeafOperator *A = (LeafOperator *)(AB->GetInput(0)->GetOp());
   group_no = A->GetGroup();
   group = Ssp->GetGroup(group_no);
-  SCHEMA *As_schema = ((LOG_COLL_PROP *)group->get_log_prop())->Schema;
+  Schema *As_schema = ((LOG_COLL_PROP *)group->get_log_prop())->schema;
 
   // Check (mostly) that second join is legal
   for (i = 0; i < nsize2; i++) {
@@ -892,7 +884,7 @@ bool EQJOIN_LTOR::condition(Expression *before, MExression *mexpr, int ContextID
   LeafOperator *B = (LeafOperator *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
-  SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
+  Schema *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->schema;
 
   // See where second join predicates of antecedent go
   for (i = 0; i < size2; i++) {
@@ -989,7 +981,7 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
-  SCHEMA *Bs_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
+  Schema *Bs_schema = ((LOG_COLL_PROP *)LogProp)->schema;
 
   // See where second join predicates of antecedent go
   for (i = 0; i < size2; i++) {
@@ -1017,7 +1009,7 @@ Expression *EQJOIN_RTOL::next_substitute(Expression *before, PHYS_PROP *ReqdProp
   group_no = C->GetGroup();
   group = Ssp->GetGroup(group_no);
   LogProp = group->get_log_prop();
-  SCHEMA *Cs_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
+  Schema *Cs_schema = ((LOG_COLL_PROP *)LogProp)->schema;
 
   // Check (mostly) that second join is legal
   for (i = 0; i < nsize2; i++) {
@@ -1087,7 +1079,7 @@ bool EQJOIN_RTOL::condition(Expression *before, MExression *mexpr, int ContextID
   LeafOperator *B = (LeafOperator *)(AB->GetInput(1)->GetOp());
   int group_no = B->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
-  SCHEMA *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
+  Schema *Bs_schema = ((LOG_COLL_PROP *)(group->get_log_prop()))->Schema;
 
   // See where second join predicates of antecedent go
   for (i = 0; i < size2; i++) {
@@ -1214,7 +1206,7 @@ Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   int group_no = AA->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
-  SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
+  Schema *AAA = ((LOG_COLL_PROP *)log_prop)->schema;
 
   // Get schema for C
   Expression *CD = before->GetInput(1);
@@ -1222,7 +1214,7 @@ Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   group_no = CC->GetGroup();
   group = Ssp->GetGroup(group_no);
   log_prop = group->get_log_prop();
-  SCHEMA *CCC = ((LOG_COLL_PROP *)log_prop)->Schema;
+  Schema *CCC = ((LOG_COLL_PROP *)log_prop)->schema;
 
   // If a pair of attributes in (lattrs1,rattrs1), is in (A,C),
   // then the pair should be in (nlattrs2,nrattrs2).
@@ -1349,7 +1341,7 @@ bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
   int group_no = AA->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *log_prop = group->get_log_prop();
-  SCHEMA *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
+  Schema *AAA = ((LOG_COLL_PROP *)log_prop)->Schema;
 
   // Get schema for C
   Expression *CD = before->GetInput(1);
@@ -1357,7 +1349,7 @@ bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
   group_no = CC->GetGroup();
   group = Ssp->GetGroup(group_no);
   log_prop = group->get_log_prop();
-  SCHEMA *CCC = ((LOG_COLL_PROP *)log_prop)->Schema;
+  Schema *CCC = ((LOG_COLL_PROP *)log_prop)->Schema;
 
   // If a pair of attributes in (lattrs1,rattrs1), is in (A,C),
   // then the pair should be in (nlattrs2,nrattrs2).
@@ -1454,7 +1446,7 @@ Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   int group_no = A->GetGroup();
   Group *group = Ssp->GetGroup(group_no);
   LOG_PROP *LogProp = group->get_log_prop();
-  SCHEMA *As_schema = ((LOG_COLL_PROP *)LogProp)->Schema;
+  Schema *As_schema = ((LOG_COLL_PROP *)LogProp)->schema;
 
   /*
    * Check that project list is in incoming schema
@@ -1631,7 +1623,7 @@ Expression *AGG_THRU_EQJOIN::next_substitute(Expression *before, PHYS_PROP *Reqd
   int r_gid = r_op->GetGroup();
   Group *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
-  SCHEMA *right_schema = r_prop->Schema;
+  Schema *right_schema = r_prop->schema;
 
   // new_gby = (gby^right_schema) u ratts
   int new_gby_size = 0;
@@ -1682,7 +1674,7 @@ bool AGG_THRU_EQJOIN::condition(Expression *before, MExression *mexpr, int Conte
   int r_gid = r_op->GetGroup();
   Group *r_group = Ssp->GetGroup(r_gid);
   LOG_COLL_PROP *r_prop = (LOG_COLL_PROP *)r_group->get_log_prop();
-  SCHEMA *right_schema = r_prop->Schema;
+  Schema *right_schema = r_prop->schema;
   // get candidatekey of the left input
   LeafOperator *l_op = (LeafOperator *)before->GetInput(0)->GetInput(0)->GetOp();
   int l_gid = l_op->GetGroup();

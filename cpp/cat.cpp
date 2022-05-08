@@ -25,10 +25,10 @@ CAT::CAT(string filename) {
   char TextLine[LINEWIDTH];  // text line buffer
   char *p;
 
-  COLL_PROP *CollProp;
-  ATTR *Attribute;
-  IND_PROP *Index;
-  BIT_IND_PROP *BitIndexProp;
+  CollectionsProperties *CollProp;
+  Attribute *attribute;
+  IndexProperties *Index;
+  BitIndexProperties *BitIndexProp;
 
   string CollName;
   string AttrName;
@@ -67,7 +67,7 @@ CAT::CAT(string filename) {
         AddColl(CollName, CollProp);
       }
 
-      CollProp = new COLL_PROP;
+      CollProp = new CollectionsProperties;
 
       p += strlen(KEYWORD_COLLNAME);
       // Add to BULK_PROP map
@@ -185,14 +185,14 @@ CAT::CAT(string filename) {
 
         if (IsCommentOrBlankLine(TextLine)) continue;
 
-        Attribute = new ATTR;
+        attribute = new Attribute;
         DOM_TYPE domain;
-        parseAttribute(TextLine, AttrName, Attribute, domain);
+        parseAttribute(TextLine, AttrName, attribute, domain);
 
         i++;
 
         // add to catalog
-        AddAttr(CollName, AttrName, Attribute, domain);
+        AddAttr(CollName, AttrName, attribute, domain);
       }
       continue;
     }
@@ -211,7 +211,7 @@ CAT::CAT(string filename) {
 
         if (IsCommentOrBlankLine(TextLine)) continue;
 
-        Index = new IND_PROP;
+        Index = new IndexProperties;
         parseIndex(TextLine, CollName, IndexName, Index);
         i++;
 
@@ -235,7 +235,7 @@ CAT::CAT(string filename) {
 
         if (IsCommentOrBlankLine(TextLine)) continue;
 
-        BitIndexProp = new BIT_IND_PROP;
+        BitIndexProp = new BitIndexProperties;
         parseBitIndex(TextLine, CollName, BitIndexName, BitIndexProp);
         i++;
 
@@ -335,7 +335,7 @@ CAT::~CAT() {
 }
 
 // Add CollProp for this collection.  If Collection is new, also update CollTable
-void CAT::AddColl(string CollName, COLL_PROP *CollProp) {
+void CAT::AddColl(string CollName, CollectionsProperties *CollProp) {
   int CollId = GetCollId(CollName);
   if (CollId >= CollProps.size()) CollProps.resize(CollId + 1);
   CollProps[CollId] = CollProp;
@@ -344,7 +344,7 @@ void CAT::AddColl(string CollName, COLL_PROP *CollProp) {
 // fill tables related to attributes
 // If Attribute or Collection are new, add them to AttProps, AttTable, AttNames, resp.
 // Add Attr to Attrs table, Attribute to Attnames
-void CAT::AddAttr(string CollName, string AttName, ATTR *Attr, DOM_TYPE domain) {
+void CAT::AddAttr(string CollName, string AttName, Attribute *Attr, DOM_TYPE domain) {
   // If Attribute is new, add it to AttProps.  Add AttProp to AttProps table.
   int AttId = GetAttId(CollName, AttName);
   if (AttId >= Attrs.size()) Attrs.resize(AttId + 1);
@@ -366,7 +366,7 @@ void CAT::AddAttr(string CollName, string AttName, ATTR *Attr, DOM_TYPE domain) 
 
 // If Index, COllection are new, add them to IndProps, IndNames, respectively.
 // Add IndProp, Index to IndProps, IndNames, resp.
-void CAT::AddIndex(string CollName, string IndexName, IND_PROP *IndProp) {
+void CAT::AddIndex(string CollName, string IndexName, IndexProperties *IndProp) {
   // If Index is new, add it to IndProps.  Add IndProp to IndProps
   int IndId = GetIndId(CollName, IndexName);
   if (IndId >= IndProps.size()) IndProps.resize(IndId + 1);
@@ -386,7 +386,7 @@ void CAT::AddIndex(string CollName, string IndexName, IND_PROP *IndProp) {
 // If BitIndex, COllection are new, add them to BitIndProps, BitIndNames, respectively.
 // Add BitIndProp, BitIndex to BitIndProps, BitIndNames, resp.
 //##ModelId=3B0C0878008E
-void CAT::AddBitIndex(string CollName, string BitIndexName, BIT_IND_PROP *BitIndProp) {
+void CAT::AddBitIndex(string CollName, string BitIndexName, BitIndexProperties *BitIndProp) {
   // If BitIndex is new, add it to BitIndProps.  Add BitIndProp to BitIndProps
   int BitIndId = GetBitIndId(CollName, BitIndexName);
   if (BitIndId >= BitIndProps.size()) BitIndProps.resize(BitIndId + 1);
@@ -437,7 +437,7 @@ void CAT::GetKey(char *p, KEYS_SET *Keys) {
 
 // get collection property by collection Id
 //##ModelId=3B0C08770385
-COLL_PROP *CAT::GetCollProp(int CollId) {
+CollectionsProperties *CAT::GetCollProp(int CollId) {
   if (CollId < CollProps.size())
     return CollProps[CollId];
   else
@@ -446,7 +446,7 @@ COLL_PROP *CAT::GetCollProp(int CollId) {
 
 // get attribute property by attribute Id
 //##ModelId=3B0C0877038F
-ATTR *CAT::GetAttr(int AttId) {
+Attribute *CAT::GetAttr(int AttId) {
   if (AttId < Attrs.size())
     return Attrs[AttId];
   else
@@ -462,7 +462,7 @@ DOM_TYPE CAT::GetDomain(int AttId) {
 }
 
 // get index property by index Id
-IND_PROP *CAT::GetIndProp(int IndId) {
+IndexProperties *CAT::GetIndProp(int IndId) {
   if (IndId < IndProps.size())
     return IndProps[IndId];
   else
@@ -471,7 +471,7 @@ IND_PROP *CAT::GetIndProp(int IndId) {
 
 // get Bitindex property by Bitindex Id
 //##ModelId=3B0C0878000C
-BIT_IND_PROP *CAT::GetBitIndProp(int BitIndId) {
+BitIndexProperties *CAT::GetBitIndProp(int BitIndId) {
   if (BitIndId < BitIndProps.size())
     return BitIndProps[BitIndId];
   else
@@ -538,7 +538,7 @@ void CAT::parseKeys(char *p, KEYS_SET *Keys, string CollName) {
 
 // fill out attribute, except for AttId, which is filled out when adding attribute
 //##ModelId=3B0C087800DE
-void CAT::parseAttribute(char *p, string &AttrName, ATTR *Attribute, DOM_TYPE &domain) {
+void CAT::parseAttribute(char *p, string &AttrName, Attribute *Attribute, DOM_TYPE &domain) {
   p = SkipSpace(p);
   parseString(p);  // get the Name
   AttrName = p;
@@ -572,7 +572,7 @@ void CAT::parseAttribute(char *p, string &AttrName, ATTR *Attribute, DOM_TYPE &d
   Attribute->Min = (float)atof(p);
 }
 
-void CAT::parseIndex(char *p, string CollName, string &IndexName, IND_PROP *Index) {
+void CAT::parseIndex(char *p, string CollName, string &IndexName, IndexProperties *Index) {
   p = SkipSpace(p);
   parseString(p);  // get the Name
   IndexName = p;
@@ -593,7 +593,7 @@ void CAT::parseIndex(char *p, string CollName, string &IndexName, IND_PROP *Inde
   Index->Clustered = ((strcmp(p, "T") == 0) ? true : false);
 }
 
-void CAT::parseBitIndex(char *p, string CollName, string &BitIndexName, BIT_IND_PROP *BitIndex) {
+void CAT::parseBitIndex(char *p, string CollName, string &BitIndexName, BitIndexProperties *BitIndex) {
   p = SkipSpace(p);
   parseString(p);  // get the Name
   BitIndexName = p;
@@ -638,7 +638,7 @@ string CAT::Dump() {
   string temp;
 
   // dump collection properties
-  os += "******* COLL_PROP: ********\n";
+  os += "******* CollectionsProperties: ********\n";
   for (int CollId = 1; CollId < CollProps.size(); CollId++)
     os += GetCollName(CollId) + ":\t" + CollProps[CollId]->Dump();
 
@@ -647,11 +647,11 @@ string CAT::Dump() {
   for (int AttId = 1; AttId < Attrs.size(); AttId++) os += Attrs[AttId]->Dump() + "\n";
 
   // dump index properties
-  os += "\n******** IND_PROP: ********\n";
+  os += "\n******** IndexProperties: ********\n";
   for (int IndId = 1; IndId < IndProps.size(); IndId++) os += GetIndName(IndId) + ":\n", IndProps[IndId]->Dump() + "\n";
 
   // dump bit index properties
-  os += "\n******** BIT_IND_PROP: ********\n";
+  os += "\n******** BitIndexProperties: ********\n";
   for (int BitIndId = 1; BitIndId < BitIndProps.size(); BitIndId++)
     os += GetBitIndName(BitIndId) + ":\n" + BitIndProps[BitIndId]->Dump() + "\n";
 

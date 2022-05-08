@@ -6,8 +6,6 @@
 #define SHRINK_INERVAL 10000
 #define MAX_AVAIL_MEM 40000000  // available memory bound to 50M
 
-extern Cost GlobalEpsBound;
-
 SearchSpace::SearchSpace() : NewGrpID(-1) {
   // initialize HashTbl to contain HashTableSize elements, each initially nullptr.
   HashTbl = new MExression *[HtblSize];  // 8192
@@ -39,7 +37,7 @@ string SearchSpace::DumpHashTable() {
   int total = 0;
   for (int i = 0; i < HtblSize; i++) {
     for (MExression *mexpr = HashTbl[i]; mexpr != nullptr; mexpr = mexpr->GetNextHash(), total++)
-      os += "group:" + to_string(mexpr->GetGrpID()) + " " + mexpr->Dump();
+      os += "group:" + to_string(i) + ":" + to_string(mexpr->GetGrpID()) + "\t" + mexpr->Dump();
     if (HashTbl[i]) os += "\n";
   }
   os += "Hash Table END, total " + to_string(total) + " mexpr\n";
@@ -55,6 +53,7 @@ string SearchSpace::DumpChanged() {
     if (Groups[i]->is_changed()) {
       group = Groups[i];
       os += group->Dump();
+      os += "\n";
       group->set_changed(false);
     }
 
@@ -74,8 +73,6 @@ void SearchSpace::ShrinkGroup(int group_no) {
   MExression *p;
   MExression *prev;
   int DeleteCount = 0;
-
-  SET_TRACE Trace(true);
 
   group = Groups[group_no];
 
@@ -159,7 +156,7 @@ void SearchSpace::FastDump() {
   OutputFile << "SearchSpace Content: RootGID: " << RootGID << endl;
 
   for (int i = 0; i < Groups.size(); i++) {
-    Groups[i]->FastDump();
+    OutputFile << Groups[i]->Dump() << endl;
     Groups[i]->set_changed(false);
   }
 }
@@ -517,9 +514,9 @@ WINNER *Group::GetWinner(PHYS_PROP *PhysProp) {
 void Group::NewWinner(PHYS_PROP *ReqdProp, MExression *MExpr, Cost *TotalCost, bool done) {
   if (COVETrace && MExpr)  // New Winner
   {
-    OutputCOVE << "NewWin " << to_string(MExpr->GetGrpID()) << " \"" << ReqdProp->Dump() << "\"" << TotalCost->Dump()
-               << "  { " << to_string(MExpr->GetGrpID()) << " " << MExpr << " \"" << MExpr->Dump() << "\" "
-               << (done ? "Done" : "Not Done") << " }\n"
+    OutputCOVE << "\tNewWin { " << to_string(MExpr->GetGrpID()) << " \"" << ReqdProp->Dump() << "\" " << TotalCost->Dump()
+               << " } { " << to_string(MExpr->GetGrpID()) << " " << MExpr << " \"" << MExpr->Dump() << "\" "
+               << (done ? "Done" : "Not Done") << " }"
                << endl;
   }
 
@@ -552,7 +549,7 @@ bool Group::CheckWinnerDone() {
 
   // No winner is done
   return (false);
-}  // Group::CheckWinnerDone
+}
 
 WINNER::WINNER(MExression *MExpr, PHYS_PROP *PhysProp, Cost *cost, bool done)
     : cost(cost), MPlan((MExpr == nullptr) ? nullptr : (new MExression(*MExpr))), PhysProp(PhysProp), Done(done){};
@@ -572,11 +569,7 @@ void SearchSpace::optimize() {
   }
 
   // start optimization with root group, 0th context, parent task of zero.
-  if (GlobepsPruning) {
-    Cost *eps_bound = new Cost(GlobalEpsBound);
-    PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true, eps_bound));
-  } else
-    PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true, nullptr));
+  PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true));
 
   while (!PTasks.empty()) {
     TaskNo++;
@@ -590,9 +583,8 @@ void SearchSpace::optimize() {
 
     PTRACE("------------------ OPEN after task " << TaskNo << ":");
     OutputFile << PTasks.Dump() << endl;
-
-    OutputFile << endl << DumpHashTable() << endl;
   }
+  OutputFile << endl << DumpHashTable() << endl;
 
   PTRACE("Optimizing completed: " << TaskNo << " tasks\n");
   OUTPUT("TotalTask : " << TaskNo);

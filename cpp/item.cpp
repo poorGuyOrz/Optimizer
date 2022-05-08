@@ -28,7 +28,7 @@ ATTR_EXP::ATTR_EXP(string range_var, int *atts, int size) : RangeVar(range_var),
   // CollTable[0]=""
   int AttId = GetAttId("", RangeVar);
   // we do not know the cadinalities, use (-1, -1, -1)
-  AttNew = new ATTR(AttId, -1, -1, -1);
+  AttNew = new Attribute(AttId, -1, -1, -1);
 };
 
 string ATTR_EXP::Dump() {

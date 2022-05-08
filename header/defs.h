@@ -1,25 +1,7 @@
-/*
-DEFS.H - General programming support: #includes, #defines, typedefs, tracing.
-$Revision: 21 $
-Columbia Optimizer Framework
-
-  A Joint Research Project of Portland State University
-  and the Oregon Graduate Institute
-  Directed by Leonard Shapiro and David Maier
-  Supported by NSF Grants IRI-9610013 and IRI-9619977
-*/
 
 #pragma once
 
 #include "../header/stdafx.h"
-
-/*
-============================================================
-General definitions
-============================================================
-*/
-#define KILO 1024  // For TPC-D sizes
-#define LINE_STRING ("===========")
 
 #define MIN(a, b) ((a > b) ? b : a)
 #define MAX(a, b) ((a > b) ? a : b)
@@ -64,33 +46,20 @@ typedef enum ORDER_INDEX {
 // e.g. sum(xxx) as .SUM, whose domain is unknown
 typedef enum DOM_TYPE { string_t, int_t, real_t, unknown } DOM_TYPE;
 
-#define PTRACE(object)                                                                                       \
-  {                                                                                                          \
-    if (TraceOn && !ForGlobalEpsPruning) {                                                                   \
-      if (FileTrace)                                                                                         \
-        OutputFile << TraceDepth << ":" << setiosflags(ios::right) << setw(12) << __FILE__ << ":" << setw(4) \
-                   << __LINE__ << setiosflags(ios::right) << setw(8) << ">>>>>: " << object << endl;         \
-    }                                                                                                        \
+#define PTRACE(object)                                                                                               \
+  {                                                                                                                  \
+    OutputFile << TraceDepth << ":" << setiosflags(ios::right) << setw(12) << __FILE__ << ":" << setw(4) << __LINE__ \
+               << setiosflags(ios::right) << setw(8) << ">>>>>: " << object << endl;                                 \
   }
 
 // Print n tabs, then the character string.  No newlines except as in string.
-#define OUTPUTN(n, str)                                         \
-  {                                                             \
-    if (!ForGlobalEpsPruning) {                                 \
-      string OutputString;                                      \
-      OutputString = "    ";                                    \
-      for (int i = 0; i < n; i++) OutputString += OutputString; \
-      OutputString += str;                                      \
-      OutputFile << (OutputString);                             \
-    }                                                           \
-  }
-
-// trace without line and file info.  No newlines except in format input.
-#define WTRACE(format, object)                       \
-  {                                                  \
-    if (TraceOn) {                                   \
-      if (FileTrace) OutputFile << (object) << endl; \
-    }                                                \
+#define OUTPUTN(n, str)                                       \
+  {                                                           \
+    string OutputString;                                      \
+    OutputString = "    ";                                    \
+    for (int i = 0; i < n; i++) OutputString += OutputString; \
+    OutputString += str;                                      \
+    OutputFile << (OutputString);                             \
   }
 
 // Output the object to window and OutputFile, even if tracing is off.
@@ -116,7 +85,6 @@ class SearchSpace;
 class CAT;
 class RULE;
 class OPT_STAT;
-class SET_TRACE;
 class RuleSet;
 class CostModel;
 class KEYS_SET;
@@ -139,23 +107,15 @@ extern ofstream OutputFile;  // global output file
 extern ofstream OutputCOVE;  // global COVE script file
 extern int TraceDepth;       // Not the stack depth, but the number of times SET_TRACE
 // objects have been created in current stack functions.
-extern bool TraceOn;          // Are we tracing?
-extern bool FileTrace;        // Are we sending the trace output to the output file?
 extern bool COVETrace;        // Are we doing COVE tracing?
-extern bool WindowTrace;      // Are we sending the tracing to the Window?
-extern bool TraceFinalSSP;    // Does the trace print the final search space?
-extern bool TraceOPEN;        // Should we force tracing of the OPEN stack?
-extern bool TraceSSP;         // Should we force tracing of the Search Space?
 extern bool Pruning;          // global pruning flag
 extern bool CuCardPruning;    // global cucard pruning flag
-extern bool GlobepsPruning;   // global epsilon pruning flag
 extern int RadioVal;          // Radio value for queryfile
 extern bool SingleLineBatch;  // Should output of batch queries be one line per query?
 // SingleLineBatch and _TABLE_ cannot both be true
 extern bool Halt;         // halt flat
 extern int HaltGrpSize;   // halt when number of plans equals to 100% of group
 extern int HaltWinSize;   // window size for checking the improvement
-extern int HaltImpr;      // halt when the improvement is less than 20%
 extern int TaskNo;        // Number of the current task.
 extern int Memo_M_Exprs;  // How Many M_EXPRs in the MEMO Structure?
 
@@ -171,18 +131,11 @@ extern RuleSet *ruleSet;
 extern CostModel *costModel;
 extern KEYS_SET IntOrdersSet;  // set of Interesting Orders
 
-extern bool NO_PHYS_IN_GROUP;
-
-/* ======= Pragmas ====== */
-
-/* ======= Symbolic Constants ====== */
-
 /*
 
 UNIQ:   on == Use the unique rule set rules
 SORT_AFTERS: sort possible moves in order of estimated cost
 INFBOUND: When optimizing a group, ignore the initial upper bound; use infinity instead
-_COSTS_ Prints the cost of each mexpr as it is costed, in the output window
 _TABLE_: prints one summary line for each optimization, using different epsilons
 _GEN_LOG: Used to control the generation of logical expressions when eps pruning is done.
 REUSE_SIB: An attempt to improve pattern matching by reusing one side of generated mexprs.

@@ -12,7 +12,6 @@ int main(int argc, char const *argv[]) {
   OutputFile.open("../colout.txt");
   OutputCOVE.open("../script.cove");
 
-  GlobepsPruning = false;
   ForGlobalEpsPruning = false;
   OptStat = new OPT_STAT;
   ruleSet = new RuleSet();
@@ -51,17 +50,16 @@ int main(int argc, char const *argv[]) {
 
   std::chrono::duration<double, std::milli> diff = std::chrono::system_clock::now() - now;
   cout << "Optimization elapsed time:" << (diff).count() << "ms" << endl;
+  Ssp->FastDump();
 
   PHYS_PROP *PhysProp = CONT::vc[0]->GetPhysProp();
   Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);
   *HeuristicCost = *(Ssp->GetGroup(0)->GetWinner(PhysProp)->GetCost());
   assert(Ssp->GetGroup(0)->GetWinner(PhysProp)->GetDone());
-  GlobalEpsBound = (*HeuristicCost) * (GLOBAL_EPS);
   delete Ssp;
   for (int i = 0; i < CONT::vc.size(); i++) delete CONT::vc[i];
   CONT::vc.clear();
   delete Cat;
-  GlobepsPruning = true;
   ForGlobalEpsPruning = false;
   OUTPUT(ruleSet->DumpStats());
 

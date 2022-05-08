@@ -20,7 +20,6 @@ INT_ARRAY Conditions;
 void Optimizer() {
   TaskNo = 0;
   Memo_M_Exprs = 0;
-  SET_TRACE Trace(true);
   AppDir = "../";
   if (CatFile == "catalog") CatFile = AppDir + "CATALOGS/uniform.txt";
   if (CMFile == "cm") CMFile = AppDir + "CMS/cmj";
@@ -203,7 +202,6 @@ void Optimizer() {
         PHYS_PROP *PhysProp = CONT::vc[0]->GetPhysProp();
         *HeuristicCost = *(Ssp->GetGroup(0)->GetWinner(PhysProp)->GetCost());
         assert(Ssp->GetGroup(0)->GetWinner(PhysProp)->GetDone());
-        GlobalEpsBound = (*HeuristicCost) * (GLOBAL_EPS);
         delete Ssp;
         for (int i = 0; i < CONT::vc.size(); i++) delete CONT::vc[i];
         CONT::vc.clear();
@@ -225,7 +223,6 @@ void Optimizer() {
       // For each iteration of the global epsilon counter ii {
       for (double ii = 0; ii <= GLOBAL_EPS * 10; ii++) {
         OUTPUT("%3.1f\t", ii / 10);
-        GlobalEpsBound = (*HeuristicCost) * ii / 10;
 #endif
 
         // Parse and print the query and its interesting orders
@@ -282,11 +279,7 @@ void Optimizer() {
         our query )
         */
         Ssp->CopyOut(Ssp->GetRootGID(), PhysProp, 0);
-        if (TraceFinalSSP) {
-          Ssp->FastDump();
-        } else {
-          PTRACE("final Search Space:" << endl << Ssp->Dump());
-        }
+        PTRACE("final Search Space:" << endl << Ssp->Dump());
 
         // Delete Contexts, close batch query file, delete search space
         if (!PiggyBack) {
@@ -300,7 +293,7 @@ void Optimizer() {
         // else keep the search space for reuse
         if (!PiggyBack) delete Ssp;
 
-        // OUTPUT Rule Set Statistics
+          // OUTPUT Rule Set Statistics
 #ifndef _TABLE_
         if (!SingleLineBatch) OUTPUT(ruleSet->DumpStats());
 #endif
@@ -333,7 +326,6 @@ void Optimizer() {
   delete costModel;
   delete ruleSet;
   delete HeuristicCost;
-
 
   OutputFile.close();
   OutputCOVE.close();

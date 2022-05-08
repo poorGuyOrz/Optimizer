@@ -280,8 +280,7 @@ class Group {
   Group(MExression *MExpr);  // Create a new Group containing just this MExpression
   ~Group();
 
-  string Dump();
-  void FastDump();
+  string Dump(bool dumpexpr = false);
 
   // Find first and last (in some sense) MExpression in this Group
   inline MExression *GetFirstLogMExpr() { return FirstLogMExpr; };

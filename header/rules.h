@@ -128,14 +128,10 @@ class RuleSet {
 
 */
 #ifdef _REUSE_SIB
-//##ModelId=3B0C0868038E
 class Node {
  public:
-  //##ModelId=3B0C086803A3
   BINDERY *bindery;
-  //##ModelId=3B0C086803B9
   Node *next;
-  //##ModelId=3B0C086803C0
   Node() {
     bindery = NULL;
     next = NULL;
@@ -146,12 +142,9 @@ class Node {
 class BINDERY {
  private:
   Expression *original;  // bind with this original pattern
-
   MExression *cur_expr;  // bind the original pattern to this multi-expression
-
-  bool one_expr;  // Is this an expression bindery?
-
-  int group_no;  // group no of the cur_expr
+  bool one_expr;         // Is this an expression bindery?
+  int group_no;          // group no of the cur_expr
 
   typedef enum BINDERY_STATE {
     start,          // This is a new MExpression
@@ -164,7 +157,6 @@ class BINDERY {
   BINDERY **input;  // binderys for input expr's
 #ifdef _REUSE_SIB
   Node *list, *last, *currentBind;
-  //##ModelId=3B0EA6DA024E
   void test_delete(int arity);
 
 #endif
@@ -325,7 +317,7 @@ class RULE {
   inline void set_index(int i) { index = i; };
   inline void set_mask(BIT_VECTOR v) { mask = v; };
 
-  string Dump() { return "RULE " + name; };
+  string Dump() { return "rule : " + name; };
 
     // if not stop generating logical expression when epsilon pruning is applied
     // need these to identify the substitue

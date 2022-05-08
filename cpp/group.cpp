@@ -4,7 +4,6 @@
 
 Group::Group(MExression *MExpr)
     : GroupID(MExpr->GetGrpID()), FirstLogMExpr(MExpr), LastLogMExpr(MExpr), FirstPhysMExpr(NULL), LastPhysMExpr(NULL) {
-
   init_state();
 
   // find the log prop
@@ -55,8 +54,7 @@ Group::Group(MExression *MExpr)
 
   // the initial value is -1, meaning no winner has been found
   count = -1;
-  if (COVETrace)  // New Group
-  {
+  if (COVETrace) {
     string os;
     if (arity) {
       for (int i = 0; i < arity; i++) {
@@ -64,16 +62,14 @@ Group::Group(MExression *MExpr)
         os = os + " " + to_string(MExpr->GetInput(i));
       }
     }
-    os += " ";
 
-    OutputCOVE << "addGroup { " << GroupID << " " << MExpr << " \" " << MExpr->GetOp()->Dump() << "  \"" << os << "} "
+    OutputCOVE << "\taddGroup { " << GroupID << " " << MExpr << " [ " << MExpr->GetOp()->Dump() << "  " << os << " ]} "
                << LogProp->DumpCOVE() << endl;
   }
 }
 
 // free up memory
 Group::~Group() {
-
   delete LogProp;
   delete LowerBd;
 
@@ -143,14 +139,12 @@ void Group::NewMExpr(MExression *MExpr) {
     }
     os += " ";
 
-    OutputCOVE << "addExp { " << GroupID << " " << MExpr << " \" " << MExpr->GetOp()->Dump() << "  \"" << os << "} "
+    OutputCOVE << "\taddExp { " << GroupID << " " << MExpr << " [ " << MExpr->GetOp()->Dump() << " " << os << " ]} "
                << LogProp->DumpCOVE() << endl;
   }
 }
 
 void Group::set_optimized(bool is_optimized) {
-  SET_TRACE Trace(true);
-
   if (is_optimized) {
     PTRACE("group " << GroupID << " is completed");
   }
@@ -192,26 +186,27 @@ void Group::DeletePhysMExpr(MExression *PhysMExpr) {
   }
 }
 
-string Group::Dump() {
+string Group::Dump(bool dumpexpr) {
   string os;
   int Size = 0;
   MExression *MExpr;
 
-  os = "Group: " + to_string(GroupID) + "\n";
+  if (!dumpexpr) os = "Group: " + to_string(GroupID) + "\n";
 
   for (MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
-    os += "\t\tLogic M_Expr: ";
+    os += "\tLogic M_Expr: ";
     os += MExpr->Dump();
     os += ";\n";
     Size++;
   }
   for (MExpr = FirstPhysMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
-    os += "\t\tPhysc M_Expr: ";
+    os += "\tPhysc M_Expr: ";
     os += MExpr->Dump();
     os += ";\n";
     Size++;
   }
   os += "\t----- has " + to_string(Size) + " MExprs -----\n";
+  if (dumpexpr) return os;
 
   // Print Winner's circle
   os += "Winners:\n";
@@ -235,41 +230,7 @@ string Group::Dump() {
 
   os += "log_prop: ";
   os += (*LogProp).Dump();
+  os += "\n";
 
   return os;
-}
-
-void Group::FastDump() {
-  int Size = 0;
-  MExression *MExpr;
-
-  OutputFile << "Group:" << GroupID  << endl;
-
-  for (MExpr = FirstLogMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
-    OutputFile << MExpr->Dump() << " ; ";
-    Size++;
-  }
-  for (MExpr = FirstPhysMExpr; MExpr != NULL; MExpr = MExpr->GetNextMExpr()) {
-    OutputFile << MExpr->Dump() << " ; ";
-    Size++;
-  }
-
-  OutputFile << endl << "----- has " << Size << " MExprs -----" << endl;
-
-  // Print Winner's circle
-  OutputFile << "Winners:" << endl;
-
-  Size = Winners.size();
-  PHYS_PROP *PhysProp;
-  if (!Size) OutputFile << "\tNo Winners" << endl;
-  for (int i = 0; i < Size; i++) {
-    PhysProp = Winners[i]->GetPhysProp();
-    OutputFile << "\t" << PhysProp->Dump();
-    OutputFile << ", " << (Winners[i]->GetMPlan() ? Winners[i]->GetMPlan()->Dump() : "NULL");
-    OutputFile << ", " << (Winners[i]->GetCost() ? Winners[i]->GetCost()->Dump() : "-1");
-    OutputFile << ", " << (Winners[i]->GetDone() ? "Done" : "Not done") << endl;
-  }
-
-  OutputFile << "LowerBound: " << LowerBd->Dump() << endl;
-  OutputFile << "log_prop: " << (*LogProp).Dump();
 }

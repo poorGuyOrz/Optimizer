@@ -1,35 +1,22 @@
 #pragma once
 #include <stack>
 
-// #include "../header/ssp.h"
 #include "rules.h"
 // class OptimizerTask;       // Abstract class for all task classes
 // class OptimizerTaskStack;  // Pending tasks - some structure which contains all tasks waiting to execute
 // class OptimizeGroupTask;   // Optimize a Group - find the cheapest plan in the group satisfying a context
 // class OptimizeExprTask;    // Optimize an Expression - Fire all relevant rules for this expression
 // class ExploreGroupTask;    // Explore a group - Fire all transformation rules in this group.
-// class O_INPUTS;            // Optimize inputs - determine if this expression satisfies the current context
+// class OptimizeInputTask;            // Optimize inputs - determine if this expression satisfies the current context
 // class ApplyRuleTask;       // Apply a single rule to a single MExression
 
-/* ============================================================ */
-
-/*
-Moves
-=====
-Pair of rule and promise, used to sort rules according to their promise
-=======================================
-*/
+// Pair of rule and promise, used to sort rules according to their promise
 typedef struct MOVE {
   int promise;
   RULE *rule;
 } MOVE;
 
-/*
-Afters
-=====
-Pair of expr and cost value, used to sort expr according to their cost
-=======================================
-*/
+// Pair of expr and cost value, used to sort expr according to their cost
 typedef struct AFTERS {
   MExression *m_expr;
   Cost *cost;
@@ -59,13 +46,11 @@ class OptimizerTask {
   int ParentTaskNo;  // The task which created me
 
  public:
-  OptimizerTask(int ContextID, int ParentTaskNo) : ContextID(ContextID) { ParentTaskNo = ParentTaskNo; };
+  OptimizerTask(int ContextID, int ParentTaskNo) : ContextID(ContextID), ParentTaskNo(ParentTaskNo){};
   ~OptimizerTask(){};
-
   virtual string Dump() = 0;
-
-  virtual void perform() = 0;  // TaskNo is current task number, which will
-};                             // OptimizerTask
+  virtual void perform() = 0;
+};
 
 /*
   ============================================================
@@ -94,7 +79,7 @@ class OptimizerTaskStack {
   OptimizerTask *pop() {
     auto task = task_stack_.back();
     task_stack_.pop_back();
-    if (COVETrace) OutputCOVE << "PopTaskList {" << task->Dump() << "}" << endl;
+    if (COVETrace) OutputCOVE << "PopTaskList  {" << task->Dump() << "}" << endl;
     return task;
   };
 
@@ -103,8 +88,12 @@ class OptimizerTaskStack {
     if (empty())
       os = "Task Stack is empty!!";
     else {
+      int count1 = task_stack_.size() - 5;
       int count = 0;
-      for (auto &&task : task_stack_) os += "    task: " + to_string(count++) + "   " + task->Dump() + "\n";
+      for (auto &&task : task_stack_) {
+        if (count >= count1) os += "    task: " + to_string(count) + "   " + task->Dump() + "\n";
+        count++;
+      }
     }
     return os;
   };
@@ -144,22 +133,18 @@ class OptimizerTaskStack {
 
 class OptimizeGroupTask : public OptimizerTask {
  private:
-  int GrpID;       // Which group to optimize
-  bool Last;       // if this task is the last task for this group
-  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
-                   // else it is zero
+  int GrpID;  // Which group to optimize
+  bool Last;  // if this task is the last task for this group
  public:
-  OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true, Cost *epsbound = nullptr)
-      : OptimizerTask(ContextID, parent_task_no), GrpID(GrpID), Last(last), EpsBound(epsbound) {
+  OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true)
+      : OptimizerTask(ContextID, parent_task_no), GrpID(GrpID), Last(last) {
     // if INFBOUND flag is on, set the bound to be INF
 #ifdef INFBOUND
     Cost *INFCost = new Cost(-1);
     CONT::vc[ContextID]->SetUpperBound(*INFCost);
 #endif
   };
-  ~OptimizeGroupTask() {
-    if (EpsBound) delete EpsBound;
-  };
+  ~OptimizeGroupTask(){};
 
   // Optimize the group by searching for a winner for the context.
   // Initialize or update the winner for the context's property
@@ -199,15 +184,11 @@ class OptimizeGroupTask : public OptimizerTask {
  */
 class ExploreGroupTask : public OptimizerTask {
  private:
-  int GrpID;       // Group to be explored
-  bool Last;       // is it the last task in this group
-  Cost *EpsBound;  // if global eps pruning is on, this is the eps bound for eps pruning
-                   // else it is zero
+  int GrpID;  // Group to be explored
+  bool Last;  // is it the last task in this group
  public:
-  ExploreGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = false, Cost *epsbound = nullptr);
-  ~ExploreGroupTask() {
-    if (EpsBound) delete EpsBound;
-  };
+  ExploreGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = false);
+  ~ExploreGroupTask(){};
 
   void perform();
 
@@ -228,12 +209,9 @@ class OptimizeExprTask : public OptimizerTask {
   MExression *MExpr;   // Which expression to optimize
   const bool explore;  // if this task is for exploring  Should not happen - see ExploreGroupTask
   bool Last;           // if this task is the last task for the group
-  Cost *EpsBound;      // if global eps pruning is on, this is the eps bound of this task
-                       // else it is zero
 
  public:
-  OptimizeExprTask(MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false,
-                   Cost *epsbound = nullptr);
+  OptimizeExprTask(MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false);
 
   ~OptimizeExprTask() {
     if (Last) {
@@ -254,8 +232,6 @@ class OptimizeExprTask : public OptimizerTask {
       } else
         group->set_explored(true);
     }
-
-    if (EpsBound) delete EpsBound;
   };
 
   string Dump();
@@ -267,7 +243,7 @@ class OptimizeExprTask : public OptimizerTask {
 /*
 
       ========================================================
-     O_INPUTS - Task to Optimize inputs
+     OptimizeInputTask - Task to Optimize inputs
      ========================================================
      This task is rather misnamed.  It:
      1) Determines whether the (physical) MExpr satisfies the task's context
@@ -283,7 +259,7 @@ class OptimizeExprTask : public OptimizerTask {
      costed, it calculates the cost of the entire physical expression.
  */
 
-class O_INPUTS : public OptimizerTask {
+class OptimizeInputTask : public OptimizerTask {
  private:
   MExression *MExpr;  // expression whose inputs we are optimizing
   int arity;
@@ -291,9 +267,7 @@ class O_INPUTS : public OptimizerTask {
   int PrevInputNo;  // keep track of the previous optimized input no
   Cost *LocalCost;  // the local cost of the mexpr
   bool Last;        // if this task is the last task for the group
-  Cost *EpsBound;   // if global eps pruning is on, this is the eps bound for eps pruning
-  // else it is zero
-  int ContNo;  // keep track of number of contexts
+  int ContNo;       // keep track of number of contexts
 
   // Costs and properties of input winners and groups.  Computed incrementally
   //  by this method.
@@ -301,10 +275,9 @@ class O_INPUTS : public OptimizerTask {
   LOG_PROP **InputLogProp;
 
  public:
-  O_INPUTS(MExression *MExpr, int ContextID, int ParentTaskNo, bool last = false, Cost *epsbound = nullptr,
-           int ContNo = 0);
+  OptimizeInputTask(MExression *MExpr, int ContextID, int ParentTaskNo, bool last = false, int ContNo = 0);
 
-  ~O_INPUTS();
+  ~OptimizeInputTask();
 
   // return the new upper bd for the input
   Cost *NewUpperBd(Cost *OldUpperBd, int input);
@@ -312,7 +285,7 @@ class O_INPUTS : public OptimizerTask {
 
   string Dump();
 
-};  // O_INPUTS
+};  // OptimizeInputTask
 
 /*
    ============================================================
@@ -326,11 +299,8 @@ class ApplyRuleTask : public OptimizerTask {
   MExression *MExpr;   // root of expr. before rule
   const bool explore;  // if this task is for exploring
   bool Last;           // if this task is the last task for the group
-  Cost *EpsBound;      // if global eps pruning is on, this is the eps bound for eps pruning
-                       // else it is zero
  public:
-  ApplyRuleTask(RULE *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false,
-                Cost *epsbound = nullptr);
+  ApplyRuleTask(RULE *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false);
 
   ~ApplyRuleTask();
 

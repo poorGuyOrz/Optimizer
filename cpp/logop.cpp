@@ -12,9 +12,7 @@ GET::GET(int collId) : CollId(collId) {
   name = GetName() + GetCollName(CollId);  // for debug
 };
 
-//##ModelId=3B0C087301F0
 GET::GET(string collection, string rangeVar) {
-  SET_TRACE Trace(true);
   RangeVar = rangeVar;
   if (collection == rangeVar)
     CollId = GetCollId(collection);
@@ -30,10 +28,10 @@ GET::GET(string collection, string rangeVar) {
     // Get all atts for this collection, then add to att tables
     INT_ARRAY *AttArray = Cat->GetAttNames(collectionID);
     int Size = AttArray->size();
-    ATTR *attr;
+    Attribute *attr;
     for (int i = 0; i < Size; i++)  // For each attribute
     {
-      attr = new ATTR(*(Cat->GetAttr(AttArray->at(i))));
+      attr = new Attribute(*(Cat->GetAttr(AttArray->at(i))));
       DOM_TYPE domain = Cat->GetDomain(AttArray->at(i));
       Cat->AddAttr(RangeVar, TruncName(GetAttName(AttArray->at(i))), attr, domain);
     }
@@ -47,8 +45,8 @@ GET::GET(string collection, string rangeVar) {
       Size = IndArray->size();
       for (int i = 0; i < Size; i++)  // For each index
       {
-        IND_PROP *indprop = new IND_PROP;
-        IND_PROP *ip = (Cat->GetIndProp(IndArray->at(i)));
+        IndexProperties *indprop = new IndexProperties;
+        IndexProperties *ip = (Cat->GetIndProp(IndArray->at(i)));
         *indprop = *ip;
         // Alter keys in the property object so they will refer to new range variable attributes
         indprop->update(RangeVar);
@@ -63,8 +61,8 @@ GET::GET(string collection, string rangeVar) {
       Size = BitIndArray->size();
       for (int i = 0; i < Size; i++)  // For each index
       {
-        BIT_IND_PROP *bitindprop = new BIT_IND_PROP;
-        BIT_IND_PROP *ip = (Cat->GetBitIndProp(BitIndArray->at(i)));
+        BitIndexProperties *bitindprop = new BitIndexProperties;
+        BitIndexProperties *ip = (Cat->GetBitIndProp(BitIndArray->at(i)));
         *bitindprop = *ip;
         // Alter keys in the property object so they will refer to new range variable attributes
         bitindprop->update(RangeVar);
@@ -75,7 +73,7 @@ GET::GET(string collection, string rangeVar) {
 
     // Populate all relevant CollId-based tables
     // Should use a cinstructor here but it's already in use.
-    COLL_PROP *collp = new COLL_PROP;
+    CollectionsProperties *collp = new CollectionsProperties;
     *collp = *(Cat->GetCollProp(collectionID));  // Will be in catalog
     collp->update(RangeVar);
     Cat->AddColl(RangeVar, collp);
@@ -94,7 +92,7 @@ string GET::Dump() { return GetName() + "(" + GetCollName(CollId) + ")"; }
 // find the logical property of the collection,
 // also check the schema
 LOG_PROP *GET::FindLogProp(LOG_PROP **input) {
-  COLL_PROP *CollProp = Cat->GetCollProp(CollId);
+  CollectionsProperties *CollProp = Cat->GetCollProp(CollId);
   assert(CollProp != NULL);
 
   INT_ARRAY *AttrNames = Cat->GetAttNames(CollId);
@@ -103,18 +101,18 @@ LOG_PROP *GET::FindLogProp(LOG_PROP **input) {
   int Size = AttrNames->size();
   assert(Size > 0);
 
-  SCHEMA *Schema = new SCHEMA(Size);
-  Schema->TableNum = 1;
-  Schema->TableId = new int;
-  Schema->TableId[0] = CollId;
+  Schema *schema = new Schema(Size);
+  schema->TableNum = 1;
+  schema->TableId = new int;
+  schema->TableId[0] = CollId;
 
-  ATTR *Attr;
+  Attribute *Attr;
   int i;
   for (i = 0; i < Size; i++) {
-    Attr = new ATTR(*Cat->GetAttr((*AttrNames)[i]));
+    Attr = new Attribute(*Cat->GetAttr((*AttrNames)[i]));
     assert(Attr != NULL);
-    // Attr = new ATTR((*AttrNames)[i], AttProp->CuCard);
-    Schema->AddAttr(i, Attr);
+    // Attr = new Attribute((*AttrNames)[i], AttProp->CuCard);
+    schema->AddAttr(i, Attr);
   }
 
   KEYS_SET *cand_key;
@@ -123,7 +121,7 @@ LOG_PROP *GET::FindLogProp(LOG_PROP **input) {
   cand_key = new KEYS_SET(temp_key, cand_key_size);
   delete[] temp_key;
 
-  LOG_COLL_PROP *result = new LOG_COLL_PROP(CollProp->Card, CollProp->UCard, Schema, cand_key);
+  LOG_COLL_PROP *result = new LOG_COLL_PROP(CollProp->Card, CollProp->UCard, schema, cand_key);
   // copy the foreign key info from catalog
   for (i = 0; i < CollProp->FKeyArray.size(); i++) {
     FOREIGN_KEY *fk = new FOREIGN_KEY(*CollProp->FKeyArray[i]);
@@ -172,7 +170,6 @@ string EQJOIN::Dump() {
   return os;
 }
 
-//##ModelId=3B0C08730331
 LOG_PROP *EQJOIN::FindLogProp(LOG_PROP **input) {
   LOG_COLL_PROP *Left = (LOG_COLL_PROP *)(input[0]);
   LOG_COLL_PROP *Right = (LOG_COLL_PROP *)(input[1]);
@@ -184,12 +181,12 @@ LOG_PROP *EQJOIN::FindLogProp(LOG_PROP **input) {
 
   // check the joined predicates(attributes) are in the schema
   int i;
-  for (i = 0; i < size; i++) assert(Left->Schema->InSchema(lattrs[i]));
+  for (i = 0; i < size; i++) assert(Left->schema->InSchema(lattrs[i]));
 
-  for (i = 0; i < size; i++) assert(Right->Schema->InSchema(rattrs[i]));
+  for (i = 0; i < size; i++) assert(Right->schema->InSchema(rattrs[i]));
 
   // union schema
-  SCHEMA *Schema = Left->Schema->UnionSchema(Right->Schema);
+  Schema *schema = Left->schema->UnionSchema(Right->schema);
 
   // compute join log_prop
   int ConditionNum = size;
@@ -220,7 +217,7 @@ LOG_PROP *EQJOIN::FindLogProp(LOG_PROP **input) {
           // get Cucard for reference key;
           //  not sure if it is the correct multiple
           for (int j = 0; j < Left->FKeyList[i]->RefKey->GetSize(); j++) {
-            ATTR *Attr = Cat->GetAttr((*Left->FKeyList[i]->RefKey)[j]);
+            Attribute *Attr = Cat->GetAttr((*Left->FKeyList[i]->RefKey)[j]);
             RefUcard *= Attr->CuCard;
           }
         }
@@ -247,7 +244,7 @@ LOG_PROP *EQJOIN::FindLogProp(LOG_PROP **input) {
             // get Cucard for reference key;
             //  not sure if it is the correct multiple
             for (int j = 0; j < Right->FKeyList[i]->RefKey->GetSize(); j++) {
-              ATTR *Attr = Cat->GetAttr((*Right->FKeyList[i]->RefKey)[j]);
+              Attribute *Attr = Cat->GetAttr((*Right->FKeyList[i]->RefKey)[j]);
               RefUcard *= Attr->CuCard;
             }
           }
@@ -333,7 +330,7 @@ LOG_PROP *EQJOIN::FindLogProp(LOG_PROP **input) {
     cand_key->Merge(*Right->CandidateKey);
   }
 
-  LOG_COLL_PROP *result = new LOG_COLL_PROP((float)Card, (float)UCard, Schema, cand_key);
+  LOG_COLL_PROP *result = new LOG_COLL_PROP((float)Card, (float)UCard, schema, cand_key);
 
   // foreign key is the merge of left foreign keys and right foreign keys
   for (i = 0; i < Left->FKeyList.size(); i++) {
@@ -380,7 +377,7 @@ LOG_PROP *DUMMY::FindLogProp(LOG_PROP **input) {
   assert(Right->UCard >= 0);
 
   // union schema
-  SCHEMA *Schema = Left->Schema->UnionSchema(Right->Schema);
+  Schema *Schema = Left->schema->UnionSchema(Right->schema);
 
   double Card;
   double UCard;
@@ -439,7 +436,7 @@ LOG_PROP *PROJECT::FindLogProp(LOG_PROP **input) {
 
   LOG_COLL_PROP *rel_input = (LOG_COLL_PROP *)(input[0]);
 
-  SCHEMA *schema = rel_input->Schema->projection(attrs, size);
+  Schema *schema = rel_input->schema->projection(attrs, size);
 
   for (int att_index = 0; att_index < schema->GetSize(); att_index++) {
     attr_cucard = (*schema)[att_index]->CuCard;
@@ -501,7 +498,7 @@ LOG_PROP *SELECT::FindLogProp(LOG_PROP **input) {
   double old_cucard, new_cucard, new_card;
   double sel = pred_input->Selectivity;
 
-  SCHEMA *new_schema = new SCHEMA(*(rel_input->Schema));
+  Schema *new_schema = new Schema(*(rel_input->schema));
 
   new_card = ceil(rel_input->Card * sel);
   for (int i = 0; i < new_schema->GetSize(); i++) {
@@ -555,7 +552,7 @@ LOG_PROP *RM_DUPLICATES::FindLogProp(LOG_PROP **input) {
 
   float new_ucard, new_card;
 
-  SCHEMA *new_schema = new SCHEMA(*(rel_input->Schema));
+  Schema *new_schema = new Schema(*(rel_input->schema));
 
   new_card = rel_input->UCard;
   new_ucard = rel_input->UCard;
@@ -630,7 +627,7 @@ ub4 AGG_LIST::hash() {
 //##ModelId=3B0C087500BD
 LOG_PROP *AGG_LIST::FindLogProp(LOG_PROP **input) {
   LOG_COLL_PROP *rel_input = (LOG_COLL_PROP *)input[0];
-  SCHEMA *temp_schema = rel_input->Schema->projection(GbyAtts, GbySize);
+  Schema *temp_schema = rel_input->schema->projection(GbyAtts, GbySize);
 
   float new_cucard, gby_cucard;
   float new_card = 1;
@@ -659,10 +656,10 @@ LOG_PROP *AGG_LIST::FindLogProp(LOG_PROP **input) {
   // add ATTR_EXP for every AGG_OP
 
   int NumOps = AggOps->size();
-  SCHEMA *agg_schema = new SCHEMA(NumOps);
+  Schema *agg_schema = new Schema(NumOps);
   for (i = 0; i < NumOps; i++) {
     AGG_OP *aggop = (*AggOps)[i];
-    ATTR *new_attr = new ATTR(aggop->GetRangeVar(), aggop->GetAtts(), aggop->GetAttsSize());
+    Attribute *new_attr = new Attribute(aggop->GetRangeVar(), aggop->GetAtts(), aggop->GetAttsSize());
     // CuCard is the same as group by
     new_attr->CuCard = new_cucard;
     agg_schema->AddAttr(i, new_attr);
@@ -672,7 +669,7 @@ LOG_PROP *AGG_LIST::FindLogProp(LOG_PROP **input) {
   agg_schema->TableId = new int[1];
   agg_schema->TableId[0] = 0;
 
-  SCHEMA *result_schema = temp_schema->UnionSchema(agg_schema);
+  Schema *result_schema = temp_schema->UnionSchema(agg_schema);
   delete temp_schema;
   delete agg_schema;
 
@@ -745,17 +742,17 @@ bool AGG_LIST::operator==(Operator *other) {
 //##ModelId=3B0C08750224
 LOG_PROP *FUNC_OP::FindLogProp(LOG_PROP **input) {
   LOG_COLL_PROP *rel_input = (LOG_COLL_PROP *)input[0];
-  SCHEMA *temp_schema = new SCHEMA(*(rel_input->Schema));
+  Schema *temp_schema = new Schema(*(rel_input->schema));
 
-  SCHEMA *new_schema = new SCHEMA(1);
-  ATTR *new_attr = new ATTR(RangeVar, Atts, AttsSize);
+  Schema *new_schema = new Schema(1);
+  Attribute *new_attr = new Attribute(RangeVar, Atts, AttsSize);
   // the CuCard is the UCard of the input relation
   new_attr->CuCard = rel_input->UCard;
   new_schema->AddAttr(0, new_attr);
 
   new_schema->TableId = 0;
   new_schema->TableNum = 0;
-  SCHEMA *result_schema = temp_schema->UnionSchema(new_schema);
+  Schema *result_schema = temp_schema->UnionSchema(new_schema);
   delete temp_schema;
   delete new_schema;
 

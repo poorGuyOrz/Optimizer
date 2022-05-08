@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22.0)
 project(Optmizer VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
+# add_definitions(-D_SORT_AFTERS)
 
 function(redefine_file_macro targetname)
     #获取当前目标的所有源文件

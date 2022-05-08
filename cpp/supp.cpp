@@ -226,7 +226,7 @@ void KEYS_SET::update(string NewName) {
 
 // Returns the CuCard of the attribute
 float KEYS_SET::GetAttrCuCard(int index) {
-  ATTR *attr;
+  Attribute *attr;
   attr = Cat->GetAttr(KeyArray[index]);
   return attr->CuCard;
 }
@@ -297,7 +297,7 @@ string KEYS_SET::Dump() {
 }
 
 //##ModelId=3B0C08600288
-COLL_PROP::COLL_PROP(COLL_PROP &other)  // copy constructor
+CollectionsProperties::CollectionsProperties(CollectionsProperties &other)  // copy constructor
 {
   Card = other.Card;
   Keys = other.Keys;
@@ -312,7 +312,7 @@ COLL_PROP::COLL_PROP(COLL_PROP &other)  // copy constructor
 };
 
 //##ModelId=3B0C0860026A
-void COLL_PROP::update(string NewName) {
+void CollectionsProperties::update(string NewName) {
   Keys->update(NewName);
   CandidateKey->update(NewName);
   for (int i = 0; i < FKeyArray.size(); i++) {
@@ -321,7 +321,7 @@ void COLL_PROP::update(string NewName) {
 }
 
 // dump collection property content
-string COLL_PROP::Dump() {
+string CollectionsProperties::Dump() {
   string os;
   os = "Card: " + to_string(Card) + "\tUCard: " + to_string(UCard);
   if (Keys->GetSize() > 0) os += "\tOrder: " + OrderToString(Order);
@@ -343,18 +343,18 @@ string COLL_PROP::Dump() {
   return os;
 }
 
-void IND_PROP::update(string NewName) { Keys->update(NewName); }
+void IndexProperties::update(string NewName) { Keys->update(NewName); }
 
 // dump index property content
-string IND_PROP::Dump() {
+string IndexProperties::Dump() {
   return "  Type:" + IndexOrderToString(IndType) + "  Keys:" + (*Keys).Dump() +
          (Clustered == true ? "  Clustered" : "  not Clustered");
 }
 
-void BIT_IND_PROP::update(string NewName) { BitAttr->update(NewName); }
+void BitIndexProperties::update(string NewName) { BitAttr->update(NewName); }
 
 // dump index property content
-string BIT_IND_PROP::Dump() {
+string BitIndexProperties::Dump() {
   return "  Bit Attributes:", (*BitAttr).Dump() + "  Index Attributes:" + GetAttName(IndexAttr);
 }
 
@@ -362,7 +362,7 @@ string FOREIGN_KEY::Dump() {
   return "(  Foreign Key:" + (*ForeignKey).Dump() + "  reference to:" + (*RefKey).Dump() + "  )";
 }
 
-ATTR::ATTR(string range_var, int *atts, int size) {
+Attribute::Attribute(string range_var, int *atts, int size) {
   ATTR_EXP *ae = new ATTR_EXP(range_var, CopyArray(atts, size), size);
   AttId = ae->GetAttNew()->AttId;
   CuCard = ae->GetAttNew()->CuCard;
@@ -370,20 +370,20 @@ ATTR::ATTR(string range_var, int *atts, int size) {
   Max = ae->GetAttNew()->Max;
 
   delete ae;
-};  // ATTR::ATTR(string range_var, int * atts, int size)
+};  // Attribute::Attribute(string range_var, int * atts, int size)
 
-// ATTR dump function
-string ATTR::Dump() {
+// Attribute dump function
+string Attribute::Dump() {
   return GetAttName(AttId) + ":\tDomain: " + DomainToString(Cat->GetDomain(AttId)) + "\tCuCard: " + to_string(CuCard) +
          "\tMin: " + to_string(Min) + "\tMax: " + to_string(Max);
 };
 
-string ATTR::attrDump() { return GetAttName(AttId); }
+string Attribute::attrDump() { return GetAttName(AttId); }
 
-string ATTR::DumpCOVE() { return GetAttName(AttId) + " " + to_string((int)CuCard); };
+string Attribute::DumpCOVE() { return GetAttName(AttId) + ":" + to_string((int)CuCard) + "  "; };
 
-// SCHEMA function
-bool SCHEMA::AddAttr(int Index, ATTR *attr) {
+// Schema function
+bool Schema::AddAttr(int Index, Attribute *attr) {
   assert(Index < Size);
   Attrs[Index] = attr;
 
@@ -391,7 +391,7 @@ bool SCHEMA::AddAttr(int Index, ATTR *attr) {
 }
 
 // return true if the relname.attname is in the schema
-bool SCHEMA::InSchema(int AttId) {
+bool Schema::InSchema(int AttId) {
   int i = 0;
   for (i = 0; i < Size; i++)
     if (AttId == Attrs[i]->AttId) break;
@@ -403,7 +403,7 @@ bool SCHEMA::InSchema(int AttId) {
 }
 
 // max cucard of each tables in the schema
-float SCHEMA::GetTableMaxCuCard(int TableIndex) {
+float Schema::GetTableMaxCuCard(int TableIndex) {
   float Max = 0;
 
   for (int i = 0; i < Size; i++) {
@@ -421,7 +421,7 @@ float SCHEMA::GetTableMaxCuCard(int TableIndex) {
 }
 
 // width of the table in the schema
-float SCHEMA::GetTableWidth(int TableIndex) {
+float Schema::GetTableWidth(int TableIndex) {
   // add Width=0 for Table "", used for AGG_OP
   if (TableId[TableIndex] == 0) return 0;
   return Cat->GetCollProp(TableId[TableIndex])->Width;
@@ -429,8 +429,8 @@ float SCHEMA::GetTableWidth(int TableIndex) {
 
 // projection
 // 	projection of attrs onto schema
-SCHEMA *SCHEMA::projection(int *attrs, int size) {
-  SCHEMA *new_schema = new SCHEMA(size);
+Schema *Schema::projection(int *attrs, int size) {
+  Schema *new_schema = new Schema(size);
 
   new_schema->TableNum = 0;
   new_schema->TableId = new int[this->TableNum];
@@ -441,8 +441,8 @@ SCHEMA *SCHEMA::projection(int *attrs, int size) {
     for (index = 0; index < this->Size; index++) {
       if (attrs[i] == this->Attrs[index]->AttId) {
         // has attr op in projection list -- add it in:
-        // ATTR * Attr = new ATTR(Attrs[index]->AttId , Attrs[index]->CuCard, -1, -1);
-        ATTR *Attr = new ATTR(*Attrs[index]);
+        // Attribute * Attr = new Attribute(Attrs[index]->AttId , Attrs[index]->CuCard, -1, -1);
+        Attribute *Attr = new Attribute(*Attrs[index]);
         new_schema->AddAttr(i, Attr);
 
         // get the table info for the new schema
@@ -464,24 +464,24 @@ SCHEMA *SCHEMA::projection(int *attrs, int size) {
 
 }  // projection(attrs)
 
-// union the attributes from the two joined SCHEMA.
+// union the attributes from the two joined Schema.
 // also check the joined predicates(attributes) are in the catalog(schema)
 // calculate the ATT_PROP
-SCHEMA *SCHEMA::UnionSchema(SCHEMA *other) {
+Schema *Schema::UnionSchema(Schema *other) {
   int i, j;
 
   // union the schemas
   int LSize = this->GetSize();
   int RSize = other->GetSize();
 
-  SCHEMA *Schema = new SCHEMA(LSize + RSize);
+  Schema *schema = new Schema(LSize + RSize);
 
-  Schema->TableNum = this->TableNum + other->TableNum;
-  Schema->TableId = new int[Schema->TableNum];
-  for (i = 0; i < this->TableNum; i++) Schema->TableId[i] = this->TableId[i];
-  for (j = 0; j < other->TableNum; j++) Schema->TableId[i + j] = other->TableId[j];
+  schema->TableNum = this->TableNum + other->TableNum;
+  schema->TableId = new int[schema->TableNum];
+  for (i = 0; i < this->TableNum; i++) schema->TableId[i] = this->TableId[i];
+  for (j = 0; j < other->TableNum; j++) schema->TableId[i + j] = other->TableId[j];
 
-  ATTR *Attr;
+  Attribute *Attr;
   for (i = 0; i < LSize; i++) {
     // from cascade
     // we calculate new cucards, in a very very crude way.
@@ -490,8 +490,8 @@ SCHEMA *SCHEMA::UnionSchema(SCHEMA *other) {
     CuCard = (CuCard != -1) ? CuCard / 2 : -1;
     float min = (*this)[i]->Min;
     float max = (*this)[i]->Max;
-    Attr = new ATTR((*this)[i]->AttId, CuCard, min, max);
-    Schema->AddAttr(i, Attr);
+    Attr = new Attribute((*this)[i]->AttId, CuCard, min, max);
+    schema->AddAttr(i, Attr);
   }
 
   for (j = 0; j < RSize; j++) {
@@ -502,15 +502,15 @@ SCHEMA *SCHEMA::UnionSchema(SCHEMA *other) {
     CuCard = (CuCard != -1) ? CuCard / 2 : -1;
     float min = (*other)[j]->Min;
     float max = (*other)[j]->Max;
-    Attr = new ATTR((*other)[j]->AttId, CuCard, min, max);
-    Schema->AddAttr(i + j, Attr);
+    Attr = new Attribute((*other)[j]->AttId, CuCard, min, max);
+    schema->AddAttr(i + j, Attr);
   }
 
-  return Schema;
+  return schema;
 }
 
 // return true if contains all the keys
-bool SCHEMA::Contains(KEYS_SET *Keys) {
+bool Schema::Contains(KEYS_SET *Keys) {
   for (int i = 0; i < Keys->GetSize(); i++) {
     if (!InSchema((*Keys)[i])) return false;
   }
@@ -520,15 +520,15 @@ bool SCHEMA::Contains(KEYS_SET *Keys) {
 }  // Contains
 
 // free up memory
-SCHEMA::~SCHEMA() {
+Schema::~Schema() {
   for (int i = 0; i < Size; i++) delete Attrs[i];
   delete Attrs;
 
   delete[] TableId;
 }
 
-// SCHEMA dump function
-string SCHEMA::Dump() {
+// Schema dump function
+string Schema::Dump() {
   string os;
   for (int i = 0; i < Size; i++) {
     os += (*(Attrs[i])).Dump();
@@ -537,14 +537,14 @@ string SCHEMA::Dump() {
   return os;
 }
 
-string SCHEMA::DumpCOVE() {
+string Schema::DumpCOVE() {
   string os;
   for (int i = 0; i < Size; i++) os += (*(Attrs[i])).DumpCOVE();
   return os;
 }
 
-// SCHEMA attributes store function
-KEYS_SET *SCHEMA::AttrStore() {
+// Schema attributes store function
+KEYS_SET *Schema::AttrStore() {
   KEYS_SET *largeKeySet = new KEYS_SET();
   // PTRACE ("Schema Size is %d", GetSize());
   for (int i = 0; i < GetSize(); i++) {
@@ -560,7 +560,7 @@ KEYS_SET *SCHEMA::AttrStore() {
 // LOG_COLL_PROP dump function
 string LOG_COLL_PROP::Dump() {
   string os;
-  os = "  Card: " + to_string(Card) + "  UCard: " + to_string(UCard) + "\nSchema:\n" + (*Schema).Dump();
+  os = "  Card: " + to_string(Card) + "  UCard: " + to_string(UCard);  // + "\nSchema:\n" + (*schema).Dump();
   if (CandidateKey->GetSize() > 0) os += "CandidateKey:" + (*CandidateKey).Dump() + "\n";
 
   if (FKeyList.size() > 0) {
@@ -577,7 +577,7 @@ string LOG_COLL_PROP::Dump() {
 
 // LOG_COLL_PROP dump function for COVE script
 string LOG_COLL_PROP::DumpCOVE() {
-  return to_string((int)Card) + " " + to_string(UCard) + " { " + (*Schema).DumpCOVE() + " }\n";
+  return to_string((int)Card) + " " + to_string(UCard) + " { " + (*schema).DumpCOVE() + " }";
 };
 
 // misc functions
@@ -787,13 +787,10 @@ void parseString(char *p) {
 }
 
 //=============  PHYS_PROP Methods  ===================
-PHYS_PROP::PHYS_PROP(KEYS_SET *Keys, ORDER Order) : Keys(Keys), Order(Order) {
-};
+PHYS_PROP::PHYS_PROP(KEYS_SET *Keys, ORDER Order) : Keys(Keys), Order(Order){};
 
 // a constructor for ANY property
-PHYS_PROP::PHYS_PROP(ORDER Order) : Keys(NULL), Order(Order) {
-  assert(Order == any);
-}
+PHYS_PROP::PHYS_PROP(ORDER Order) : Keys(NULL), Order(Order) { assert(Order == any); }
 
 PHYS_PROP::PHYS_PROP(PHYS_PROP &other)
     : Keys(other.Order == any ? NULL : new KEYS_SET(*(other.Keys))), Order(other.Order) {

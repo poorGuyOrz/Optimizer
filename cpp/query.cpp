@@ -22,7 +22,7 @@
 #define KEYWORD_OP_NE "OP_NE"
 #define KEYWORD_OP_LIKE "OP_LIKE"
 #define KEYWORD_OP_IN "OP_IN"
-#define KEYWORD_ATTR "ATTR"
+#define KEYWORD_ATTR "Attribute"
 #define KEYWORD_STR "STR"
 #define KEYWORD_INT "INT"
 #define KEYWORD_RM_DUPLICATES "RM_DUPLICATES"
@@ -67,8 +67,6 @@ Query::Query(string QueryFile) {
   char *p;
   int i = 0;
   int LeftNumber = 0;
-
-  SET_TRACE Trace(false);
 
   if ((fp = fopen(QueryFile.c_str(), "r")) == NULL) OUTPUT_ERROR("can not open file 'query'!");
 
@@ -254,7 +252,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
   }
 
   // Deal with item epxrs
-  if (p = strstr(OneElement, KEYWORD_ATTR))  // ATTR
+  if (p = strstr(OneElement, KEYWORD_ATTR))  // Attribute
   {
     p += strlen(KEYWORD_ATTR);
     p = SkipSpace(p);
