@@ -81,18 +81,18 @@ OptimizeGroupTask::perform
     對於物理表達式。使用optinputtask優化
 */
 void OptimizeGroupTask::perform() {
+  auto GrpID = group_->GetGroupID();
   PTRACE("OptimizeGroupTask: " << GrpID << " is performing "
                                << "Last flag is " << Last);
 
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
 
-  Group *group = Ssp->GetGroup(GrpID);
-  MExression *FirstLogMExpr = group->GetFirstLogMExpr();
+  MExression *FirstLogMExpr = group_->GetFirstLogMExpr();
 
   if (FirstLogMExpr->GetOp()->is_const()) {
     PTRACE("Group " << GrpID << " is const group");
     MExression *WPlan = new MExression(*FirstLogMExpr);
-    group->NewWinner(new PHYS_PROP(any), WPlan, new Cost(0), true);
+    group_->NewWinner(new PHYS_PROP(any), WPlan, new Cost(0), true);
     return;
   }
 
@@ -102,7 +102,7 @@ void OptimizeGroupTask::perform() {
   PHYS_PROP *LocalReqdProp = LocalCont->GetPhysProp();  // What prop is required
   Cost *LocalCost = LocalCont->GetUpperBd();
 
-  SCReturn = group->search_circle(LocalCont, moreSearch);
+  SCReturn = group_->search_circle(LocalCont, moreSearch);
 
   // If case (2) or (1), terminate this task
   if (!moreSearch) {
@@ -111,22 +111,22 @@ void OptimizeGroupTask::perform() {
     return;
   }
 
-  PTRACE("Group is " << (group->is_optimized() ? "" : "not") << " optimized");
-  if (!group->is_optimized()) {
+  PTRACE("Group is " << (group_->is_optimized() ? "" : "not") << " optimized");
+  if (!group_->is_optimized()) {
     assert(moreSearch && !SCReturn);  // assert (this is case 3)
     // if (property is ANY)
     if (LocalReqdProp->GetOrder() == any) {
       PTRACE("add winner with null plan, push OptimizeExprTask on 1st logical expression");
-      group->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
+      group_->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
       PTasks.push(new OptimizeExprTask(FirstLogMExpr, false, ContextID, TaskNo, true));
     } else {
       PTRACE("Push OptimizeGroupTask with current context, another with ANY context");
       assert(LocalReqdProp->GetOrder() == sorted);  // temporary
-      PTasks.push(new OptimizeGroupTask(GrpID, ContextID, TaskNo, true));
+      PTasks.push(new OptimizeGroupTask(group_, ContextID, TaskNo, true));
       Cost *NewCost = new Cost(*(LocalCont->GetUpperBd()));
       CONT *NewContext = new CONT(new PHYS_PROP(any), NewCost, false);
       CONT::vc.push_back(NewContext);
-      PTasks.push(new OptimizeGroupTask(GrpID, CONT::vc.size() - 1, TaskNo, true));
+      PTasks.push(new OptimizeGroupTask(group_, CONT::vc.size() - 1, TaskNo, true));
     }
   } else  // Group is optimized
   {
@@ -138,7 +138,7 @@ void OptimizeGroupTask::perform() {
     if (LocalReqdProp->GetOrder() == any) {
       PTRACE("push OptimizeInputTask on all physical mexprs");
       assert(moreSearch && SCReturn);
-      for (MExression *PhysMExpr = group->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
+      for (MExression *PhysMExpr = group_->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
         PhysMExprs.push_back(PhysMExpr);
         count++;
       }
@@ -157,7 +157,7 @@ void OptimizeGroupTask::perform() {
       assert(LocalReqdProp->GetOrder() == sorted);  // temporary
       // Push OptimizeInputTask on all physical mexprs with current context, last one is last task
       PTRACE("Push OptimizeInputTask on all physical mexprs");
-      for (MExression *PhysMExpr = group->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
+      for (MExression *PhysMExpr = group_->GetFirstPhysMExpr(); PhysMExpr; PhysMExpr = PhysMExpr->GetNextMExpr()) {
         PhysMExprs.push_back(PhysMExpr);
         count++;
       }
@@ -177,7 +177,7 @@ void OptimizeGroupTask::perform() {
       if (!SCReturn) {
         PTRACE("Push ApplyRuleTask on enforcer rule");
         if (LocalReqdProp->GetOrder() == sorted) {
-          RULE *Rule = (*ruleSet)[R_SORT_RULE];
+          Rule *Rule = (*ruleSet)[R_SORT_RULE];
           PTasks.push(new ApplyRuleTask(Rule, FirstLogMExpr, false, ContextID, TaskNo, false));
         } else {
           assert(false);
@@ -186,7 +186,7 @@ void OptimizeGroupTask::perform() {
       // add a winner to the circle, with null plan.
       //(i.e., initialize the winner's circle for this property.)
       PTRACE("Init winner's circle for this property");
-      if (moreSearch && !SCReturn) group->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
+      if (moreSearch && !SCReturn) group_->NewWinner(LocalReqdProp, nullptr, new Cost(*LocalCost), false);
     }
   }
   delete this;
@@ -195,41 +195,32 @@ void OptimizeGroupTask::perform() {
 
 string OptimizeGroupTask::Dump() {
   string os;
-
-  os = "OptimizeGroupTask group: " + to_string(GrpID) + ", parent task: " + to_string(ParentTaskNo) +
+  os = "OptimizeGroupTask group: " + to_string(group_->GetGroupID()) + ", parent task: " + to_string(ParentTaskNo) +
        ", Last: " + to_string(Last);
   os += ", " + CONT::vc[ContextID]->Dump();
   return os;
 }
 
-ExploreGroupTask::ExploreGroupTask(int grpID, int ContextID, int parentTaskNo, bool last)
-    : OptimizerTask(ContextID, parentTaskNo), GrpID(grpID), Last(last){};
-
 void ExploreGroupTask::perform() {
+  auto GrpID = group_->GetGroupID();
   PTRACE("ExploreGroupTask " << GrpID << " performing");
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
 
-  Group *group = Ssp->GetGroup(GrpID);
-
-  if (group->is_optimized())  // See discussion in ExploreGroupTask class declaration
-  {
-    delete this;
-    return;
-  } else if (group->is_explored()) {
+  if (group_->is_optimized() || group_->is_explored()) {
     delete this;
     return;
   }
 
-  if (group->is_exploring())
+  if (group_->is_exploring())
     assert(false);
   else {
     // the group will be explored, let other tasks don't do it again
-    group->set_exploring(true);
+    group_->set_exploring(true);
 
     // mark the group not explored since we will begin exploration
-    group->set_explored(false);
+    group_->set_explored(false);
 
-    MExression *LogMExpr = group->GetFirstLogMExpr();
+    MExression *LogMExpr = group_->GetFirstLogMExpr();
 
     // only need to E_EXPR the first log expr,
     // because it will generate all logical exprs by applying appropriate rules
@@ -244,7 +235,7 @@ void ExploreGroupTask::perform() {
 
 string ExploreGroupTask::Dump() {
   string os;
-  os = "ExploreGroupTask  group: " + to_string(GrpID) + ", parent task: " + to_string(ParentTaskNo) +
+  os = "ExploreGroupTask  group: " + to_string(group_->GetGroupID()) + ", parent task: " + to_string(ParentTaskNo) +
        ", Last: " + to_string(Last);
   os += ", " + CONT::vc[ContextID]->Dump();
   return os;
@@ -279,7 +270,7 @@ void OptimizeExprTask::perform() {
   MOVE *Move = new MOVE[ruleSet->RuleCount];  // to collect valid, promising moves
   int moves = 0;                              // # of moves already collected
   for (int RuleNo = 0; RuleNo < ruleSet->RuleCount; RuleNo++) {
-    RULE *Rule = (*ruleSet)[RuleNo];
+    Rule *Rule = (*ruleSet)[RuleNo];
 
     if (Rule == nullptr) continue;  // some rules may be turned off
 
@@ -318,7 +309,7 @@ void OptimizeExprTask::perform() {
     }
 
     // push future tasks in reverse order (due to LIFO stack)
-    RULE *Rule = Move[moves].rule;
+    Rule *Rule = Move[moves].rule;
     PTRACE("pushing rule " << Rule->GetName());
 
     // apply the rule
@@ -336,7 +327,7 @@ void OptimizeExprTask::perform() {
         int grp_no = (MExpr->GetInput(input_no));
         if (!Ssp->GetGroup(grp_no)->is_exploring()) {
           // ExploreGroupTask can not be the last task for the group
-          PTasks.push(new ExploreGroupTask(grp_no, ContextID, TaskNo, false));
+          PTasks.push(new ExploreGroupTask(Ssp->GetGroup(grp_no), ContextID, TaskNo, false));
         }
       }
     }  // earlier tasks: explore all inputs to match the original pattern
@@ -492,7 +483,11 @@ void OptimizeInputTask::perform() {
   // Cache local properties of G and the expression being optimized
 
   Operator *Op = MExpr->GetOp();  // the op of the expr
-  assert(Op->is_physical());
+  // assert(Op->is_physical());
+  // if (!Op->is_physical()) {
+  //   cout << "error" << endl;
+  //   abort();
+  // }
   Group *LocalGroup = Ssp->GetGroup(MExpr->GetGrpID());  // Group of the MExpr
 
   PHYS_PROP *LocalReqdProp = CONT::vc[ContextID]->GetPhysProp();  // What prop is required
@@ -694,7 +689,7 @@ void OptimizeInputTask::perform() {
       int ContID = CONT::vc.size() - 1;
       PTRACE("push OptimizeGroupTask " << IGNo << ", " << CONT::vc[ContID]->Dump());
 
-      PTasks.push(new OptimizeGroupTask(IGNo, ContID, TaskNo, true));
+      PTasks.push(new OptimizeGroupTask(IG, ContID, TaskNo, true));
 
       // delete (void*) CostSoFar;
       delete IGContext;
@@ -828,8 +823,8 @@ string OptimizeInputTask::Dump() {
   return os;
 }  // Dump
 
-ApplyRuleTask::ApplyRuleTask(RULE *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last)
-    : OptimizerTask(ContextID, parent_task_no), Rule(rule), MExpr(mexpr), explore(explore), Last(last){};
+ApplyRuleTask::ApplyRuleTask(Rule *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last)
+    : OptimizerTask(ContextID, parent_task_no), rule(rule), MExpr(mexpr), explore(explore), Last(last){};
 
 ApplyRuleTask::~ApplyRuleTask() {
   if (Last) {
@@ -856,7 +851,7 @@ ApplyRuleTask::~ApplyRuleTask() {
 void ApplyRuleTask::perform() {
   CONT *Context = CONT::vc[ContextID];
 
-  PTRACE("ApplyRuleTask performing, rule: " << Rule->GetName() << " expression: " << MExpr->Dump());
+  PTRACE("ApplyRuleTask performing, rule: " << rule->GetName() << " expression: " << MExpr->Dump());
   PTRACE("Context ID: " << ContextID << " , " << CONT::vc[ContextID]->Dump());
   PTRACE("Last flag is " << Last);
 
@@ -873,7 +868,7 @@ void ApplyRuleTask::perform() {
   // if not stop generating logical expression when epsilon prune is applied
   // if this context is done and the substitute is physical, if the substitute
   // is logical continue
-  if (Context->is_done() && Rule->is_log_to_phys()) {
+  if (Context->is_done() && rule->is_log_to_phys()) {
     PTRACE("Context: %s is done", Context->GetPhysProp()->Dump());
     delete this;
     return;
@@ -918,26 +913,26 @@ void ApplyRuleTask::perform() {
   //     search space.
 
   // Loop over all Bindings of MExpr to the original pattern of the rule
-  bindery = new BINDERY(MExpr, Rule->GetOriginal());
+  bindery = new BINDERY(MExpr, rule->GetOriginal());
   for (; bindery->advance(); delete before) {
     // There must be a Binding since advance() returned non-null.
     // Extract the bound Expression from the bindery
     before = bindery->extract_expr();
     PTRACE("new Binding is: " << endl << before->Dump());
-    Bindings[Rule->get_index()]++;
+    Bindings[rule->get_index()]++;
     // check the rule's condition function
     CONT *Cont = CONT::vc[ContextID];
     PHYS_PROP *ReqdProp = Cont->GetPhysProp();  // What prop is required of
 
-    if (!Rule->condition(before, MExpr, ContextID)) {
+    if (!rule->condition(before, MExpr, ContextID)) {
       PTRACE("Binding FAILS condition function, expr: " << MExpr->Dump());
       continue;  // try to find another binding
     }
     PTRACE("Binding SATISFIES condition function.  Mexpr: " << MExpr->Dump());
 
-    Conditions[Rule->get_index()]++;
+    Conditions[rule->get_index()]++;
     // try to derive a new substitute expression
-    after = Rule->next_substitute(before, ReqdProp);
+    after = rule->next_substitute(before, ReqdProp);
 
     assert(after != nullptr);
 
@@ -961,7 +956,7 @@ void ApplyRuleTask::perform() {
     delete after;  // "after" no longer used
 
     // Give this expression the rule's mask
-    NewMExpr->set_rule_mask(Rule->get_mask());
+    NewMExpr->set_rule_mask(rule->get_mask());
 
     // We need to handle this case for rules like project -> nullptr,
     // by merging groups
@@ -1006,13 +1001,12 @@ void ApplyRuleTask::perform() {
   delete bindery;
 
   // Mark rule vector to show that this rule has fired
-  MExpr->fire_rule(Rule->get_index());
+  MExpr->fire_rule(rule->get_index());
 
   // tasks must destroy themselves
   delete this;
 }
 
 string ApplyRuleTask::Dump() {
-  return "ApplyRuleTask     " + Rule->Dump() + ", mexpr " + MExpr->Dump() + ", parent task " +
-         to_string(ParentTaskNo);
+  return "ApplyRuleTask     " + rule->Dump() + ", mexpr " + MExpr->Dump() + ", parent task " + to_string(ParentTaskNo);
 }

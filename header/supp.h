@@ -662,7 +662,6 @@ class Cost {
 CONTEXTs/CONSTRAINTS on a search
 ============================================================
 */
-class CONT
 // Each search for the cheapest solution to a problem or
 // subproblem is done relative to some conditions, also called
 // constraints.  In our context, a condition consists of
@@ -675,7 +674,7 @@ class CONT
 // not only to save space, but to share information about when
 // the search is done, what is the current upper bound, etc.
 
-{
+class CONT {
  public:
   // The vector of contexts, vc, implements sharing.  Each task which
   // creates a context  adds an entry to this vector.  Finish is true
@@ -710,8 +709,7 @@ class CONT
 
   //  Update bounds, when we get better ones.
   inline void SetUpperBound(Cost &NewUB) { *UpperBd = NewUB; };
-
-};  // class CONT
+};
 
 /*
            ============================================================

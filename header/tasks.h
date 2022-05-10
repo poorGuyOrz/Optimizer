@@ -1,22 +1,12 @@
 #pragma once
-#include <stack>
 
 #include "rules.h"
-// class OptimizerTask;       // Abstract class for all task classes
-// class OptimizerTaskStack;  // Pending tasks - some structure which contains all tasks waiting to execute
-// class OptimizeGroupTask;   // Optimize a Group - find the cheapest plan in the group satisfying a context
-// class OptimizeExprTask;    // Optimize an Expression - Fire all relevant rules for this expression
-// class ExploreGroupTask;    // Explore a group - Fire all transformation rules in this group.
-// class OptimizeInputTask;            // Optimize inputs - determine if this expression satisfies the current context
-// class ApplyRuleTask;       // Apply a single rule to a single MExression
 
-// Pair of rule and promise, used to sort rules according to their promise
 typedef struct MOVE {
   int promise;
-  RULE *rule;
+  Rule *rule;
 } MOVE;
 
-// Pair of expr and cost value, used to sort expr according to their cost
 typedef struct AFTERS {
   MExression *m_expr;
   Cost *cost;
@@ -51,16 +41,6 @@ class OptimizerTask {
   virtual string Dump() = 0;
   virtual void perform() = 0;
 };
-
-/*
-  ============================================================
-  OptimizerTaskStack - Pending Tasks
-  ============================================================
-  This collection of undone tasks is currently stored as a stack.
-  Other structures are certainly appropriate, but in any case dependencies
-  must be stored.  For example, a directed graph could be used to
-  parallelize optimization.
-*/
 
 class OptimizerTaskStack {
  private:
@@ -133,26 +113,17 @@ class OptimizerTaskStack {
 
 class OptimizeGroupTask : public OptimizerTask {
  private:
-  int GrpID;  // Which group to optimize
-  bool Last;  // if this task is the last task for this group
- public:
-  OptimizeGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = true)
-      : OptimizerTask(ContextID, parent_task_no), GrpID(GrpID), Last(last) {
-    // if INFBOUND flag is on, set the bound to be INF
-#ifdef INFBOUND
-    Cost *INFCost = new Cost(-1);
-    CONT::vc[ContextID]->SetUpperBound(*INFCost);
-#endif
-  };
-  ~OptimizeGroupTask(){};
+  Group *group_;
+  bool Last;
 
-  // Optimize the group by searching for a winner for the context.
-  // Initialize or update the winner for the context's property
+ public:
+  OptimizeGroupTask(Group *group, int ContextID, int parent_task_no, bool last = true)
+      : OptimizerTask(ContextID, parent_task_no), group_(group), Last(last){};
+
   void perform();
 
   string Dump();
-
-};  // OptimizeGroupTask
+};
 
 /*
 
@@ -184,11 +155,11 @@ class OptimizeGroupTask : public OptimizerTask {
  */
 class ExploreGroupTask : public OptimizerTask {
  private:
-  int GrpID;  // Group to be explored
+  Group *group_;
   bool Last;  // is it the last task in this group
  public:
-  ExploreGroupTask(int GrpID, int ContextID, int parent_task_no, bool last = false);
-  ~ExploreGroupTask(){};
+  ExploreGroupTask(Group *group, int ContextID, int parentTaskNo, bool last)
+      : OptimizerTask(ContextID, parentTaskNo), group_(group), Last(last){};
 
   void perform();
 
@@ -295,17 +266,16 @@ class OptimizeInputTask : public OptimizerTask {
 
 class ApplyRuleTask : public OptimizerTask {
  private:
-  RULE *Rule;          // rule to apply
+  Rule *rule;          // rule to apply
   MExression *MExpr;   // root of expr. before rule
   const bool explore;  // if this task is for exploring
   bool Last;           // if this task is the last task for the group
  public:
-  ApplyRuleTask(RULE *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false);
+  ApplyRuleTask(Rule *rule, MExression *mexpr, bool explore, int ContextID, int parent_task_no, bool last = false);
 
   ~ApplyRuleTask();
 
   void perform();
 
   string Dump();
-
-};  // ApplyRuleTask
+};

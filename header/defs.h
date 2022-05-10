@@ -83,7 +83,7 @@ class Query;
 class OptimizerTaskStack;
 class SearchSpace;
 class CAT;
-class RULE;
+class Rule;
 class OPT_STAT;
 class RuleSet;
 class CostModel;

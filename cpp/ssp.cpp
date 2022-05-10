@@ -514,10 +514,9 @@ WINNER *Group::GetWinner(PHYS_PROP *PhysProp) {
 void Group::NewWinner(PHYS_PROP *ReqdProp, MExression *MExpr, Cost *TotalCost, bool done) {
   if (COVETrace && MExpr)  // New Winner
   {
-    OutputCOVE << "\tNewWin { " << to_string(MExpr->GetGrpID()) << " \"" << ReqdProp->Dump() << "\" " << TotalCost->Dump()
-               << " } { " << to_string(MExpr->GetGrpID()) << " " << MExpr << " \"" << MExpr->Dump() << "\" "
-               << (done ? "Done" : "Not Done") << " }"
-               << endl;
+    OutputCOVE << "\tNewWin { " << to_string(MExpr->GetGrpID()) << " \"" << ReqdProp->Dump() << "\" "
+               << TotalCost->Dump() << " } { " << to_string(MExpr->GetGrpID()) << " " << MExpr << " \"" << MExpr->Dump()
+               << "\" " << (done ? "Done" : "Not Done") << " }" << endl;
   }
 
   this->set_changed(true);
@@ -569,7 +568,7 @@ void SearchSpace::optimize() {
   }
 
   // start optimization with root group, 0th context, parent task of zero.
-  PTasks.push(new OptimizeGroupTask(RootGID, 0, 0, true));
+  PTasks.push(new OptimizeGroupTask(Ssp->GetGroup(RootGID), 0, 0, true));
 
   while (!PTasks.empty()) {
     TaskNo++;

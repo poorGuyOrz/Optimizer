@@ -22,7 +22,7 @@
 #define KEYWORD_OP_NE "OP_NE"
 #define KEYWORD_OP_LIKE "OP_LIKE"
 #define KEYWORD_OP_IN "OP_IN"
-#define KEYWORD_ATTR "Attribute"
+#define KEYWORD_ATTR "ATTR"
 #define KEYWORD_STR "STR"
 #define KEYWORD_INT "INT"
 #define KEYWORD_RM_DUPLICATES "RM_DUPLICATES"

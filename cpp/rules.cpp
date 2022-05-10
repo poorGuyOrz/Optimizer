@@ -502,7 +502,7 @@ void BINDERY::test_delete(int arity) {
 
 // Rule  Get -> File-scan
 GET_TO_FILE_SCAN::GET_TO_FILE_SCAN()
-    : RULE("Get->FileScan", 0, new Expression(new GET(0)), new Expression(new FILE_SCAN(0))) {
+    : Rule("Get->FileScan", 0, new Expression(new GET(0)), new Expression(new FILE_SCAN(0))) {
   set_index(R_GET_TO_FILE_SCAN);
 };
 
@@ -513,7 +513,7 @@ Expression *GET_TO_FILE_SCAN::next_substitute(Expression *before, PHYS_PROP *Req
 
 //  Rule  EQJOIN  -> LOOPS JOIN
 EQ_TO_LOOPS::EQ_TO_LOOPS()
-    : RULE(
+    : Rule(
           "EQJOIN->LOOPS_JOIN", 2,
           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
           new Expression(new LOOPS_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
@@ -547,7 +547,7 @@ bool EQ_TO_LOOPS::condition(Expression *before, MExression *mexpr, int ContextID
 
 // Rule  EQJOIN  -> LOOPS INDEX JOIN
 EQ_TO_LOOPS_INDEX::EQ_TO_LOOPS_INDEX()
-    : RULE("EQJOIN -> LOOPS_INDEX_JOIN", 1,
+    : Rule("EQJOIN -> LOOPS_INDEX_JOIN", 1,
            new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new GET(0))),
            new Expression(new LOOPS_INDEX_JOIN(0, 0, 0, 0), new Expression(new LeafOperator(0)))) {
   set_index(R_EQ_TO_LOOPS_INDEX);
@@ -596,7 +596,7 @@ bool EQ_TO_LOOPS_INDEX::condition(Expression *before, MExression *mexpr, int Con
 
 // Rule  EQJOIN  -> MERGE JOIN
 EQ_TO_MERGE::EQ_TO_MERGE()
-    : RULE(
+    : Rule(
           "EQJOIN -> MERGE_JOIN", 2,
           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
           new Expression(new MERGE_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
@@ -639,14 +639,9 @@ bool EQ_TO_MERGE::condition(Expression *before, MExression *mexpr, int ContextID
 }  // EQ_TO_MERGE::condition
 #endif
 
-/*
-  Rule  EQJOIN  -> HASH JOIN
-  ====  ======  == ===== ====
-*/
-
-//##ModelId=3B0C086A02B4
+// Rule  EQJOIN  -> HASH JOIN
 EQ_TO_HASH::EQ_TO_HASH()
-    : RULE(
+    : Rule(
           "EQJOIN->HASH_JOIN", 2,
           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
           new Expression(new HASH_JOIN(0, 0, 0), new Expression(new LeafOperator(0)),
@@ -685,7 +680,7 @@ Expression *EQ_TO_HASH::next_substitute(Expression *before, PHYS_PROP *ReqdProp)
 */
 //##ModelId=3B0C086A03CE
 EQJOIN_COMMUTE::EQJOIN_COMMUTE()
-    : RULE(
+    : Rule(
           "EQJOIN_COMMUTE", 2,
           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(1)),
@@ -717,7 +712,7 @@ Expression *EQJOIN_COMMUTE::next_substitute(Expression *before, PHYS_PROP *ReqdP
 */
 // assoc of join left to right
 EQJOIN_LTOR::EQJOIN_LTOR()
-    : RULE("EQJOIN_LTOR", 3,
+    : Rule("EQJOIN_LTOR", 3,
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
                                          new Expression(new LeafOperator(0)),  // A
@@ -918,7 +913,7 @@ Right to Left Associativity
 */
 //##ModelId=3B0C086B016C
 EQJOIN_RTOL::EQJOIN_RTOL()
-    : RULE("EQJOIN_RTOL", 3,
+    : Rule("EQJOIN_RTOL", 3,
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new LeafOperator(0)),  // A
                           new Expression(new EQJOIN(0, 0, 0),
@@ -1105,12 +1100,9 @@ bool EQJOIN_RTOL::condition(Expression *before, MExression *mexpr, int ContextID
   return true;
 }  // EQJOIN_RTOL::condition
 
-/*
-        Cesar's EXCHANGE rule: (AxB)x(CxD) -> (AxC)x(BxD)
-          ====  ============= =
-*/
+// Cesar's EXCHANGE rule: (AxB)x(CxD) -> (AxC)x(BxD)
 EXCHANGE::EXCHANGE()
-    : RULE("EXCHANGE", 4,
+    : Rule("EXCHANGE", 4,
            new Expression(new EQJOIN(0, 0, 0),
                           new Expression(new EQJOIN(0, 0, 0),
                                          new Expression(new LeafOperator(0)),   // A
@@ -1127,12 +1119,10 @@ EXCHANGE::EXCHANGE()
                                          new Expression(new LeafOperator(1)),    // B
                                          new Expression(new LeafOperator(3)))))  // D
 {
-  // set rule mask and index
   set_index(R_EXCHANGE);
   set_mask(1 << R_EQJOIN_COMMUTE | 1 << R_EQJOIN_LTOR | 1 << R_EQJOIN_RTOL | 1 << R_EXCHANGE);
 }  // EXCHANGE::EXCHANGE
 
-//##ModelId=3B0C086B0249
 Expression *EXCHANGE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   /*
    * Join numbering convention:
@@ -1394,24 +1384,17 @@ bool EXCHANGE::condition(Expression *before, MExression *mexpr, int ContextID) {
   return true;
 }  // EXCHANGE::condition
 
-/*
-  Rule  SELECT  -> FILTER
-  ====  ======  == ======
-*/
-
-//##ModelId=3B0C086B0361
+// Rule  SELECT  -> FILTER
 SELECT_TO_FILTER::SELECT_TO_FILTER()
-    : RULE("SELECT -> FILTER", 2,
+    : Rule("SELECT -> FILTER", 2,
            new Expression(new SELECT,
                           new Expression(new LeafOperator(0)),  // table
                           new Expression(new LeafOperator(1))   // predicate
                           ),
            new Expression(new FILTER, new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
-  // set rule index
   set_index(R_SELECT_TO_FILTER);
-}  // SELECT_TO_FILTER::SELECT_TO_FILTER
+}
 
-//##ModelId=3B0C086B036A
 Expression *SELECT_TO_FILTER::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
 
@@ -1419,20 +1402,15 @@ Expression *SELECT_TO_FILTER::next_substitute(Expression *before, PHYS_PROP *Req
   result = new Expression(new FILTER, new Expression(*(before->GetInput(0))), new Expression(*(before->GetInput(1))));
 
   return (result);
-}  // SELECT_TO_FILTER::next_substitute
+}
 
-/*
-    Rule  PROJ -> P PROJ
-    ====  ==== == =-====
-*/
-
-//##ModelId=3B0C086B02DE
+// Rule  PROJ -> P PROJ
 P_TO_PP::P_TO_PP()
-    : RULE("PROJECT -> P_PROJECT", 1, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
+    : Rule("PROJECT -> P_PROJECT", 1, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
            new Expression(new P_PROJECT(0, 0), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_P_TO_PP);
-}  // P_TO_PP::P_TO_PP
+}
 
 Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
@@ -1459,28 +1437,20 @@ Expression *P_TO_PP::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   return (result);
 }  // P_TO_PP::next_substitute
 
-/*
-    Rule  Sort enforcer
-    ====  ============
-*/
-
-//##ModelId=3B0C086C0037
+// Rule  Sort enforcer
 SORT_RULE::SORT_RULE()
-    : RULE("SORT enforcer", 1, new Expression(new LeafOperator(0)),
+    : Rule("SORT enforcer", 1, new Expression(new LeafOperator(0)),
            new Expression(new QSORT(),  // bogus should this be oby?
                           new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_SORT_RULE);
-}  // SORT_RULE::SORT_RULE
+}
 
-//##ModelId=3B0C086C004C
 Expression *SORT_RULE::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
-  // create transformed expression
   Expression *result = new Expression(new QSORT(), new Expression(*before));
   return (result);
 }
 
-//##ModelId=3B0C086C0041
 int SORT_RULE::promise(Operator *op_arg, int ContextID) {
   CONT *Cont = CONT::vc[ContextID];
   PHYS_PROP *ReqdProp = Cont->GetPhysProp();  // What prop is required of
@@ -1488,25 +1458,18 @@ int SORT_RULE::promise(Operator *op_arg, int ContextID) {
   int result = (ReqdProp->GetOrder() == any) ? 0 : SORT_PROMISE;
 
   return (result);
-}  // SORT_RULE::promise
+}
 
-/*
-    Rule  RM_DUPLICATES  -> HASH_DUPLICATES
-    ====  ======  == ======
-*/
-
-//##ModelId=3B0C086C00EB
+// Rule  RM_DUPLICATES  -> HASH_DUPLICATES
 RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES()
-    : RULE("RM_DUPLICATES  -> HASH_DUPLICATES", 1,
+    : Rule("RM_DUPLICATES  -> HASH_DUPLICATES", 1,
            new Expression(new RM_DUPLICATES(),
                           new Expression(new LeafOperator(0))  // input table
                           ),
            new Expression(new HASH_DUPLICATES(), new Expression(new LeafOperator(0)))) {
-  // set rule index
   set_index(R_RM_TO_HASH_DUPLICATES);
-}  // RM_TO_HASH_DUPLICATES::RM_TO_HASH_DUPLICATES
+}
 
-//##ModelId=3B0C086C00F5
 Expression *RM_TO_HASH_DUPLICATES::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
 
@@ -1514,25 +1477,19 @@ Expression *RM_TO_HASH_DUPLICATES::next_substitute(Expression *before, PHYS_PROP
   result = new Expression(new HASH_DUPLICATES(), new Expression(*(before->GetInput(0))));
 
   return (result);
-}  // RM_TO_HASH_DUPLICATES::next_substitute
+}
 
-/*
-    Rule  AGG_LIST  -> HGROUP_LIST
-    ====  ======  == ======
-*/
-
-//##ModelId=3B0C086C018C
+// Rule  AGG_LIST  -> HGROUP_LIST
 AL_TO_HGL::AL_TO_HGL(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
-    : RULE("AGG_LIST  -> HGROUP_LIST", 1,
+    : Rule("AGG_LIST  -> HGROUP_LIST", 1,
            new Expression(new AGG_LIST(0, 0, list1),
                           new Expression(new LeafOperator(0))  // input table
                           ),
            new Expression(new HGROUP_LIST(0, 0, list2), new Expression(new LeafOperator(0)))) {
   // set rule index
   set_index(R_AL_TO_HGL);
-}  // AL_TO_HGL::AL_TO_HGL
+}
 
-//##ModelId=3B0C086C0196
 Expression *AL_TO_HGL::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
 
@@ -1553,14 +1510,9 @@ Expression *AL_TO_HGL::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
   return (result);
 }  // AL_TO_HGL::next_substitute
 
-/*
-    Rule  FUNC_OP  -> P_FUNC_OP
-    ====  ======  == ======
-*/
-
-//##ModelId=3B0C086C0235
+// Rule  FUNC_OP  -> P_FUNC_OP
 FO_TO_PFO::FO_TO_PFO()
-    : RULE("FUNC_OP  -> P_FUNC_OP", 1,
+    : Rule("FUNC_OP  -> P_FUNC_OP", 1,
            new Expression(new FUNC_OP("", 0, 0),
                           new Expression(new LeafOperator(0))  // input table
                           ),
@@ -1590,7 +1542,7 @@ Expression *FO_TO_PFO::next_substitute(Expression *before, PHYS_PROP *ReqdProp) 
 
 //##ModelId=3B0C086C0308
 AGG_THRU_EQJOIN::AGG_THRU_EQJOIN(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2)
-    : RULE("AGGREGATE EQJOIN -> JOIN AGGREGATE", 2,
+    : Rule("AGGREGATE EQJOIN -> JOIN AGGREGATE", 2,
            new Expression(new AGG_LIST(0, 0, list1),
                           new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                                          new Expression(new LeafOperator(1)))),
@@ -1716,7 +1668,7 @@ bool AGG_THRU_EQJOIN::condition(Expression *before, MExression *mexpr, int Conte
 
 //##ModelId=3B0C086D0010
 EQ_TO_BIT::EQ_TO_BIT()
-    : RULE("EQJOIN -> BIT_JOIN", 2,
+    : Rule("EQJOIN -> BIT_JOIN", 2,
            new Expression(new EQJOIN(0, 0, 0), new Expression(new LeafOperator(0)),
                           new Expression(new SELECT,
                                          new Expression(new GET(0)),          // table
@@ -1823,7 +1775,7 @@ Rule  SELECT  -> INDEXED_FILTER
 
 //##ModelId=3B0C086D00F6
 SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER()
-    : RULE("SELECT -> INDEXED_FILTER", 1,
+    : Rule("SELECT -> INDEXED_FILTER", 1,
            new Expression(new SELECT,
                           new Expression(new GET(0)),          // table
                           new Expression(new LeafOperator(0))  // predicate
@@ -1868,24 +1820,18 @@ bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, MExression *mexpr, 
   return (false);
 }
 
-/* ============================================================ */
-/*
-Rule  PROJ SEL -> SEL PROJ
-====  ==== === == === ====
-*/
-//##ModelId=3B0C086D01B5
+// Rule  PROJ SEL -> SEL PROJ
 PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
-    : RULE("PROJECT_THRU_SELECT", 2,
+    : Rule("PROJECT_THRU_SELECT", 2,
+           new Expression(new PROJECT(0, 0),                                   //
+                          new Expression(new SELECT,                           //
+                                         new Expression(new LeafOperator(0)),  //
+                                         new Expression(new LeafOperator(1)))),
            new Expression(new PROJECT(0, 0),
-                          new Expression(new SELECT,  // table
-                                         new Expression(new LeafOperator(0)),
-                                         new Expression(new LeafOperator(1))  // predicate
-                                         )),
-           new Expression(
-               new PROJECT(0, 0),
-               new Expression(new SELECT, new Expression(new PROJECT(0, 0), new Expression(new LeafOperator(0))),
-                              new Expression(new LeafOperator(1))))) {
-  // set rule index
+                          new Expression(new SELECT,                        //
+                                         new Expression(new PROJECT(0, 0),  //
+                                                        new Expression(new LeafOperator(0))),
+                                         new Expression(new LeafOperator(1))))) {
   set_index(R_PROJECT_THRU_SELECT);
   set_mask(1 << R_PROJECT_THRU_SELECT);
 }  // PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
@@ -1926,24 +1872,14 @@ Expression *PROJECT_THRU_SELECT::next_substitute(Expression *before, PHYS_PROP *
   return result;
 }  // PROJECT_THRU_SELECT::next_substitute
 
-/*
-    Rule  DUMMY  -> PDUMMY
-    ====  =====  == ======
-*/
-
-//##ModelId=3B0C086D026A
+// Rule  DUMMY  -> PDUMMY
 DUMMY_TO_PDUMMY::DUMMY_TO_PDUMMY()
-    : RULE("DUMMY->PDUMMY", 2,
+    : Rule("DUMMY->PDUMMY", 2,
            new Expression(new DUMMY(), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))),
-           new Expression(new PDUMMY(), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1))
-
-                              )) {
-  // set rule index
+           new Expression(new PDUMMY(), new Expression(new LeafOperator(0)), new Expression(new LeafOperator(1)))) {
   set_index(R_DUMMY_TO_PDUMMY);
+}
 
-}  // DUMMY_TO_PDUMMY::DUMMY_TO_PDUMMY
-
-//##ModelId=3B0C086D0273
 Expression *DUMMY_TO_PDUMMY::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   DUMMY *Op = (DUMMY *)before->GetOp();
 
@@ -1951,4 +1887,4 @@ Expression *DUMMY_TO_PDUMMY::next_substitute(Expression *before, PHYS_PROP *Reqd
   Expression *result =
       new Expression(new PDUMMY(), new Expression(*(before->GetInput(0))), new Expression(*(before->GetInput(1))));
   return result;
-}  // DUMMY_TO_PDUMMY::next_substitute
+}
