@@ -208,3 +208,45 @@ Winners:
         sorted on (C.Z)  KeyOrder: (ascending, HASH_JOIN(<C.Y>,<AB.Y>), input: 4, input: 3, 10.819944, Not done
 LowerBound: 0.388580
 log_prop:   Card: 26846.000000  UCard: 26846.000000
+
+
+-----
+表达式的实现
+1. 表达式和功能分离，表达式只是存粹的表达式，不包含其他的额外功能，
+  SQL可以抽象为某几个阶段，表达式从一个阶段进入到下一个阶段，利于实现。层次分明，代码解耦，易于测试
+  ```c++
+    ast = parser(sql)
+    {
+      bind(ast);
+      optmizer(ast);
+      execute(ast);
+      break;
+    }
+  ```
+2. 表达式和功能结合，表达式实现不同功能的实现方法，表达式始终存在，SQL执行到某阶段。只是执行到表达式的某阶段的代码实现
+  紧耦合，SQL的生命周期可以抽象为一个对象的函数的执行，最终表达式会膨胀到难以理解的地步，不利于测试。
+  ```c++
+    statement = parser(sql)
+    {
+      statement.bind();
+      statement.optmizer();
+      statement.execute();
+    }
+  ```
+3. 不同阶段使用不同的实现，parser binder按照statement为单位表示SQL，内部可以有自己的表示方法，
+  ```c++
+    statement = parser(sql)
+    {
+      statement.bind();
+      optree = statement.convert;
+      optmizer(optree);
+      execute(optree);
+    }
+  ```
+
+parser 
+binder
+optimzer
+executor
+
+

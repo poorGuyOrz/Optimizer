@@ -130,16 +130,3 @@ extern CAT *Cat;
 extern RuleSet *ruleSet;
 extern CostModel *costModel;
 extern KEYS_SET IntOrdersSet;  // set of Interesting Orders
-
-/*
-
-UNIQ:   on == Use the unique rule set rules
-SORT_AFTERS: sort possible moves in order of estimated cost
-INFBOUND: When optimizing a group, ignore the initial upper bound; use infinity instead
-_TABLE_: prints one summary line for each optimization, using different epsilons
-_GEN_LOG: Used to control the generation of logical expressions when eps pruning is done.
-REUSE_SIB: An attempt to improve pattern matching by reusing one side of generated mexprs.
-NOCART: Do not allow Cartesian products during optimization.
-SAFETY: Used within Bill's memory manager.  Higher level of error checking.
-CONDPRUNE: Use Group Pruning technique as a condition for firing some rules
-*/

@@ -1,21 +1,3 @@
-/*
-item.cpp -
-        $Revision: 3 $
-        Implements operators on items,as defined in classes ATTR_EXP, LOG_PROP,
-        CONJ_OP, typically part of a predicate, as defined in item.h
-
-          Columbia Optimizer Framework
-
-        A Joint Research Project of Portland State University
-           and the Oregon Graduate Institute
-        Directed by Leonard Shapiro and David Maier
-        Supported by NSF Grants IRI-9610013 and IRI-9619977
-
-
-*/
-
-// #include "../header/stdafx.h"
-// #include "../header/item.h"
 #include "../header/item.h"
 
 #include "../header/stdafx.h"
@@ -43,7 +25,6 @@ string ATTR_EXP::Dump() {
   return os;
 };
 
-//##ModelId=3B0C087502BA
 LOG_PROP *ATTR_OP::FindLogProp(LOG_PROP **input) {
   KEYS_SET fv;
 

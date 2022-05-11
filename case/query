@@ -48,19 +48,25 @@
 // )
 
 
-							(EQJOIN(C.CCK, O.OCK),
-								GET("C"),
-								(SELECT,
-									GET("O"),
-									(OP_AND,
-										(OP_LT,
-											ATTR("O.OD"),
-											INT("1356")
-										),
-										(OP_GE,
-											ATTR("O.OD"),
-											INT("1000")
-										)
-									)
-								)
-							)
+ 					(EQJOIN(<L.LSK, C.CNK>, <S.SSK, S.SNK>),
+ 						(EQJOIN(O.OOK, L.LOK),
+ 							(EQJOIN(C.CCK, O.OCK),
+ 								GET("C"),
+ 								(SELECT,
+ 									GET("O"),
+ 									(OP_AND,
+ 										(OP_LT,
+ 											ATTR("O.OD"),
+ 											INT("1356")
+ 										),
+ 										(OP_GE,
+ 											ATTR("O.OD"),
+ 											INT("1000")
+ 										)
+ 									)
+ 								)
+ 							),
+ 							GET("L")
+ 						),
+ 						GET("S")
+ 					)

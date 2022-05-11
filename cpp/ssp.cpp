@@ -234,10 +234,6 @@ int SearchSpace::MergeGroups(int group_no1, int group_no2) {
     FromGid = group_no1;
   }
 
-#ifdef UNIQ
-  assert(false);
-#endif
-
   return ToGid;
 }  // SearchSpace::MergeGroups
 

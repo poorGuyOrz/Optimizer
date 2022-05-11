@@ -37,7 +37,7 @@ class OptimizerTask {
 
  public:
   OptimizerTask(int ContextID, int ParentTaskNo) : ContextID(ContextID), ParentTaskNo(ParentTaskNo){};
-  ~OptimizerTask(){};
+  virtual ~OptimizerTask(){};
   virtual string Dump() = 0;
   virtual void perform() = 0;
 };

@@ -1,5 +1,6 @@
 #include "../header/query.h"
 
+#include "../header/expression.h"
 #include "../header/stdafx.h"
 
 #define LINEWIDTH 255    // buffer length of one text line
@@ -48,16 +49,16 @@
     Expr = ParseExpr(ExprStr);              \
     free(OneElement);                       \
     Op = new COMP_OP(Operator);             \
-    return new Expression(Op, Expr);        \
+    return new Expression(Op, {Expr});      \
   }
 
-#define PARSE_OP2(KEYWORD_OP, Operator)             \
-  if (p = strstr(OneElement, KEYWORD_OP)) {         \
-    LeftExpr = ParseExpr(ExprStr);                  \
-    RightExpr = ParseExpr(ExprStr);                 \
-    free(OneElement);                               \
-    Op = new COMP_OP(Operator);                     \
-    return new Expression(Op, LeftExpr, RightExpr); \
+#define PARSE_OP2(KEYWORD_OP, Operator)               \
+  if (p = strstr(OneElement, KEYWORD_OP)) {           \
+    LeftExpr = ParseExpr(ExprStr);                    \
+    RightExpr = ParseExpr(ExprStr);                   \
+    free(OneElement);                                 \
+    Op = new COMP_OP(Operator);                       \
+    return new Expression(Op, {LeftExpr, RightExpr}); \
   }
 
 Query::Query(string QueryFile) {
@@ -166,7 +167,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
 
     Op = new PROJECT(KeysSet.CopyOut(), KeysSet.GetSize());
 
-    return new Expression(Op, Expr);
+    return new Expression(Op, {Expr});
   }
 
   if (p = strstr(OneElement, KEYWORD_SELECT))  // SELECT
@@ -178,7 +179,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
 
     Op = new SELECT;
 
-    return new Expression(Op, LeftExpr, RightExpr);
+    return new Expression(Op, {LeftExpr, RightExpr});
   }
 
   if (p = strstr(OneElement, KEYWORD_EQJOIN))  // EQJOIN
@@ -211,7 +212,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
     IntOrdersSet.Merge(LeftKeysSet);
     IntOrdersSet.Merge(RightKeysSet);
 
-    return new Expression(Op, LeftExpr, RightExpr);
+    return new Expression(Op, {LeftExpr, RightExpr});
   }
 
   if (p = strstr(OneElement, KEYWORD_DUMMY))  // DUMMY
@@ -225,7 +226,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
 
     Op = new DUMMY();
 
-    return new Expression(Op, LeftExpr, RightExpr);
+    return new Expression(Op, {LeftExpr, RightExpr});
   }
 
   if (p = strstr(OneElement, KEYWORD_GET))  // GET
@@ -248,7 +249,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
       OUTPUT_ERROR(" GET is missing a COMMA !");
 
     free(OneElement);
-    return new Expression(Op);
+    return new Expression(Op, {});
   }
 
   // Deal with item epxrs
@@ -260,7 +261,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
     Op = new ATTR_OP(GetAttId(ParseOneParameter(p)));
     free(OneElement);
 
-    return new Expression(Op);
+    return new Expression(Op, {});
   }
 
   if (p = strstr(OneElement, KEYWORD_INT))  // INT
@@ -271,7 +272,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
     Op = new CONST_INT_OP(atoi(ParseOneParameter(p).c_str()));
     free(OneElement);
 
-    return new Expression(Op);
+    return new Expression(Op, {});
   }
 
   if (p = strstr(OneElement, KEYWORD_STR))  // STR
@@ -282,7 +283,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
     Op = new CONST_STR_OP(ParseOneParameter(p));
     free(OneElement);
 
-    return new Expression(Op);
+    return new Expression(Op, {});
   }
 
   if (p = strstr(OneElement, KEYWORD_SET))  // SET
@@ -293,7 +294,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
     Op = new CONST_SET_OP(ParseOneParameter(p));
     free(OneElement);
 
-    return new Expression(Op);
+    return new Expression(Op, {});
   }
 
   if (p = strstr(OneElement, KEYWORD_RM_DUPLICATES))  // RM_DUPLICATES
@@ -304,7 +305,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
 
     Op = new RM_DUPLICATES;
 
-    return new Expression(Op, Expr);
+    return new Expression(Op, {Expr});
   }
 
   if (p = strstr(OneElement, KEYWORD_AGG_LIST))  // AGG_LIST
@@ -329,7 +330,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
     int NumOps = AggOps->size();
     Op = new AGG_LIST(GbyKeysSet.CopyOut(), Size, AggOps);
 
-    return new Expression(Op, Expr);
+    return new Expression(Op, {Expr});
   }
 
   if (p = strstr(OneElement, KEYWORD_FUNC_OP))  // FUNC_OP
@@ -362,7 +363,7 @@ Expression *Query::ParseExpr(char *&ExprStr) {
 
     Op = new FUNC_OP(range_var, AttrKeySet.CopyOut(), size);
 
-    return new Expression(Op, Expr);
+    return new Expression(Op, {Expr});
   }
 
   if (p = strstr(OneElement, KEYWORD_ORDER_BY))  // ORDER_BY
@@ -642,5 +643,4 @@ AGG_OP *Query::GetOneAggOp(char *&p) {
 
 string Query::Dump() { return QueryExpr->Dump(); }
 
-// display the interesting orders
 string Query::Dump_IntOrders() { return (IntOrdersSet.Dump()); }

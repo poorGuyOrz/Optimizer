@@ -1,16 +1,3 @@
-/*
-LOGOP.H - Logical Operators
-$Revision: 4 $
-Columbia Optimizer Framework
-
-  A Joint Research Project of Portland State University
-  and the Oregon Graduate Institute
-  Directed by Leonard Shapiro and David Maier
-  Supported by NSF Grants IRI-9610013 and IRI-9619977
-*/
-
-// Logical operators
-
 #pragma once
 #include "op.h"
 
@@ -73,8 +60,7 @@ class GET : public LogicalOperator {
  private:
   int CollId;
   string RangeVar;
-
-};  // GET
+};
 
 /*
    ============================================================
@@ -126,7 +112,6 @@ class EQJOIN : public LogicalOperator {
 };  // EQJOIN
 
 /*
-/*
 ============================================================
 DUMMY
 ============================================================
@@ -135,35 +120,23 @@ once can result in significant savings.  DUMMY has two inputs, no transforms, on
 implementation, namely PDUMMY.
 */
 
-//##ModelId=3B0C0874001A
 class DUMMY : public LogicalOperator {
  public:
-  //##ModelId=3B0C0874002F
   DUMMY();
-  //##ModelId=3B0C08740030
   DUMMY(DUMMY &Op);
-  //##ModelId=3B0C08740039
   Operator *Clone() { return new DUMMY(*this); };
 
-  //##ModelId=3B0C08740042
   ~DUMMY(){};
 
-  //##ModelId=3B0C08740043
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C0874004D
-  inline int GetArity() { return (2); };  // Inputs are left and right streams
-  //##ModelId=3B0C08740056
+  inline int GetArity() { return (2); };          // Inputs are left and right streams
   inline string GetName() { return ("DUMMY"); };  // Name of this operator
-  //##ModelId=3B0C08740057
-  inline int GetNameId() { return DUMMY_ID; };  // Name of this operator
-  //##ModelId=3B0C08740060
+  inline int GetNameId() { return DUMMY_ID; };    // Name of this operator
   inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); };
 
-  //##ModelId=3B0C0874006B
   ub4 hash();
 
-  //##ModelId=3B0C08740074
   string Dump();
 
 };  // DUMMY
@@ -208,34 +181,22 @@ class SELECT : public LogicalOperator {
    modeled as arguments.
 */
 
-//##ModelId=3B0C087401DC
 class PROJECT : public LogicalOperator {
  public:
-  //##ModelId=3B0C087401F1
   int *attrs;  // attr's to project on
-  //##ModelId=3B0C087401FB
-  int size;  // the number of the attrs
+  int size;    // the number of the attrs
 
-  //##ModelId=3B0C08740205
   PROJECT(int *attrs, int size);
-  //##ModelId=3B0C08740210
   PROJECT(PROJECT &Op);
-  //##ModelId=3B0C08740219
   Operator *Clone() { return new PROJECT(*this); };
 
-  //##ModelId=3B0C0874021A
   ~PROJECT() { delete[] attrs; };
 
-  //##ModelId=3B0C08740223
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  //##ModelId=3B0C0874022D
   inline int GetArity() { return (1); };  // Only input is the stream of bytes.  What to project is an argument, pattrs
-  //##ModelId=3B0C0874022E
   inline string GetName() { return ("PROJECT"); };  // Name of this operator
-  //##ModelId=3B0C08740237
-  inline int GetNameId() { return PROJECT_ID; };  // Name of this operator
-  //##ModelId=3B0C08740241
+  inline int GetNameId() { return PROJECT_ID; };    // Name of this operator
   inline bool operator==(Operator *other) {
     return (other->GetNameId() == GetNameId() &&
             EqualArray(((PROJECT *)other)->attrs, attrs, size));  // arguments are equal
@@ -256,17 +217,12 @@ class PROJECT : public LogicalOperator {
    on which duplicates are removed
 */
 
-//##ModelId=3B0C087402F5
 class RM_DUPLICATES : public LogicalOperator {
  public:
-  //##ModelId=3B0C08740300
   RM_DUPLICATES();
-  //##ModelId=3B0C08740309
   RM_DUPLICATES(RM_DUPLICATES &Op);
-  //##ModelId=3B0C0874030B
   Operator *Clone() { return new RM_DUPLICATES(*this); };
 
-  //##ModelId=3B0C08740313
   ~RM_DUPLICATES(){};
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
@@ -280,8 +236,7 @@ class RM_DUPLICATES : public LogicalOperator {
   ub4 hash();
 
   string Dump();
-
-};  // RM_DUPLICATES
+};
 
 /*
    ============================================================
@@ -300,23 +255,15 @@ class RM_DUPLICATES : public LogicalOperator {
         example each array has one element.
 */
 
-//##ModelId=3B0C08750043
 class AGG_LIST : public LogicalOperator {
  public:
-  //##ModelId=3B0C08750057
   int *GbyAtts;
-  //##ModelId=3B0C08750061
   int GbySize;
-  //##ModelId=3B0C08750076
   AGG_OP_ARRAY *AggOps;
-  //##ModelId=3B0C0875007F
   int *FlattenedAtts;
-  //##ModelId=3B0C08750093
   int FAttsSize;
 
-  //##ModelId=3B0C0875009D
   AGG_LIST(int *gby_atts, int gby_size, AGG_OP_ARRAY *agg_ops);
-  //##ModelId=3B0C087500B1
   AGG_LIST(AGG_LIST &Op)
       : GbyAtts(CopyArray(Op.GbyAtts, Op.GbySize)),
         GbySize(Op.GbySize),
@@ -329,10 +276,8 @@ class AGG_LIST : public LogicalOperator {
     }
   };
 
-  //##ModelId=3B0C087500BB
   Operator *Clone() { return new AGG_LIST(*this); };
 
-  //##ModelId=3B0C087500BC
   ~AGG_LIST() {
     delete[] GbyAtts;
     for (int i = 0; i < AggOps->size(); i++) delete (*AggOps)[i];
@@ -351,8 +296,7 @@ class AGG_LIST : public LogicalOperator {
   ub4 hash();
 
   string Dump();
-
-};  // AGG_LIST
+};
 
 /*
    ============================================================
@@ -389,9 +333,7 @@ class FUNC_OP : public LogicalOperator {
   };
 
   // since this operator has arguments
-  //##ModelId=3B0C08750256
   ub4 hash();
 
-  //##ModelId=3B0C08750257
   string Dump();
 };

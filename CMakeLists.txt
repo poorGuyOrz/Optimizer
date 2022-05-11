@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.22.0)
+cmake_minimum_required(VERSION 3.16.0)
 project(Optmizer VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 # add_definitions(-DCONDPRUNE)
 
 function(redefine_file_macro targetname)

@@ -197,17 +197,6 @@ class RuleSet {
    through several stages: start, then loop over several valid bindings, then finish.
 
 */
-#ifdef _REUSE_SIB
-class Node {
- public:
-  BINDERY *bindery;
-  Node *next;
-  Node() {
-    bindery = NULL;
-    next = NULL;
-  }
-};
-#endif
 
 class BINDERY {
  private:
@@ -225,11 +214,6 @@ class BINDERY {
   BINDERY_STATE state;
 
   BINDERY **input;  // binderys for input expr's
-#ifdef _REUSE_SIB
-  Node *list, *last, *currentBind;
-  void test_delete(int arity);
-
-#endif
 
  public:
   // Create an Expression bindery
@@ -389,10 +373,7 @@ class Rule {
 
     // if not stop generating logical expression when epsilon pruning is applied
     // need these to identify the substitue
-#ifdef _GEN_LOG
-  bool is_log_to_phys() { return (substitute->GetOp()->is_physical()); };
-  bool is_log_to_log() { return (substitute->GetOp()->is_logical()); };
-#endif
+
 };
 
 /*
@@ -418,9 +399,7 @@ class EQ_TO_LOOPS : public Rule {
   EQ_TO_LOOPS();
   ~EQ_TO_LOOPS(){};
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-#ifdef CONDPRUNE
   bool condition(Expression *before, MExression *mexpr, int ContextID);
-#endif
 
 };  // EQ_TO_LOOPS
 
@@ -434,9 +413,7 @@ class EQ_TO_MERGE : public Rule {
   EQ_TO_MERGE();
   int promise(Operator *op_arg, int ContextID);
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-#ifdef CONDPRUNE
   bool condition(Expression *before, MExression *mexpr, int ContextID);
-#endif
 };  // EQ_TO_MERGE
 
 /*

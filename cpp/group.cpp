@@ -1,4 +1,3 @@
-// group.cpp -  implementation of class Group
 #include "../header/ssp.h"
 #include "../header/stdafx.h"
 
@@ -93,7 +92,6 @@ Group::~Group() {
 }
 
 // estimate the number of tables in EQJOIN
-//##ModelId=3B0C086701FC
 int Group::EstimateNumTables(MExression *MExpr) {
   int table_num;
   int total = 0;

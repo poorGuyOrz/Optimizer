@@ -274,12 +274,6 @@ void OptimizeExprTask::perform() {
 
     if (Rule == nullptr) continue;  // some rules may be turned off
 
-#ifdef UNIQ
-    if (!(MExpr->can_fire(Rule->get_index()))) {
-      PTRACE("Rejected rule %d ", Rule->get_index());
-      continue;  // rule has already fired
-    }
-#endif
     if (explore && Rule->GetSubstitute()->GetOp()->is_physical()) {
       PTRACE("Rejected rule  " << Rule->get_index());
       continue;  // only fire transformation rule when exploring
@@ -857,34 +851,12 @@ void ApplyRuleTask::perform() {
 
   // if stop generating logical expression when epsilon prune is applied
   // if this context is done, stop
-#ifndef _GEN_LOG
   // Check that this context is not done
   if (Context->is_done()) {
     PTRACE("Context: " << Context->GetPhysProp()->Dump() << " is done");
     delete this;
     return;
   }
-#else
-  // if not stop generating logical expression when epsilon prune is applied
-  // if this context is done and the substitute is physical, if the substitute
-  // is logical continue
-  if (Context->is_done() && rule->is_log_to_phys()) {
-    PTRACE("Context: %s is done", Context->GetPhysProp()->Dump());
-    delete this;
-    return;
-  }
-#endif
-
-#ifdef UNIQ
-  // Check again to see that the rule has not been fired since this was put on the stack
-  if (!(MExpr->can_fire(Rule->get_index()))) {
-    // tasks must destroy themselves
-    PTRACE("Rejected rule %d ", Rule->get_index());
-
-    delete this;
-    return;
-  }
-#endif
 
   if (!ForGlobalEpsPruning) OptStat->FiredRule++;  // Count invocations of this task
 

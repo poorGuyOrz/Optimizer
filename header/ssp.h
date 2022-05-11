@@ -1,15 +1,14 @@
 // SearchSpace.H - Search Space
 
 #pragma once
-#include "../header/query.h"
+#include "expression.h"
+#include "mexpression.h"
+#include "query.h"
 
-#define NEW_GRPID -1  // used by SearchSpace::CopyIn and MExression::MExression
-// means need to create a new group
 #define NEW_GRPID_NOWIN -2  // use by SearchSpace::CopyIn.  Means NEW_GRPID, and this is a
 // subgroup of DUMMY so don't init nontrivial winners
 class SearchSpace;
 class Group;
-class MExression;
 class WINNER;
 
 /*
@@ -102,135 +101,6 @@ class SearchSpace {
   vector<Group *> Groups;
 
 };  // class SearchSpace
-
-/*
-   ============================================================
-   MULTI_EXPRESSIONS - class M_EXP
-   ============================================================
-   MExression is a compact form of Expression which utilizes sharing.  Inputs are
-   GROUPs instead of EXPRs, so the MExression embodies several EXPRs.
-   All searching is done with M_EXPRs, so each contains lots of state.
-
-*/
-class MExression {
- private:
-  MExression *HashPtr;  // list within hash bucket
-  BIT_VECTOR RuleMask;  // If 1, do not fire rule with that index
-  int counter;          // to keep track of how many winners point to this MEXPR
-  Operator *Op;         // Operator
-  int *Inputs;
-  int GrpID;  // I reside in this group
-
-  // link to the next mexpr in the same group
-  MExression *NextMExpr;
-
- public:
-  ~MExression() {
-    if (GetArity()) {
-      delete[] Inputs;
-    }
-
-    delete Op;
-  };
-
-  // Transform an Expression into an MExression.  May involve creating new Groups.
-  //  GrpID is the ID of the group where the MExression will be put.  If GrpID is
-  //  NEW_GRPID(-1), make a new group with that ID.  (Same as SearchSpace::CopyIn)
-  MExression(Expression *Expr, int grpid)
-      : Op(Expr->GetOp()->Clone()),
-        NextMExpr(nullptr),
-        GrpID((grpid == NEW_GRPID) ? Ssp->GetNewGrpID() : grpid),
-        HashPtr(nullptr),
-        RuleMask(0) {
-    int groupID;
-    Expression *input;
-    counter = 0;
-
-    // copy in the sub-expression
-    int arity = GetArity();
-    if (arity) {
-      Inputs = new int[arity];
-      for (int i = 0; i < arity; i++) {
-        input = Expr->GetInput(i);
-
-        if (input->GetOp()->is_leaf())  // deal with LeafOperator, sharing the existing group
-          groupID = ((LeafOperator *)input->GetOp())->GetGroup();
-        else {
-          // create a new sub group
-          if (Op->GetName() == "DUMMY")
-            groupID = NEW_GRPID_NOWIN;  // DUMMY subgroups have only trivial winners
-          else
-            groupID = NEW_GRPID;
-          MExression *MExpr = Ssp->CopyIn(input, groupID);
-        }
-
-        Inputs[i] = groupID;
-      }
-    }  // if(arity)
-  };
-
-  MExression(MExression &other)
-      : GrpID(other.GrpID),
-        HashPtr(other.HashPtr),
-        NextMExpr(other.NextMExpr),
-        Op(other.Op->Clone()),
-        RuleMask(other.RuleMask) {
-    // Inputs are the only member data left to copy.
-    int arity = Op->GetArity();
-    if (arity) {
-      Inputs = new int[arity];
-      while (--arity >= 0) Inputs[arity] = other.GetInput(arity);
-    }
-  };
-
-  inline int GetCounter() { return counter; };
-  inline void IncCounter() { counter++; };
-  inline void DecCounter() {
-    if (counter != 0) counter--;
-  };
-  inline Operator *GetOp() { return (Op); };
-  inline int GetInput(int i) const { return (Inputs[i]); };
-  inline void SetInput(int i, int grpId) { Inputs[i] = grpId; };
-  inline int GetGrpID() { return (GrpID); };
-  inline int GetArity() { return (Op->GetArity()); };
-
-  inline MExression *GetNextHash() { return HashPtr; };
-  inline void SetNextHash(MExression *mexpr) { HashPtr = mexpr; };
-
-  inline void SetNextMExpr(MExression *MExpr) { NextMExpr = MExpr; };
-  inline MExression *GetNextMExpr() { return NextMExpr; };
-
-  // We just fired this rule, so update dont_fire bit vector
-  inline void fire_rule(int rule_no) { bit_on(RuleMask, rule_no); };
-
-#ifdef UNIQ
-  // Can I fire this rule?
-  inline bool can_fire(int rule_no) { return (is_bit_off(RuleMask, rule_no)); };
-#endif
-
-  inline void set_rule_mask(BIT_VECTOR v) { RuleMask = v; };
-
-  ub4 hash() {
-    ub4 hashval = Op->hash();
-
-    // to check the equality of the inputs
-    for (int input_no = Op->GetArity(); --input_no >= 0;) hashval = lookup2(GetInput(input_no), hashval);
-
-    return (hashval % (HtblSize - 1));
-  };
-
-  string Dump() {
-    string os;
-
-    os = (*Op).Dump();
-
-    int Size = GetArity();
-    for (int i = 0; i < Size; i++) os += ", input: " + to_string(Inputs[i]);
-
-    return os;
-  };
-
-};  // class MExression
 
 /*
 
@@ -376,8 +246,7 @@ class Group {
   int EstimateNumTables(MExression *MExpr);
 
   static bool firstplan;
-
-};  // class Group
+};
 
 /*
 ============================================================
