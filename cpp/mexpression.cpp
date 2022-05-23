@@ -1,4 +1,5 @@
 #include "../header/mexpression.h"
+
 #include "../header/ssp.h"
 
 MExression::MExression(Expression *Expr, int grpid)
@@ -13,7 +14,6 @@ MExression::MExression(Expression *Expr, int grpid)
   // copy in the sub-expression
   int arity = GetArity();
   if (arity) {
-    Inputs = new int[arity];
     for (int i = 0; i < arity; i++) {
       input = Expr->GetInput(i);
 
@@ -27,8 +27,7 @@ MExression::MExression(Expression *Expr, int grpid)
           groupID = NEW_GRPID;
         MExression *MExpr = Ssp->CopyIn(input, groupID);
       }
-
-      Inputs[i] = groupID;
+      children_.push_back(groupID);
     }
   }  // if(arity)
 };
@@ -37,12 +36,6 @@ MExression::MExression(MExression &other)
     : GrpID(other.GrpID),
       HashPtr(other.HashPtr),
       NextMExpr(other.NextMExpr),
+      children_(other.children_),
       Op(other.Op->Clone()),
-      RuleMask(other.RuleMask) {
-  // Inputs are the only member data left to copy.
-  int arity = Op->GetArity();
-  if (arity) {
-    Inputs = new int[arity];
-    while (--arity >= 0) Inputs[arity] = other.GetInput(arity);
-  }
-};
+      RuleMask(other.RuleMask){};

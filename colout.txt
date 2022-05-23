@@ -1,0 +1,2081 @@
+SearchSpace Content: RootGID: 0
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+Group: 1
+	Logic M_Expr: GET(C);
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+Group: 3
+	Logic M_Expr: GET(O);
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+Group: 4
+	Logic M_Expr: OP_AND, input: 5, input: 8;
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.250000, FreeVars : ()
+
+
+Group: 5
+	Logic M_Expr: OP_LT, input: 6, input: 7;
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+Group: 6
+	Logic M_Expr: Attribute();
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+Group: 7
+	Logic M_Expr: INT(%1356);
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+Group: 8
+	Logic M_Expr: OP_GE, input: 9, input: 10;
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+Group: 9
+	Logic M_Expr: Attribute();
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+Group: 10
+	Logic M_Expr: INT(%1000);
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 1-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 0 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 1: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 1:
+    task: 0   OptimizeExprTask  group: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task: 1, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 2-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 291 >>>>>: 9 promising moves
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EXCHANGE
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN_RTOL
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN_COMMUTE
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN_LTOR
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN -> BIT_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN->LOOPS_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN -> LOOPS_INDEX_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN->HASH_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN -> MERGE_JOIN
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 2: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 2:
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   ApplyRuleTask     rule : EQJOIN -> MERGE_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 3-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN -> MERGE_JOIN expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(MERGE_JOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 3: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 3:
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 4-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 0
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 9.000000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 4: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 4:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 1, parent task: 4, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 5-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 1 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 1 , Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 123 >>>>>: Push OptimizeGroupTask with current context, another with ANY context
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 5: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 5:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 6-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 1 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 2 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 6: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 6:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeExprTask  group: GET(C), parent task: 6, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 7-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: GET(C)
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 2 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 291 >>>>>: 1 promising moves
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule Get->FileScan
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 7: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 7:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : Get->FileScan, mexpr GET(C), parent task 7
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 8-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: Get->FileScan expression: GET(C)
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 2 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(GET(C))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: GET(C)
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(FILE_SCAN(C))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : FILE_SCAN(C)
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: FILE_SCAN(C)
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 8: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 8:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeInputTask expr : FILE_SCAN(C), parent task 8, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 9-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: FILE_SCAN(C)
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 2 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: FILE_SCAN(C): 450.450000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 450.450000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with Any Prop, FILE_SCAN(C), 450.450000
+0:cpp/group.cpp: 147 >>>>>: group 1 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 9: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(C), 450.450000, Done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 9:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 10-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 1 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 1 , Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is  optimized
+0:cpp/tasks.cpp: 159 >>>>>: Push OptimizeInputTask on all physical mexprs
+0:cpp/tasks.cpp: 166 >>>>>: pushing OptimizeInputTask FILE_SCAN(C)
+0:cpp/tasks.cpp: 178 >>>>>: Push ApplyRuleTask on enforcer rule
+0:cpp/tasks.cpp: 188 >>>>>: Init winner's circle for this property
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 10: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(C), 450.450000, Done
+	sorted on (C.CCK)  KeyOrder: (ascending, NULL Plan, -1.000000, Not done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 10:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILE_SCAN(C), parent task 10, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SORT enforcer, mexpr GET(C), parent task 10
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 11-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: SORT enforcer expression: GET(C)
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 1 , Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(LeafOperator<0,1>)
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: GET(C)
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(QSORT,
+    (LeafOperator<0,1>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : QSORT, input: 1
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: QSORT, input: 1
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 11: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	Physc M_Expr: QSORT, input: 1;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(C), 450.450000, Done
+	sorted on (C.CCK)  KeyOrder: (ascending, NULL Plan, -1.000000, Not done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 11:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILE_SCAN(C), parent task 10, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeInputTask expr : QSORT, input: 1, parent task 11, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 12-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: QSORT, input: 1
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 1 , Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: QSORT, input: 1: 605.201419
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 605.201419
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 12: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	Physc M_Expr: QSORT, input: 1;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(C), 450.450000, Done
+	sorted on (C.CCK)  KeyOrder: (ascending, QSORT, input: 1, 605.201419, Not done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 12:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILE_SCAN(C), parent task 10, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: 605.201419, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 13-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: FILE_SCAN(C)
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 1 , Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: 605.201419, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: FILE_SCAN(C): 450.450000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 450.450000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with sorted on (C.CCK)  KeyOrder: (ascending, FILE_SCAN(C), 450.450000
+0:cpp/group.cpp: 147 >>>>>: group 1 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 13: 
+Changed Search Space:
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	Physc M_Expr: QSORT, input: 1;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(C), 450.450000, Done
+	sorted on (C.CCK)  KeyOrder: (ascending, FILE_SCAN(C), 450.450000, Done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 13:
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 14-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 0, expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 1
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 9.000000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 2, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 14: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 14:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 14, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 15-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 2 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 3 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 123 >>>>>: Push OptimizeGroupTask with current context, another with ANY context
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 15: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 15:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 16-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 2 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 16: 
+Changed Search Space:
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 16:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeExprTask  group: SELECT, input: 3, input: 4, parent task: 16, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 17-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: SELECT, input: 3, input: 4
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 291 >>>>>: 2 promising moves
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule SELECT -> INDEXED_FILTER
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule SELECT -> FILTER
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 17: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 17:
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   ApplyRuleTask     rule : SELECT -> FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 18-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: SELECT -> FILTER expression: SELECT, input: 3, input: 4
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(SELECT,
+    (LeafOperator<0,3>),
+    (LeafOperator<1,4>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: SELECT, input: 3, input: 4
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(FILTER,
+    (LeafOperator<0,3>),
+    (LeafOperator<1,4>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: FILTER, input: 3, input: 4
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 18: 
+Changed Search Space:
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	Physc M_Expr: FILTER, input: 3, input: 4;
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 18:
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 19-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 0
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 18.750000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 19: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 19:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeGroupTask group: 3, parent task: 19, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 20-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 3 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 5 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 20: 
+Changed Search Space:
+Group: 3
+	Logic M_Expr: GET(O);
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 20:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeExprTask  group: GET(O), parent task: 20, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 21-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: GET(O)
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 5 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 291 >>>>>: 1 promising moves
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule Get->FileScan
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 21: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 21:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   ApplyRuleTask     rule : Get->FileScan, mexpr GET(O), parent task 21
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 22-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: Get->FileScan expression: GET(O)
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 5 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(GET(O))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: GET(O)
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(FILE_SCAN(O))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : FILE_SCAN(O)
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: FILE_SCAN(O)
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 22: 
+Changed Search Space:
+Group: 3
+	Logic M_Expr: GET(O);
+	Physc M_Expr: FILE_SCAN(O);
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 22:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : FILE_SCAN(O), parent task 22, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 23-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: FILE_SCAN(O)
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 5 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: FILE_SCAN(O): 4504.500000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 4504.500000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with Any Prop, FILE_SCAN(O), 4504.500000
+0:cpp/group.cpp: 147 >>>>>: group 3 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 23: 
+Changed Search Space:
+Group: 3
+	Logic M_Expr: GET(O);
+	Physc M_Expr: FILE_SCAN(O);
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(O), 4504.500000, Done
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 23:
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 24-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 0, expr: FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 1
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 18.750000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 4, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 24: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 24:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeGroupTask group: 4, parent task: 24, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 25-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 4 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 6 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 25: 
+Changed Search Space:
+Group: 4
+	Logic M_Expr: OP_AND, input: 5, input: 8;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.250000, FreeVars : ()
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 25:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeExprTask  group: OP_AND, input: 5, input: 8, parent task: 25, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 26-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: OP_AND, input: 5, input: 8
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 6 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 261 >>>>>: expression is an item_op
+0:cpp/tasks.cpp: 263 >>>>>: pushing OptimizeInputTask OP_AND, input: 5, input: 8
+0:cpp/group.cpp: 147 >>>>>: group 4 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 26: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 26:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 27-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: OP_AND, input: 5, input: 8
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 6 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 0
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 0.000000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 5, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 27: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 27:
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 18   OptimizeGroupTask group: 5, parent task: 27, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 28-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 5 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 7 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 28: 
+Changed Search Space:
+Group: 5
+	Logic M_Expr: OP_LT, input: 6, input: 7;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 28:
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 18   OptimizeExprTask  group: OP_LT, input: 6, input: 7, parent task: 28, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 29-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: OP_LT, input: 6, input: 7
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 7 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 261 >>>>>: expression is an item_op
+0:cpp/tasks.cpp: 263 >>>>>: pushing OptimizeInputTask OP_LT, input: 6, input: 7
+0:cpp/group.cpp: 147 >>>>>: group 5 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 29: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 29:
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 18   OptimizeInputTask expr : OP_LT, input: 6, input: 7, parent task 29, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 30-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: OP_LT, input: 6, input: 7
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 7 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 528 >>>>>: Input 0 is a const operator so its cost is zero
+0:cpp/tasks.cpp: 528 >>>>>: Input 1 is a const operator so its cost is zero
+0:cpp/tasks.cpp: 600 >>>>>: Input : 0 is a const group
+0:cpp/tasks.cpp: 600 >>>>>: Input : 1 is a const group
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: OP_LT, input: 6, input: 7: 0.000000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 0.000000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with Any Prop, OP_LT, input: 6, input: 7, 0.000000
+0:cpp/group.cpp: 147 >>>>>: group 5 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 30: 
+Changed Search Space:
+Group: 5
+	Logic M_Expr: OP_LT, input: 6, input: 7;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, OP_LT, input: 6, input: 7, 0.000000, Done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 30:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 31-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 0, expr: OP_AND, input: 5, input: 8
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 6 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 1
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 0.000000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 8, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 31: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 31:
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 18   OptimizeGroupTask group: 8, parent task: 31, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 32-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 8 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 8 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is not optimized
+0:cpp/tasks.cpp: 119 >>>>>: add winner with null plan, push OptimizeExprTask on 1st logical expression
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 32: 
+Changed Search Space:
+Group: 8
+	Logic M_Expr: OP_GE, input: 9, input: 10;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, NULL Plan, -1.000000, Not done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 32:
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 18   OptimizeExprTask  group: OP_GE, input: 9, input: 10, parent task: 32, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 33-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: OP_GE, input: 9, input: 10
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 8 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 261 >>>>>: expression is an item_op
+0:cpp/tasks.cpp: 263 >>>>>: pushing OptimizeInputTask OP_GE, input: 9, input: 10
+0:cpp/group.cpp: 147 >>>>>: group 8 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 33: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 33:
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 18   OptimizeInputTask expr : OP_GE, input: 9, input: 10, parent task 33, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 34-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: OP_GE, input: 9, input: 10
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 8 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 528 >>>>>: Input 0 is a const operator so its cost is zero
+0:cpp/tasks.cpp: 528 >>>>>: Input 1 is a const operator so its cost is zero
+0:cpp/tasks.cpp: 600 >>>>>: Input : 0 is a const group
+0:cpp/tasks.cpp: 600 >>>>>: Input : 1 is a const group
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: OP_GE, input: 9, input: 10: 0.000000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 0.000000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with Any Prop, OP_GE, input: 9, input: 10, 0.000000
+0:cpp/group.cpp: 147 >>>>>: group 8 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 34: 
+Changed Search Space:
+Group: 8
+	Logic M_Expr: OP_GE, input: 9, input: 10;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, OP_GE, input: 9, input: 10, 0.000000, Done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 34:
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 17   OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 35-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 1, expr: OP_AND, input: 5, input: 8
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 6 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: OP_AND, input: 5, input: 8: 0.000000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 0.000000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with Any Prop, OP_AND, input: 5, input: 8, 0.000000
+0:cpp/group.cpp: 147 >>>>>: group 4 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 35: 
+Changed Search Space:
+Group: 4
+	Logic M_Expr: OP_AND, input: 5, input: 8;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, OP_AND, input: 5, input: 8, 0.000000, Done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.250000, FreeVars : ()
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 35:
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+    task: 16   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 36-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 1, expr: FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: FILTER, input: 3, input: 4: 4523.250000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 4523.250000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 36: 
+Changed Search Space:
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	Physc M_Expr: FILTER, input: 3, input: 4;
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, FILTER, input: 3, input: 4, 4523.250000, Not done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 36:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 37-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: SELECT -> INDEXED_FILTER expression: SELECT, input: 3, input: 4
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 4 , Prop: Any Prop, UpperBd: 4523.250000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(SELECT,
+    (GET(O)),
+    (LeafOperator<0,4>))
+0:cpp/tasks.cpp: 900 >>>>>: Binding FAILS condition function, expr: SELECT, input: 3, input: 4
+0:cpp/group.cpp: 147 >>>>>: group 2 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 37: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 37:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 38-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 2 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 3 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is  optimized
+0:cpp/tasks.cpp: 159 >>>>>: Push OptimizeInputTask on all physical mexprs
+0:cpp/tasks.cpp: 166 >>>>>: pushing OptimizeInputTask FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 178 >>>>>: Push ApplyRuleTask on enforcer rule
+0:cpp/tasks.cpp: 188 >>>>>: Init winner's circle for this property
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 38: 
+Changed Search Space:
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	Physc M_Expr: FILTER, input: 3, input: 4;
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, FILTER, input: 3, input: 4, 4523.250000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, NULL Plan, -1.000000, Not done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 38:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   ApplyRuleTask     rule : SORT enforcer, mexpr SELECT, input: 3, input: 4, parent task 38
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 39-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: SORT enforcer expression: SELECT, input: 3, input: 4
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 3 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(LeafOperator<0,2>)
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: SELECT, input: 3, input: 4
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(QSORT,
+    (LeafOperator<0,2>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : QSORT, input: 2
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: QSORT, input: 2
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 39: 
+Changed Search Space:
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	Physc M_Expr: FILTER, input: 3, input: 4;
+	Physc M_Expr: QSORT, input: 2;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILTER, input: 3, input: 4, 4523.250000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, NULL Plan, -1.000000, Not done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 39:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+    task: 15   OptimizeInputTask expr : QSORT, input: 2, parent task 39, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 40-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: QSORT, input: 2
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 3 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: QSORT, input: 2: 4939.871950
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 4939.871950
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 40: 
+Changed Search Space:
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	Physc M_Expr: FILTER, input: 3, input: 4;
+	Physc M_Expr: QSORT, input: 2;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILTER, input: 3, input: 4, 4523.250000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, QSORT, input: 2, 4939.871950, Not done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 40:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 41-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 3 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search  needed, return value is false
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 657 >>>>>: No Winner for Input : 0
+0:cpp/tasks.cpp: 665 >>>>>: push myself, O_INPUT
+0:cpp/tasks.cpp: 672 >>>>>: LocalCost is 18.750000
+0:cpp/tasks.cpp: 684 >>>>>: push OptimizeGroupTask 3, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 41: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 41:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+    task: 15   OptimizeGroupTask group: 3, parent task: 41, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 42-----------------------------
+0:cpp/tasks.cpp:  86 >>>>>: OptimizeGroupTask: 3 is performing Last flag is 1
+0:cpp/tasks.cpp:  88 >>>>>: Context ID: 9 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+0:cpp/tasks.cpp: 114 >>>>>: Group is  optimized
+0:cpp/tasks.cpp: 159 >>>>>: Push OptimizeInputTask on all physical mexprs
+0:cpp/tasks.cpp: 166 >>>>>: pushing OptimizeInputTask FILE_SCAN(O)
+0:cpp/tasks.cpp: 178 >>>>>: Push ApplyRuleTask on enforcer rule
+0:cpp/tasks.cpp: 188 >>>>>: Init winner's circle for this property
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 42: 
+Changed Search Space:
+Group: 3
+	Logic M_Expr: GET(O);
+	Physc M_Expr: FILE_SCAN(O);
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(O), 4504.500000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, NULL Plan, 4921.121950, Not done
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 42:
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+    task: 15   OptimizeInputTask expr : FILE_SCAN(O), parent task 42, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+    task: 16   ApplyRuleTask     rule : SORT enforcer, mexpr GET(O), parent task 42
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 43-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: SORT enforcer expression: GET(O)
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 9 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(LeafOperator<0,3>)
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: GET(O)
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(QSORT,
+    (LeafOperator<0,3>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : QSORT, input: 3
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: QSORT, input: 3
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 43: 
+Changed Search Space:
+Group: 3
+	Logic M_Expr: GET(O);
+	Physc M_Expr: FILE_SCAN(O);
+	Physc M_Expr: QSORT, input: 3;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(O), 4504.500000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, NULL Plan, 4921.121950, Not done
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 43:
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+    task: 15   OptimizeInputTask expr : FILE_SCAN(O), parent task 42, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+    task: 16   OptimizeInputTask expr : QSORT, input: 3, parent task 43, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 44-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: QSORT, input: 3
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 9 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 586 >>>>>: Expr LowerBd 6350.987840, exceed Cond UpperBd 4921.121950,Pruning applied!
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 44: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 44:
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+    task: 15   OptimizeInputTask expr : FILE_SCAN(O), parent task 42, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 45-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: FILE_SCAN(O)
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 9 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 705 >>>>>: physical epxr: FILE_SCAN(O) does not satisfy required phys_prop: sorted on (O.OCK)  KeyOrder: (ascending
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with sorted on (O.OCK)  KeyOrder: (ascending,  nullptr , 4921.121950
+0:cpp/group.cpp: 147 >>>>>: group 3 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 45: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 45:
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 14   OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 46-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 0, expr: FILTER, input: 3, input: 4
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 3 , Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 1
+0:cpp/tasks.cpp: 694 >>>>>: impossible plan since no winner possible at input 0
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0:cpp/tasks.cpp: 799 >>>>>: Terminate: replaced winner with sorted on (O.OCK)  KeyOrder: (ascending, QSORT, input: 2, 4939.871950
+0:cpp/group.cpp: 147 >>>>>: group 2 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 46: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 46:
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 13   OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 47-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input 1, expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: -1.000000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 1
+First Plan is costed at task 47
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2: 5399.321950
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 5399.321950
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 47: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 2 MExprs -----
+Winners:
+	Any Prop, MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 5399.321950, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 47:
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 5399.321950, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 48-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN->HASH_JOIN expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 5399.321950, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(HASH_JOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 48: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 5399.321950, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 48:
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 5399.321950, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 12   OptimizeInputTask expr : HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 48, Prop: Any Prop, UpperBd: 5399.321950, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 49-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 5399.321950, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2: 4986.450000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 4986.450000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 49: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 4986.450000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 49:
+    task: 7   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 11   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 50-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN -> LOOPS_INDEX_JOIN expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 50: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 50:
+    task: 6   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 7   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 51-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN->LOOPS_JOIN expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(LOOPS_JOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 51: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 4 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 4986.450000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 51:
+    task: 6   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 7   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 10   OptimizeInputTask expr : LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 51, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 52-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 586 >>>>>: Expr LowerBd 567477.443600, exceed Cond UpperBd 4986.450000,Pruning applied!
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 52: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 52:
+    task: 5   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 6   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 7   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 9   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 53-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 2 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 53: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 53:
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 5   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 6   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 7   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 54-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN -> BIT_JOIN expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (SELECT,
+        (GET(O)),
+        (LeafOperator<1,4>)))
+0:cpp/tasks.cpp: 900 >>>>>: Binding FAILS condition function, expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 54: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 54:
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 5   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 6   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 7   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 55-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 1 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 55: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 55:
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 5   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 6   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 56-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN_LTOR expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 56: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 56:
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 5   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 57-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN_COMMUTE expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<0,1>),
+    (LeafOperator<1,2>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(EQJOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<1,2>),
+    (LeafOperator<0,1>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 956 >>>>>: new task to optimize new expression,pushing OptimizeExprTask, expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 57: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Logic M_Expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	----- has 5 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 4986.450000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 57:
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 5   OptimizeExprTask  group: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task: 57, Last: 0, explore: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 58-----------------------------
+0:cpp/tasks.cpp: 253 >>>>>: OptimizeExprTask performing, optimizing mexpr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 255 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 256 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 291 >>>>>: 9 promising moves
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EXCHANGE
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN_RTOL
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN_COMMUTE
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN_LTOR
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN -> BIT_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN->LOOPS_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN -> LOOPS_INDEX_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN->HASH_JOIN
+0:cpp/tasks.cpp: 307 >>>>>: pushing rule EQJOIN -> MERGE_JOIN
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 58: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 58:
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 15   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 16   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 17   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 18   ApplyRuleTask     rule : EQJOIN -> MERGE_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 59-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN -> MERGE_JOIN expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(MERGE_JOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 59: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Logic M_Expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	----- has 6 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 4986.450000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 59:
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 15   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 16   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 17   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 18   OptimizeInputTask expr : MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 59, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 60-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 586 >>>>>: Expr LowerBd 5399.321950, exceed Cond UpperBd 4986.450000,Pruning applied!
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 60: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 60:
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 15   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 16   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 17   ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 61-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN->HASH_JOIN expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(HASH_JOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 61: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Logic M_Expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	----- has 7 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, 4986.450000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 61:
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+    task: 15   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 16   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 17   OptimizeInputTask expr : HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 61, Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 62-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4986.450000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 0
+0:cpp/tasks.cpp: 634 >>>>>: Found Winner for Input : 1
+0:cpp/tasks.cpp: 722 >>>>>: Expression and COSTED: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1: 4984.200000
+0:cpp/tasks.cpp: 781 >>>>>: New winner, update upperBd : 4984.200000
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 62: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Logic M_Expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	----- has 7 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, 4984.200000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 62:
+    task: 12   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 15   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 16   ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 63-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN -> LOOPS_INDEX_JOIN expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (GET(C)))
+0:cpp/tasks.cpp: 900 >>>>>: Binding FAILS condition function, expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 63: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 63:
+    task: 11   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 12   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 15   ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 64-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN->LOOPS_JOIN expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(LOOPS_JOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 925 >>>>>: New Mexpr is : LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 964 >>>>>: new task to optimize inputs,pushing O_INPUT, epxr: LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 64: 
+Changed Search Space:
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Logic M_Expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	----- has 8 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, 4984.200000, Not done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 64:
+    task: 11   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 12   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 15   OptimizeInputTask expr : LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 64, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 65-----------------------------
+0:cpp/tasks.cpp: 472 >>>>>: O_INPUT performing Input -1, expr: LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 474 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 475 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 555 >>>>>: search_circle(): more search not needed, return value is true
+0:cpp/tasks.cpp: 586 >>>>>: Expr LowerBd 567477.443600, exceed Cond UpperBd 4984.200000,Pruning applied!
+0:cpp/tasks.cpp: 789 >>>>>: OptimizeInputTask this task is terminating.
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 65: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 65:
+    task: 10   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 11   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 12   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 14   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 66-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 1 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 66: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 66:
+    task: 9   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 11   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 12   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 13   ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 67-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN -> BIT_JOIN expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 67: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 67:
+    task: 8   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 9   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 11   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 12   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 68-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 2 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 68: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 68:
+    task: 7   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 9   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 11   ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 69-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN_LTOR expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 69: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 69:
+    task: 6   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 7   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 9   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 10   ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 70-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN_COMMUTE expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0:cpp/tasks.cpp: 893 >>>>>: new Binding is: 
+(EQJOIN(<O.OCK>,<C.CCK>),
+    (LeafOperator<0,2>),
+    (LeafOperator<1,1>))
+0:cpp/tasks.cpp: 903 >>>>>: Binding SATISFIES condition function.  Mexpr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 911 >>>>>: substitute expr is : 
+(EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<1,1>),
+    (LeafOperator<0,2>))
+0: cpp/ssp.cpp: 262 >>>>>: duplicate mexpr : EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 920 >>>>>: duplicate substitute (EQJOIN(<C.CCK>,<O.OCK>),
+    (LeafOperator<1,1>),
+    (LeafOperator<0,2>))
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 70: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 70:
+    task: 5   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 6   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 7   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 9   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 71-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 1 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 71: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 71:
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 5   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 6   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 7   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 8   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 72-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN_RTOL expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 72: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 72:
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 5   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 6   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 7   ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 73-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 2 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 73: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 73:
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 5   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+    task: 6   ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 74-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 1 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 74: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 74:
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 5   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 75-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EXCHANGE expression: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 75: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 75:
+    task: 0   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 4   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 76-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 2 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 76: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 76:
+    task: 0   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 3   ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 77-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EQJOIN_RTOL expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 77: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 77:
+    task: 0   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+    task: 2   ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 78-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 1 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 78: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 78:
+    task: 0   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+    task: 1   ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 79-----------------------------
+0:cpp/tasks.cpp: 206 >>>>>: ExploreGroupTask 2 performing
+0:cpp/tasks.cpp: 207 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 79: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 79:
+    task: 0   ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2
+
+0: cpp/ssp.cpp: 571 >>>>>: --------------------------Starting task 80-----------------------------
+0:cpp/tasks.cpp: 848 >>>>>: ApplyRuleTask performing, rule: EXCHANGE expression: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+0:cpp/tasks.cpp: 849 >>>>>: Context ID: 0 , Prop: Any Prop, UpperBd: 4984.200000, Finished:0
+0:cpp/tasks.cpp: 850 >>>>>: Last flag is 1
+0:cpp/group.cpp: 147 >>>>>: group 0 is completed
+0: cpp/ssp.cpp: 576 >>>>>: ------------------ SearchSpace after task 80: 
+Search Space not changed
+0: cpp/ssp.cpp: 579 >>>>>: ------------------ OPEN after task 80:
+Task Stack is empty!!
+
+Hash Table BEGIN:
+group:3356:3	GET(O)
+group:4216:2	SELECT, input: 3, input: 4
+group:6311:0	EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2
+group:6319:0	EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1
+group:7081:1	GET(C)
+Hash Table END, total 5 mexpr
+
+0: cpp/ssp.cpp: 584 >>>>>: Optimizing completed: 80 tasks
+
+TotalTask : 80
+TotalMExpr in MEMO: 13
+Duplicate MExpr: 1
+Hashed Logical MExpr: 6
+Max Overflow Buckets: 0
+FiredRules: 25
+
+SearchSpace Content: RootGID: 0
+Group: 0
+	Logic M_Expr: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Logic M_Expr: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2;
+	Physc M_Expr: MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	Physc M_Expr: LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1;
+	----- has 8 MExprs -----
+Winners:
+	Any Prop, HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, 4984.200000, Done
+LowerBound: 792.037500
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+Group: 1
+	Logic M_Expr: GET(C);
+	Physc M_Expr: FILE_SCAN(C);
+	Physc M_Expr: QSORT, input: 1;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(C), 450.450000, Done
+	sorted on (C.CCK)  KeyOrder: (ascending, FILE_SCAN(C), 450.450000, Done
+LowerBound: 450.450000
+log_prop:   Card: 150000.000000  UCard: 150000.000000CandidateKey:(C.CCK)
+  Foreign Keys:(  Foreign Key:(C.CNK)  reference to:(N.NNK)  )
+
+
+Group: 2
+	Logic M_Expr: SELECT, input: 3, input: 4;
+	Physc M_Expr: FILTER, input: 3, input: 4;
+	Physc M_Expr: QSORT, input: 2;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILTER, input: 3, input: 4, 4523.250000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, QSORT, input: 2, 4939.871950, Done
+LowerBound: 1126.125000
+log_prop:   Card: 375000.000000  UCard: 375000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+Group: 3
+	Logic M_Expr: GET(O);
+	Physc M_Expr: FILE_SCAN(O);
+	Physc M_Expr: QSORT, input: 3;
+	----- has 3 MExprs -----
+Winners:
+	Any Prop, FILE_SCAN(O), 4504.500000, Done
+	sorted on (O.OCK)  KeyOrder: (ascending, NULL Plan, 4921.121950, Done
+LowerBound: 4504.500000
+log_prop:   Card: 1500000.000000  UCard: 1500000.000000CandidateKey:(O.OOK)
+  Foreign Keys:(  Foreign Key:(O.OCK)  reference to:(C.CCK)  )
+
+
+Group: 4
+	Logic M_Expr: OP_AND, input: 5, input: 8;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, OP_AND, input: 5, input: 8, 0.000000, Done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.250000, FreeVars : ()
+
+
+Group: 5
+	Logic M_Expr: OP_LT, input: 6, input: 7;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, OP_LT, input: 6, input: 7, 0.000000, Done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+Group: 6
+	Logic M_Expr: Attribute();
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+Group: 7
+	Logic M_Expr: INT(%1356);
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+Group: 8
+	Logic M_Expr: OP_GE, input: 9, input: 10;
+	----- has 1 MExprs -----
+Winners:
+	Any Prop, OP_GE, input: 9, input: 10, 0.000000, Done
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.500000, FreeVars : ()
+
+
+Group: 9
+	Logic M_Expr: Attribute();
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+Group: 10
+	Logic M_Expr: INT(%1000);
+	----- has 1 MExprs -----
+Winners:
+	No Winners
+LowerBound: 0.000000
+log_prop: Max : -1.000000, Min : -1.000000, CuCard : -1.000000, Selectivity : 0.000000, FreeVars : ()
+
+
+    HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, Cost = 4984.200000
+        FILTER, input: 3, input: 4, Cost = 4523.250000
+                FILE_SCAN(O), Cost = 4504.500000
+                OP_AND, input: 5, input: 8, Cost = 0.000000
+                                OP_LT, input: 6, input: 7, Cost = 0.000000
+                                                                Attribute(), Cost = 0
+                                                                INT(%1356), Cost = 0
+                                OP_GE, input: 9, input: 10, Cost = 0.000000
+                                                                Attribute(), Cost = 0
+                                                                INT(%1000), Cost = 0
+        FILE_SCAN(C), Cost = 450.450000
+Rule#	TopMatch	Bindings	Conditions
+0	2	  	2	  	2	 	Get->FileScan
+1	1	  	1	  	1	 	SELECT -> FILTER
+2	0	  	0	  	0	 	PROJECT -> P_PROJECT
+3	2	  	1	  	0	 	EQJOIN -> LOOPS_INDEX_JOIN
+4	2	  	2	  	2	 	EQJOIN -> MERGE_JOIN
+5	2	  	2	  	2	 	EQJOIN->LOOPS_JOIN
+6	0	  	3	  	3	 	SORT enforcer
+7	2	  	2	  	2	 	EQJOIN_COMMUTE
+8	2	  	0	  	0	 	EQJOIN_LTOR
+9	2	  	0	  	0	 	EQJOIN_RTOL
+10	2	  	0	  	0	 	EXCHANGE
+11	0	  	0	  	0	 	RM_DUPLICATES  -> HASH_DUPLICATES
+12	0	  	0	  	0	 	AGG_LIST  -> HGROUP_LIST
+13	0	  	0	  	0	 	FUNC_OP  -> P_FUNC_OP
+14	0	  	0	  	0	 	AGGREGATE EQJOIN -> JOIN AGGREGATE
+15	2	  	1	  	0	 	EQJOIN -> BIT_JOIN
+16	1	  	1	  	0	 	SELECT -> INDEXED_FILTER
+17	0	  	0	  	0	 	PROJECT_THRU_SELECT
+18	2	  	2	  	2	 	EQJOIN->HASH_JOIN
+19	0	  	0	  	0	 	DUMMY->PDUMMY
+

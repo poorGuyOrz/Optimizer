@@ -34,6 +34,7 @@ int main(int argc, char const *argv[]) {
 
   query = new Query("../case/query");
   cout << endl << query->Dump() << endl;
+  cout << endl << query->Dump_IntOrders() << endl;
 
   Ssp = new SearchSpace;
   Ssp->Init();

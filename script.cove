@@ -1,0 +1,198 @@
+	addGroup { 1 0x20a9850 [ GET(C)   ]} 150000 150000.000000 { C.CCK:150000  C.CNK:25  C.CN:150000  C.CA:150000  C.CP:150000  C.C_ACCTBAL:150000  C.CM:5  C.C_COMMENT:150000   }
+	addGroup { 3 0x20aa0d0 [ GET(O)   ]} 1500000 1500000.000000 { O.OOK:1500000  O.OCK:150000  O.OS:3  O.OD:2556  O.OP:5  O.O_CLERK:1000   }
+	addGroup { 6 0x20aa590 [ Attribute()   ]} Error
+	addGroup { 7 0x20bacf0 [ INT(%1356)   ]} Error
+	addGroup { 5 0x20aa500 [ OP_LT   6 7 ]} Error
+	addGroup { 9 0x20baff0 [ Attribute()   ]} Error
+	addGroup { 10 0x20aa710 [ INT(%1000)   ]} Error
+	addGroup { 8 0x20baf60 [ OP_GE   9 10 ]} Error
+	addGroup { 4 0x20aa470 [ OP_AND   5 8 ]} Error
+	addGroup { 2 0x20a9e90 [ SELECT   3 4 ]} 375000 375000.000000 { O.OOK:375000  O.OCK:115385  O.OS:3  O.OD:2544  O.OP:5  O.O_CLERK:999   }
+	addGroup { 0 0x20a97b0 [ EQJOIN(<C.CCK>,<O.OCK>)   1 2 ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+EndInit
+
+PushTaskList {OptimizeGroupTask group: 0, parent task: 0, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 0, parent task: 0, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task: 1, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task: 1, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PushTaskList {ApplyRuleTask     rule : EQJOIN -> MERGE_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN -> MERGE_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+	addExp { 0 0x20bb7a0 [ MERGE_JOIN(<C.CCK>,<O.OCK>)  1 2  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 1, parent task: 4, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 1, parent task: 4, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: GET(C), parent task: 6, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: GET(C), parent task: 6, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : Get->FileScan, mexpr GET(C), parent task 7}
+PopTaskList  {ApplyRuleTask     rule : Get->FileScan, mexpr GET(C), parent task 7}
+	addExp { 1 0x20bd460 [ FILE_SCAN(C)   ]} 150000 150000.000000 { C.CCK:150000  C.CNK:25  C.CN:150000  C.CA:150000  C.CP:150000  C.C_ACCTBAL:150000  C.CM:5  C.C_COMMENT:150000   }
+PushTaskList {OptimizeInputTask expr : FILE_SCAN(C), parent task 8, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : FILE_SCAN(C), parent task 8, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 1 "Any Prop" 450.450000 } { 1 0x20bd460 "FILE_SCAN(C)" Done }
+PopTaskList  {OptimizeGroupTask group: 1, parent task: 5, Last: 1, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : FILE_SCAN(C), parent task 10, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : SORT enforcer, mexpr GET(C), parent task 10}
+PopTaskList  {ApplyRuleTask     rule : SORT enforcer, mexpr GET(C), parent task 10}
+	addExp { 1 0x20bbcc0 [ QSORT  1  ]} 150000 150000.000000 { C.CCK:150000  C.CNK:25  C.CN:150000  C.CA:150000  C.CP:150000  C.C_ACCTBAL:150000  C.CM:5  C.C_COMMENT:150000   }
+PushTaskList {OptimizeInputTask expr : QSORT, input: 1, parent task 11, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : QSORT, input: 1, parent task 11, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+	NewWin { 1 "sorted on (C.CCK)  KeyOrder: (ascending" 605.201419 } { 1 0x20bbcc0 "QSORT, input: 1" Not Done }
+PopTaskList  {OptimizeInputTask expr : FILE_SCAN(C), parent task 10, Prop: sorted on (C.CCK)  KeyOrder: (ascending, UpperBd: 605.201419, Finished:0}
+	NewWin { 1 "sorted on (C.CCK)  KeyOrder: (ascending" 450.450000 } { 1 0x20bd460 "FILE_SCAN(C)" Done }
+PopTaskList  {OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 2, parent task: 14, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 2, parent task: 14, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: SELECT, input: 3, input: 4, parent task: 16, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: SELECT, input: 3, input: 4, parent task: 16, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17}
+PushTaskList {ApplyRuleTask     rule : SELECT -> FILTER, mexpr SELECT, input: 3, input: 4, parent task 17}
+PopTaskList  {ApplyRuleTask     rule : SELECT -> FILTER, mexpr SELECT, input: 3, input: 4, parent task 17}
+	addExp { 2 0x20bdd90 [ FILTER  3 4  ]} 375000 375000.000000 { O.OOK:375000  O.OCK:115385  O.OS:3  O.OD:2544  O.OP:5  O.O_CLERK:999   }
+PushTaskList {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 3, parent task: 19, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 3, parent task: 19, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: GET(O), parent task: 20, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: GET(O), parent task: 20, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : Get->FileScan, mexpr GET(O), parent task 21}
+PopTaskList  {ApplyRuleTask     rule : Get->FileScan, mexpr GET(O), parent task 21}
+	addExp { 3 0x20bf680 [ FILE_SCAN(O)   ]} 1500000 1500000.000000 { O.OOK:1500000  O.OCK:150000  O.OS:3  O.OD:2556  O.OP:5  O.O_CLERK:1000   }
+PushTaskList {OptimizeInputTask expr : FILE_SCAN(O), parent task 22, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : FILE_SCAN(O), parent task 22, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 3 "Any Prop" 4504.500000 } { 3 0x20bf680 "FILE_SCAN(O)" Done }
+PopTaskList  {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 4, parent task: 24, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 4, parent task: 24, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: OP_AND, input: 5, input: 8, parent task: 25, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: OP_AND, input: 5, input: 8, parent task: 25, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 5, parent task: 27, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 5, parent task: 27, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: OP_LT, input: 6, input: 7, parent task: 28, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: OP_LT, input: 6, input: 7, parent task: 28, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : OP_LT, input: 6, input: 7, parent task 29, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : OP_LT, input: 6, input: 7, parent task 29, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 5 "Any Prop" 0.000000 } { 5 0x20aa500 "OP_LT, input: 6, input: 7" Done }
+PopTaskList  {OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeGroupTask group: 8, parent task: 31, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 8, parent task: 31, Last: 1, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeExprTask  group: OP_GE, input: 9, input: 10, parent task: 32, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: OP_GE, input: 9, input: 10, parent task: 32, Last: 1, explore: 0, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : OP_GE, input: 9, input: 10, parent task 33, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : OP_GE, input: 9, input: 10, parent task 33, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 8 "Any Prop" 0.000000 } { 8 0x20baf60 "OP_GE, input: 9, input: 10" Done }
+PopTaskList  {OptimizeInputTask expr : OP_AND, input: 5, input: 8, parent task 26, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 4 "Any Prop" 0.000000 } { 4 0x20aa470 "OP_AND, input: 5, input: 8" Done }
+PopTaskList  {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 18, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 2 "Any Prop" 4523.250000 } { 2 0x20bdd90 "FILTER, input: 3, input: 4" Not Done }
+PopTaskList  {ApplyRuleTask     rule : SELECT -> INDEXED_FILTER, mexpr SELECT, input: 3, input: 4, parent task 17}
+PopTaskList  {OptimizeGroupTask group: 2, parent task: 15, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : SORT enforcer, mexpr SELECT, input: 3, input: 4, parent task 38}
+PopTaskList  {ApplyRuleTask     rule : SORT enforcer, mexpr SELECT, input: 3, input: 4, parent task 38}
+	addExp { 2 0x20bdde0 [ QSORT  2  ]} 375000 375000.000000 { O.OOK:375000  O.OCK:115385  O.OS:3  O.OD:2544  O.OP:5  O.O_CLERK:999   }
+PushTaskList {OptimizeInputTask expr : QSORT, input: 2, parent task 39, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : QSORT, input: 2, parent task 39, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: -1.000000, Finished:0}
+	NewWin { 2 "sorted on (O.OCK)  KeyOrder: (ascending" 4939.871950 } { 2 0x20bdde0 "QSORT, input: 2" Not Done }
+PopTaskList  {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0}
+PushTaskList {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0}
+PushTaskList {OptimizeGroupTask group: 3, parent task: 41, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0}
+PopTaskList  {OptimizeGroupTask group: 3, parent task: 41, Last: 1, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0}
+PushTaskList {OptimizeInputTask expr : FILE_SCAN(O), parent task 42, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0}
+PushTaskList {ApplyRuleTask     rule : SORT enforcer, mexpr GET(O), parent task 42}
+PopTaskList  {ApplyRuleTask     rule : SORT enforcer, mexpr GET(O), parent task 42}
+	addExp { 3 0x20c0e70 [ QSORT  3  ]} 1500000 1500000.000000 { O.OOK:1500000  O.OCK:150000  O.OS:3  O.OD:2556  O.OP:5  O.O_CLERK:1000   }
+PushTaskList {OptimizeInputTask expr : QSORT, input: 3, parent task 43, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0}
+PopTaskList  {OptimizeInputTask expr : QSORT, input: 3, parent task 43, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0}
+PopTaskList  {OptimizeInputTask expr : FILE_SCAN(O), parent task 42, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4921.121950, Finished:0}
+PopTaskList  {OptimizeInputTask expr : FILTER, input: 3, input: 4, parent task 38, Prop: sorted on (O.OCK)  KeyOrder: (ascending, UpperBd: 4939.871950, Finished:0}
+PopTaskList  {OptimizeInputTask expr : MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 3, Prop: Any Prop, UpperBd: -1.000000, Finished:0}
+	NewWin { 0 "Any Prop" 5399.321950 } { 0 0x20bb7a0 "MERGE_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2" Not Done }
+PopTaskList  {ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+	addExp { 0 0x20c1000 [ HASH_JOIN(<C.CCK>,<O.OCK>)  1 2  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeInputTask expr : HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 48, Prop: Any Prop, UpperBd: 5399.321950, Finished:0}
+PopTaskList  {OptimizeInputTask expr : HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 48, Prop: Any Prop, UpperBd: 5399.321950, Finished:0}
+	NewWin { 0 "Any Prop" 4986.450000 } { 0 0x20c1000 "HASH_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2" Not Done }
+PopTaskList  {ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+	addExp { 0 0x20c0a10 [ LOOPS_JOIN(<C.CCK>,<O.OCK>)  1 2  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeInputTask expr : LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 51, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : LOOPS_JOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 51, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PopTaskList  {ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+	addExp { 0 0x20c1d40 [ EQJOIN(<O.OCK>,<C.CCK>)  2 1  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeExprTask  group: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task: 57, Last: 0, explore: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {OptimizeExprTask  group: EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task: 57, Last: 0, explore: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PushTaskList {ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PushTaskList {ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PushTaskList {ApplyRuleTask     rule : EQJOIN -> MERGE_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN -> MERGE_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+	addExp { 0 0x20c1e40 [ MERGE_JOIN(<O.OCK>,<C.CCK>)  2 1  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeInputTask expr : MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 59, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : MERGE_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 59, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN->HASH_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+	addExp { 0 0x20c18c0 [ HASH_JOIN(<O.OCK>,<C.CCK>)  2 1  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeInputTask expr : HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 61, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 61, Prop: Any Prop, UpperBd: 4986.450000, Finished:0}
+	NewWin { 0 "Any Prop" 4984.200000 } { 0 0x20c18c0 "HASH_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1" Not Done }
+PopTaskList  {ApplyRuleTask     rule : EQJOIN -> LOOPS_INDEX_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN->LOOPS_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+	addExp { 0 0x20a7570 [ LOOPS_JOIN(<O.OCK>,<C.CCK>)  2 1  ]} 375000 375000.000000 { C.CCK:75000  C.CNK:12  C.CN:75000  C.CA:75000  C.CP:75000  C.C_ACCTBAL:75000  C.CM:2  C.C_COMMENT:75000  O.OOK:187500  O.OCK:57692  O.OS:1  O.OD:1272  O.OP:2  O.O_CLERK:499   }
+PushTaskList {OptimizeInputTask expr : LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 64, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {OptimizeInputTask expr : LOOPS_JOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 64, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN -> BIT_JOIN, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN_LTOR, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN_COMMUTE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ExploreGroupTask  group: 2, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ExploreGroupTask  group: 1, parent task: 58, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<O.OCK>,<C.CCK>), input: 2, input: 1, parent task 58}
+PopTaskList  {ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EQJOIN_RTOL, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}
+PopTaskList  {ExploreGroupTask  group: 1, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ExploreGroupTask  group: 2, parent task: 2, Last: 0, Prop: Any Prop, UpperBd: 4984.200000, Finished:0}
+PopTaskList  {ApplyRuleTask     rule : EXCHANGE, mexpr EQJOIN(<C.CCK>,<O.OCK>), input: 1, input: 2, parent task 2}

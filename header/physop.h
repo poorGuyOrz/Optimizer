@@ -288,85 +288,58 @@ class FILTER : public PhysicalOperator {
    =======
 */
 
-//##ModelId=3B0C08700122
 class QSORT : public PhysicalOperator {
  public:
-  //##ModelId=3B0C08700136
   QSORT();
 
-  //##ModelId=3B0C08700140
   QSORT(QSORT &Op);
 
-  //##ModelId=3B0C08700142
   inline Operator *Clone() { return new QSORT(*this); };
 
-  //##ModelId=3B0C0870014B
   ~QSORT(){};
 
-  //##ModelId=3B0C0870014C
-  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
-                      LOG_PROP **InputLogProp);  // uses primarily cardinalities
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
-  //##ModelId=3B0C0870015F
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
-  //##ModelId=3B0C0870016B
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C08700173
   inline string GetName() { return ("QSORT"); };
 
-  //##ModelId=3B0C0870017D
   string Dump();
 };  // QSORT
 
-//##ModelId=3B0C08700213
 class HASH_DUPLICATES : public PhysicalOperator {
  public:
-  //##ModelId=3B0C08700227
   HASH_DUPLICATES(){};
-  //##ModelId=3B0C08700228
   HASH_DUPLICATES(HASH_DUPLICATES &Op){};
 
-  //##ModelId=3B0C08700231
   inline Operator *Clone() { return new HASH_DUPLICATES(*this); };
 
-  //##ModelId=3B0C08700232
   ~HASH_DUPLICATES(){};
 
-  //##ModelId=3B0C0870023B
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
-  //##ModelId=3B0C08700245
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
-  //##ModelId=3B0C08700251
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C08700259
   inline string GetName() { return ("HASH_DUPLICATES"); };
 
-  //##ModelId=3B0C08700263
   string Dump();
 
 };  // HASH_DUPLICATES
 
 // Hash-based AGG_LIST
-//##ModelId=3B0C0870033F
 class HGROUP_LIST : public PhysicalOperator {
  public:
-  //##ModelId=3B0C08700354
   AGG_OP_ARRAY *AggOps;
-  //##ModelId=3B0C0870035D
   int *GbyAtts;
-  //##ModelId=3B0C08700371
   int GbySize;
 
  public:
-  //##ModelId=3B0C0870037B
   HGROUP_LIST(int *gby_atts, int gby_size, AGG_OP_ARRAY *agg_ops)
       : GbyAtts(gby_atts), GbySize(gby_size), AggOps(agg_ops){};
 
-  //##ModelId=3B0C08700387
   HGROUP_LIST(HGROUP_LIST &Op) : GbyAtts(CopyArray(Op.GbyAtts, Op.GbySize)), GbySize(Op.GbySize) {
     AggOps = new AGG_OP_ARRAY;
     AggOps->resize(Op.AggOps->size());
@@ -377,69 +350,47 @@ class HGROUP_LIST : public PhysicalOperator {
 
   inline Operator *Clone() { return new HGROUP_LIST(*this); };
 
-  //##ModelId=3B0C08700399
   ~HGROUP_LIST() {
     for (int i = 0; i < AggOps->size(); i++) delete (*AggOps)[i];
     delete AggOps;
     delete[] GbyAtts;
   };
 
-  //##ModelId=3B0C087003A3
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
-  //##ModelId=3B0C087003AD
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
-  //##ModelId=3B0C087003C1
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C087003CB
   inline string GetName() { return ("HGROUP_LIST"); };
-  //##ModelId=3B0C087003CC
   PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props);
-  //##ModelId=3B0C087003D6
   string Dump();
 
 };  // HASH_DUPLICATES
 
-//##ModelId=3B0C087100CA
 class P_FUNC_OP : public PhysicalOperator {
  public:
-  //##ModelId=3B0C087100DE
   string RangeVar;
-  //##ModelId=3B0C087100E8
   int *Atts;
-  //##ModelId=3B0C087100F2
   int AttsSize;
 
-  //##ModelId=3B0C087100FC
   P_FUNC_OP(string range_var, int *atts, int size) : RangeVar(range_var), Atts(atts), AttsSize(size){};
 
-  //##ModelId=3B0C08710109
   P_FUNC_OP(P_FUNC_OP &Op) : RangeVar(Op.RangeVar), Atts(CopyArray(Op.Atts, Op.AttsSize)), AttsSize(Op.AttsSize){};
 
-  //##ModelId=3B0C08710111
   inline Operator *Clone() { return new P_FUNC_OP(*this); };
 
-  //##ModelId=3B0C0871011A
   ~P_FUNC_OP() { delete[] Atts; };
 
-  //##ModelId=3B0C0871011B
-  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
-                      LOG_PROP **InputLogProp);  // uses primarily cardinalities
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
-  //##ModelId=3B0C08710125
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
-  //##ModelId=3B0C08710138
   inline int GetArity() { return (1); };
-  //##ModelId=3B0C08710139
   inline string GetName() { return ("P_FUNC_OP"); };
 
-  //##ModelId=3B0C08710142
   string Dump();
-
-};  // P_FUNC_OP
+};
 
 /*
    Bit index join    This is a semi-join
@@ -448,54 +399,35 @@ class P_FUNC_OP : public PhysicalOperator {
 
 class BIT_JOIN : public PhysicalOperator {
  public:
-  //##ModelId=3B0C0871028C
   int *lattrs;  // left attr's that are the same
-  //##ModelId=3B0C08710296
   int *rattrs;  // right attr's that are the same
-  //##ModelId=3B0C087102A0
-  int size;  // the number of the attrs
-  //##ModelId=3B0C087102AA
-  int CollId;  // collection id accessed thru BIT index
+  int size;     // the number of the attrs
+  int CollId;   // collection id accessed thru BIT index
 
  public:
-  //##ModelId=3B0C087102B4
   BIT_JOIN(int *lattrs, int *rattrs, int size, int CollId);
-  //##ModelId=3B0C087102C1
   BIT_JOIN(BIT_JOIN &Op);
 
-  //##ModelId=3B0C087102C9
   inline Operator *Clone() { return new BIT_JOIN(*this); };
 
-  //##ModelId=3B0C087102D3
   ~BIT_JOIN() {
     delete[] lattrs;
     delete[] rattrs;
   };
 
-  //##ModelId=3B0C087102D4
   Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
                       LOG_PROP **InputLogProp);  // uses primarily cardinalities
 
-  //##ModelId=3B0C087102DF
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
-
-  //##ModelId=3B0C087102F1
   PHYS_PROP *FindPhysProp(PHYS_PROP **input_phys_props);
 
-  //##ModelId=3B0C087102F3
   inline int GetArity() { return (2); };
-  //##ModelId=3B0C087102FB
   inline string GetName() { return ("BIT_JOIN"); };
 
-  //##ModelId=3B0C08710305
   string Dump();
-};  // BIT_JOIN
+};
 
-/*
-   Indexed_Filter
-   ======
-*/
-
+//  Indexed_Filter
 class INDEXED_FILTER : public PhysicalOperator {
  public:
   INDEXED_FILTER(const int fileId);
@@ -504,8 +436,7 @@ class INDEXED_FILTER : public PhysicalOperator {
 
   inline Operator *Clone() { return new INDEXED_FILTER(*this); };
 
-  Cost *FindLocalCost(LOG_PROP *LocalLogProp,    // uses primarily the card of the Group
-                      LOG_PROP **InputLogProp);  // uses primarily cardinalities
+  Cost *FindLocalCost(LOG_PROP *LocalLogProp, LOG_PROP **InputLogProp);
 
   PHYS_PROP *InputReqdProp(PHYS_PROP *PhysProp, LOG_PROP *InputLogProp, int InputNo, bool &possible);
 
@@ -518,5 +449,4 @@ class INDEXED_FILTER : public PhysicalOperator {
  private:
   int FileId;
   string RangeVar;
-
-};  // INDEXED_FILTER
+};

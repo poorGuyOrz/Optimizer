@@ -5,21 +5,12 @@
 #include "stdafx.h"
 
 #define NEW_GRPID -1  // used by SearchSpace::CopyIn and MExression::MExressionmeans need to create a new group
-/*
-   ============================================================
-   MULTI_EXPRESSIONS - class M_EXP
-   ============================================================
-   MExression is a compact form of Expression which utilizes sharing.  Inputs are
-   GROUPs instead of EXPRs, so the MExression embodies several EXPRs.
-   All searching is done with M_EXPRs, so each contains lots of state.
 
-*/
 class MExression {
  private:
   MExression *HashPtr;  // list within hash bucket
   BIT_VECTOR RuleMask;  // If 1, do not fire rule with that index
   Operator *Op;         // Operator
-  int *Inputs;
   vector<int> children_;
   int GrpID;  // I reside in this group
 
@@ -27,13 +18,7 @@ class MExression {
   MExression *NextMExpr;
 
  public:
-  ~MExression() {
-    if (GetArity()) {
-      delete[] Inputs;
-    }
-
-    delete Op;
-  };
+  ~MExression() { delete Op; };
 
   // Transform an Expression into an MExression.  May involve creating new Groups.
   //  GrpID is the ID of the group where the MExression will be put.  If GrpID is
@@ -43,7 +28,7 @@ class MExression {
   MExression(MExression &other);
 
   inline Operator *GetOp() { return (Op); };
-  inline int GetInput(int i) const { return (Inputs[i]); };
+  inline int GetInput(int i) const { return (children_[i]); };
   inline int GetGrpID() { return (GrpID); };
   inline int GetArity() { return (Op->GetArity()); };
 
@@ -73,7 +58,7 @@ class MExression {
     os = (*Op).Dump();
 
     int Size = GetArity();
-    for (int i = 0; i < Size; i++) os += ", input: " + to_string(Inputs[i]);
+    for (int i = 0; i < Size; i++) os += ", input: " + to_string(children_[i]);
 
     return os;
   };

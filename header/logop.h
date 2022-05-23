@@ -160,10 +160,7 @@ class SELECT : public LogicalOperator {
 
   LOG_PROP *FindLogProp(LOG_PROP **input);
 
-  inline int GetArity() {
-    return (2);
-  };                                               // For input and predicate
-                                                   //##ModelId=3B0C08740128
+  inline int GetArity() { return (2); };           // For input and predicate
   inline string GetName() { return ("SELECT"); };  // Name of this operator
   inline int GetNameId() { return SELECT_ID; };    // Name of this operator
   inline bool operator==(Operator *other) { return (other->GetNameId() == GetNameId()); }
@@ -171,7 +168,7 @@ class SELECT : public LogicalOperator {
   ub4 hash();
 
   string Dump();
-};  // SELECT
+};
 
 /*
    ============================================================

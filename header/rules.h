@@ -51,6 +51,7 @@ typedef enum RULELABELS {
   R_PROJECT_THRU_SELECT,
   R_EQ_TO_HASH,
   R_DUMMY_TO_PDUMMY,
+  R_END,
 } RULELABELS;
 
 enum class RuleType : uint32_t {
@@ -123,8 +124,6 @@ enum class RuleType : uint32_t {
   NUM_RULES
 };
 
-extern int RuleVector[];  // initialize in Rules.cpp
-
 class RuleSet {
  private:
   vector<Rule *> rule_set;
@@ -139,12 +138,7 @@ class RuleSet {
   string DumpStats();
 
   // return the Rule in the order Set
-  inline Rule *operator[](int n) {
-    if (RuleVector[n])
-      return rule_set[n];
-    else
-      return nullptr;
-  }
+  inline Rule *operator[](int n) { return rule_set[n]; }
 };
 
 /*
@@ -371,16 +365,11 @@ class Rule {
 
   string Dump() { return "rule : " + name; };
 
-    // if not stop generating logical expression when epsilon pruning is applied
-    // need these to identify the substitue
-
+  // if not stop generating logical expression when epsilon pruning is applied
+  // need these to identify the substitue
 };
 
-/*
-         ============================================================
-         GET TO FILE SCAN
-         ============================================================
-*/
+//  GET TO FILE SCAN
 class GET_TO_FILE_SCAN : public Rule {
  public:
   GET_TO_FILE_SCAN();
@@ -389,11 +378,7 @@ class GET_TO_FILE_SCAN : public Rule {
   int promise(Operator *op_arg, int ContextID) { return FILESCAN_PROMISE; };
 };
 
-/*
-   ============================================================
-   EQJOIN to LOOPS Rule
-   ============================================================
-*/
+//  EQJOIN to LOOPS Rule
 class EQ_TO_LOOPS : public Rule {
  public:
   EQ_TO_LOOPS();
@@ -403,11 +388,7 @@ class EQ_TO_LOOPS : public Rule {
 
 };  // EQ_TO_LOOPS
 
-/*
-   ============================================================
-   EQJOIN to Merge Join Rule
-   ============================================================
-*/
+//  EQJOIN to Merge Join Rule
 class EQ_TO_MERGE : public Rule {
  public:
   EQ_TO_MERGE();
@@ -416,11 +397,7 @@ class EQ_TO_MERGE : public Rule {
   bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // EQ_TO_MERGE
 
-/*
-============================================================
-EQJOIN to Hash Join Rule
-============================================================
-*/
+// EQJOIN to Hash Join Rule
 class EQ_TO_HASH : public Rule {
  public:
   EQ_TO_HASH();
@@ -433,14 +410,10 @@ class EQ_TO_HASH : public Rule {
    EQJOIN to LOOPS Index Rule
    ============================================================
 */
-//##ModelId=3B0C086A0337
 class EQ_TO_LOOPS_INDEX : public Rule {
  public:
-  //##ModelId=3B0C086A0342
   EQ_TO_LOOPS_INDEX();
-  //##ModelId=3B0C086A034B
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-  //##ModelId=3B0C086A0355
   bool condition(Expression *before, MExression *mexpr, int ContextID);
 };  // EQ_TO_LOOPS_INDEX
 
@@ -554,74 +527,48 @@ class SORT_RULE : public Rule {
 //##ModelId=3B0C086C00D7
 class RM_TO_HASH_DUPLICATES : public Rule {
  public:
-  //##ModelId=3B0C086C00EB
   RM_TO_HASH_DUPLICATES();
-  //##ModelId=3B0C086C00EC
   ~RM_TO_HASH_DUPLICATES(){};
-  //##ModelId=3B0C086C00F5
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-};  // RM_TO_HASH_DUPLICATES
+};
 
-//##ModelId=3B0C086C0177
 class AL_TO_HGL : public Rule {
  public:
-  //##ModelId=3B0C086C018C
   AL_TO_HGL(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2);
-  //##ModelId=3B0C086C0195
   ~AL_TO_HGL(){};
-  //##ModelId=3B0C086C0196
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-};  // AL_TO_HGL
+};
 
-//##ModelId=3B0C086C0221
 class FO_TO_PFO : public Rule {
  public:
-  //##ModelId=3B0C086C0235
   FO_TO_PFO();
-  //##ModelId=3B0C086C023F
   ~FO_TO_PFO(){};
-  //##ModelId=3B0C086C0240
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-};  // FO_TO_PFO
+};
 
-//##ModelId=3B0C086C02FD
 class AGG_THRU_EQJOIN : public Rule {
  public:
-  //##ModelId=3B0C086C0308
   AGG_THRU_EQJOIN(AGG_OP_ARRAY *list1, AGG_OP_ARRAY *list2);
-  //##ModelId=3B0C086C0313
   ~AGG_THRU_EQJOIN(){};
-  //##ModelId=3B0C086C031B
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-  //##ModelId=3B0C086C0325
   bool condition(Expression *before, MExression *mexpr, int ContextID);
-};  // AGG_THRU_EQJOIN
+};
 
-//##ModelId=3B0C086C03E4
 class EQ_TO_BIT : public Rule {
  public:
-  //##ModelId=3B0C086D0010
   EQ_TO_BIT();
-  //##ModelId=3B0C086D0011
   ~EQ_TO_BIT(){};
-  //##ModelId=3B0C086D001A
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-  //##ModelId=3B0C086D0024
   bool condition(Expression *before, MExression *mexpr, int ContextID);
-};  // EQ_TO_BIT
+};
 
-//##ModelId=3B0C086D00E2
 class SELECT_TO_INDEXED_FILTER : public Rule {
  public:
-  //##ModelId=3B0C086D00F6
   SELECT_TO_INDEXED_FILTER();
-  //##ModelId=3B0C086D00F7
   ~SELECT_TO_INDEXED_FILTER(){};
-  //##ModelId=3B0C086D0100
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-  //##ModelId=3B0C086D010A
   bool condition(Expression *before, MExression *mexpr, int ContextID);
-};  // SELECT_TO_INDEXED_FILTER
+};
 
 class PROJECT_THRU_SELECT : public Rule {
  public:
@@ -630,20 +577,11 @@ class PROJECT_THRU_SELECT : public Rule {
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
   // bool condition ( Expression * before, MExression *mexpr, int ContextID);
 };
-/*
-   ============================================================
-   DUMMY to PDUMMY Rule
-   ============================================================
-*/
 
-//##ModelId=3B0C086D025F
+//  DUMMY to PDUMMY Rule
 class DUMMY_TO_PDUMMY : public Rule {
  public:
-  //##ModelId=3B0C086D026A
   DUMMY_TO_PDUMMY();
-  //##ModelId=3B0C086D026B
   ~DUMMY_TO_PDUMMY(){};
-  //##ModelId=3B0C086D0273
   Expression *next_substitute(Expression *before, PHYS_PROP *ReqdProp);
-
-};  // DUMMY_TO_PDUMMY
+};

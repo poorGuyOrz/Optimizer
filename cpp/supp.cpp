@@ -296,7 +296,6 @@ string KEYS_SET::Dump() {
   return os;
 }
 
-//##ModelId=3B0C08600288
 CollectionsProperties::CollectionsProperties(CollectionsProperties &other)  // copy constructor
 {
   Card = other.Card;

@@ -8,11 +8,8 @@ class Operator;  // All operators - Abstract
 class LogicalOperator;   // Logical Operators on Collections
 class PhysicalOperator;  // Physical Operators on Collections
 class ItemOperator;      // Item Operators on objects, used for predicates
+class LeafOperator;      // Leaf operators - place holder for a group, in a pattern. Patterns are used in rules.
 
-class LeafOperator;  // Leaf operators - place holder for a group, in a pattern. Patterns are used in rules.
-
-// Abstract Class.  Operator and its arguments.
-// Arguments could be attributes to project on, etc.
 class Operator {
  public:
   string name;  // Name of this operator

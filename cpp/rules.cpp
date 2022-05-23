@@ -8,16 +8,8 @@
 #define NUMOFRULES 20  // Number of elements in the enum RULELABELS in rules.h
 
 // use to turn some rules on/off in the optimizer
-
-int RuleVector[NUMOFRULES];
-
 RuleSet::RuleSet() : RuleCount(NUMOFRULES) {
   int rule_count = 0;
-
-  // if the file ends before the vectors are filled, set the rest to off
-  if (rule_count < NUMOFRULES) {
-    for (; rule_count < NUMOFRULES; rule_count++) RuleVector[rule_count] = 1;
-  }
 
   rule_set.resize(RuleCount);
 
@@ -90,7 +82,7 @@ string RuleSet::Dump() {
   string os;
 
   for (int i = 0; i < RuleCount; i++) {
-    os += " " + to_string(RuleVector[i]) + " " + rule_set[i]->GetName() + "\n";
+    os += " " + rule_set[i]->GetName() + "\n";
   }
   return os;
 }
@@ -1369,20 +1361,13 @@ bool EQ_TO_BIT::condition(Expression *before, MExression *mexpr, int ContextID) 
 }
 // EQ_TO_BIT::condition
 
-/*
-Rule  SELECT  -> INDEXED_FILTER
-====  ======  == ===== ====
-*/
-
+// Rule  SELECT  -> INDEXED_FILTER
 SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER()
     : Rule("SELECT -> INDEXED_FILTER", 1,
-           new Expression(new SELECT, {new Expression(new GET(0), {}),           // table
-                                       new Expression(new LeafOperator(0), {})}  // predicate
-                          ),
+           new Expression(new SELECT, {new Expression(new GET(0), {}), new Expression(new LeafOperator(0), {})}),
            new Expression(new INDEXED_FILTER(0), {new Expression(new LeafOperator(0), {})})) {
-  // set rule index
   set_index(R_SELECT_TO_INDEXED_FILTER);
-}  // SELECT_TO_INDEXED_FILTER::SELECT_TO_INDEXED_FILTER
+}
 
 Expression *SELECT_TO_INDEXED_FILTER::next_substitute(Expression *before, PHYS_PROP *ReqdProp) {
   Expression *result;
@@ -1391,7 +1376,7 @@ Expression *SELECT_TO_INDEXED_FILTER::next_substitute(Expression *before, PHYS_P
   result = new Expression(new INDEXED_FILTER(((GET *)before->GetInput(0)->GetOp())->GetCollection()),
                           {new Expression(*(before->GetInput(1)))});
   return result;
-}  // GET_TO_FILE_SCAN::next_substitute
+}
 
 //      Need to check:
 //      Predicate only has one free variable
@@ -1417,7 +1402,7 @@ bool SELECT_TO_INDEXED_FILTER::condition(Expression *before, MExression *mexpr, 
   return (false);
 }
 
-// Rule  PROJ SEL -> SEL PROJ
+// 投影下推
 PROJECT_THRU_SELECT::PROJECT_THRU_SELECT()
     : Rule("PROJECT_THRU_SELECT", 2,
            new Expression(new PROJECT(0, 0), {new Expression(new SELECT, {new Expression(new LeafOperator(0), {}),

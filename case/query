@@ -46,27 +46,47 @@
 // 		)
 // 	)
 // )
+// SELECT * FROM  (SELECT * FROM  (select * from O where O.OD < 1356 AND O.OD > 1000) JOIN C ON C.CCK =  O.OCK) JOIN L ON O.OOK =  L.LOK
+        // (PROJECT(L.LSK, C.CNK, S.SSK, S.SNK),
+ 				// 	(EQJOIN(<L.LSK, C.CNK>, <S.SSK, S.SNK>),
+ 				// 		(EQJOIN(O.OOK, L.LOK),
+ 				 			(EQJOIN(C.CCK, O.OCK),
+ 				 				GET("C"),
+ 				 				(SELECT,
+ 				 					GET("O"),
+ 				 					(OP_AND,
+ 				 						(OP_LT,
+ 				 							ATTR("O.OD"),
+ 				 							INT("1356")
+ 				 						),
+ 				 						(OP_GE,
+ 				 							ATTR("O.OD"),
+ 				 							INT("1000")
+ 				 						)
+ 				 					)
+ 				 				)
+ 				 			)
+ 				// 			GET("L")
+ 				// 		),
+ 				// 		GET("S")
+ 				// 	)
+        // )
+// 
+//     select * from A where c1 > (select min(B.c1) from B where A.c2 = B.c2);
+//  => select * from A, (select min(A.c1) as x, B.c2 as y from B group by B.c2) v where c1 > x and c2 = y;
+// 
+//     select * from A where c1 > (select count(B.c1) from B where A.c2 = B.c2);
+//  => select * from A left join
+//                  (select count(B.c1) as x, B.c2 as y from B group by B.c2) v on c2 = y
+//              where c1 > (case when y is not null then x else 0 end);
+//     select A.c1, (select sum(B.c2) from B where A.c1 = B.c1 ) as sum_e from A where A.c1 > 0;
+//  => select A.c1, temp.sum_e from B left join
+//                               (select A.c1, sum(B.c2) as sum_e from B group by B.c1) temp on A.c1 = temp.c1
+//                             where A.c1 > 0;
+// 
+//     select A.c1, (select count(B.c2) from B where A.c1 = B.c2) as sum_e from A where A.c1 > 0;
+//  => select A.c1, (case when y is not null then temp.sum_e else 0 end) from B left join
+//                               (select A.c1 as y, sum(B.c2) as sum_e from B group by B.c1) temp on A.c1 = temp.c1
+//                             where A.c1 > 0;
+// 
 
-
- 					(EQJOIN(<L.LSK, C.CNK>, <S.SSK, S.SNK>),
- 						(EQJOIN(O.OOK, L.LOK),
- 							(EQJOIN(C.CCK, O.OCK),
- 								GET("C"),
- 								(SELECT,
- 									GET("O"),
- 									(OP_AND,
- 										(OP_LT,
- 											ATTR("O.OD"),
- 											INT("1356")
- 										),
- 										(OP_GE,
- 											ATTR("O.OD"),
- 											INT("1000")
- 										)
- 									)
- 								)
- 							),
- 							GET("L")
- 						),
- 						GET("S")
- 					)

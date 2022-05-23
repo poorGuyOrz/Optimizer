@@ -53,7 +53,9 @@
     "atomic": "cpp",
     "iterator": "cpp",
     "memory_resource": "cpp",
-    "random": "cpp"
+    "random": "cpp",
+    "bitset": "cpp",
+    "optional": "cpp"
   },
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }
